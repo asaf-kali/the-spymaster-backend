@@ -22,13 +22,13 @@ test:
 # Lint
 
 lint-only:
-	black . -l $(LINE_LENGTH)
-	isort . --profile black
+	black .
+	isort .
 
 lint-check:
-	black . -l $(LINE_LENGTH) --check
-	isort . --profile black --check --skip __init__.py
-	mypy . --ignore-missing-imports
+	black . --check
+	isort . --check
+	mypy .
 	flake8 . --max-line-length=$(LINE_LENGTH) --ignore=E203,W503
 
 lint: lint-only

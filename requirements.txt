@@ -1,0 +1,3 @@
+# Telegram bot
+python-telegram-bot~=13.11
+dynaconf~=3.1
