@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 from datetime import datetime
@@ -5,20 +6,74 @@ from logging import Filter, Formatter, Logger, LogRecord
 from logging.config import dictConfig
 
 
-class ExtraDataLogger(Logger):
+class ContextLogger(Logger):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.context = {}
+
     def _log(self, *args, **kwargs) -> None:
         extra = kwargs.get("extra")
-        if extra is not None:
-            kwargs["extra"] = {"extra": extra}
+        kwargs["extra"] = {"extra": extra, "context": self.context}
         super()._log(*args, **kwargs)  # noqa
+
+    def update_context(self, data: dict = None, **kwargs):
+        if data:
+            self.context.update(data)
+        if kwargs:
+            self.context.update(kwargs)
+
+    def set_context(self, data: dict):
+        self.context = data
+
+    def reset_context(self):
+        self.set_context({})
 
 
 class ExtraDataFormatter(Formatter):
     def format(self, record: LogRecord) -> str:
+        message = super().format(record)
         extra = getattr(record, "extra", None)
         if extra:
-            record.msg += f" {extra}"
-        return super().format(record)
+            message += f" extra: {extra}"
+        return message
+
+
+class JsonFormatter(Formatter):
+    def __init__(self, detailed: bool = False, indented: bool = False):
+        super().__init__()
+        self.detailed = detailed
+        self.indent = 2 if indented else None
+        self.tz = datetime.now().astimezone().tzinfo
+
+    def format(self, record: LogRecord) -> str:
+        data: dict = {
+            "datetime": datetime.fromtimestamp(record.created, self.tz).isoformat(sep=" ", timespec="milliseconds"),
+            "message": record.msg or record.message,
+        }
+        context = getattr(record, "context", None)
+        extra = getattr(record, "extra", None)
+        if context:
+            data["context"] = context
+        if extra:
+            data["extra"] = extra
+        if self.detailed:
+            data.update(
+                {
+                    "level": record.levelname,
+                    "func_name": record.funcName,
+                    "module": record.module,
+                    "file_path": record.pathname,
+                    "line_number": record.lineno,
+                    "process": record.process,
+                    "thread": record.thread,
+                    "process_name": record.processName,
+                    "thread_name": record.threadName,
+                    "exc_info": record.exc_info,
+                    "level_code": record.levelno,
+                    "timestamp": record.created,
+                }
+            )
+        return json.dumps(data, indent=self.indent, ensure_ascii=False)
 
 
 class LevelRangeFilter(Filter):
@@ -33,12 +88,19 @@ class LevelRangeFilter(Filter):
         return False
 
 
-logging.setLoggerClass(ExtraDataLogger)
-
-log = logging.getLogger(__name__)
+logging.setLoggerClass(ContextLogger)
 
 
-def configure_logging(formatter: str = None, level: str = None):
+def get_logger(name: str) -> ContextLogger:
+    return logging.getLogger(name)  # type: ignore
+
+
+log = get_logger(__name__)
+
+
+def configure_logging(
+    formatter: str = None, level: str = None, detailed_json: bool = True, indented_json: bool = False
+):
     config = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -49,6 +111,17 @@ def configure_logging(formatter: str = None, level: str = None):
                 "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s @@@ "
                 "[%(threadName)s] [%(name)s:%(lineno)s]",
                 "datefmt": "%Y-%m-%d %H:%M:%S",
+            },
+            "json": {
+                "()": "utils.logging.JsonFormatter",
+                "detailed": detailed_json,
+                "indented": indented_json,
+            },
+            "test": {
+                "class": "utils.logging.ExtraDataFormatter",
+                "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s "
+                "[%(threadName)s] [%(name)s:%(lineno)s]",
+                "datefmt": "%H:%M:%S",
             },
         },
         "filters": {

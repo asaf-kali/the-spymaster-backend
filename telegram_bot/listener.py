@@ -1,5 +1,3 @@
-import logging
-
 from telegram import ForceReply, Update
 from telegram.ext import (
     CallbackContext,
@@ -9,29 +7,35 @@ from telegram.ext import (
     Updater,
 )
 
-from utils import config, configure_logging
+from utils import config, configure_logging, get_logger
 
-log = logging.getLogger(__name__)
-configure_logging(level="INFO")
+log = get_logger(__name__)
+configure_logging(level="INFO", formatter="json", detailed_json=False)
 
 
 # Define a few command handlers. These usually take the two arguments update and context.
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
+    log.update_context(user_id=update.effective_user.id)
+    log.info("Got start event")
     user = update.effective_user
-    update.message.reply_markdown_v2(
-        rf"Hi {user.mention_markdown_v2()}\!",
-        reply_markup=ForceReply(selective=True),
-    )
+    message = rf"Hi {user.mention_markdown_v2()}\!"
+    log.debug(f"Replying {message}")
+    update.message.reply_markdown_v2(message, reply_markup=ForceReply(selective=True))
+    log.info("Start done")
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
+    log.update_context(user_id=update.effective_user.id)
+    log.info("Got help event")
     update.message.reply_text("Help!")
 
 
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
+    log.update_context(user_id=update.effective_user.id)
+    log.info("Got message")
     update.message.reply_text(update.message.text)
 
 
