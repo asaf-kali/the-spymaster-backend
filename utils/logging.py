@@ -1,15 +1,27 @@
 import json
 import logging
 import sys
-from datetime import datetime
+import threading
+from datetime import datetime, timezone
 from logging import Filter, Formatter, Logger, LogRecord
 from logging.config import dictConfig
+from typing import Optional
+
+CONTEXT_KEY = "_logging_context"
 
 
 class ContextLogger(Logger):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.context = {}
+        self._thread_storage = threading.local()
+
+    @property
+    def context(self) -> dict:
+        current_context = getattr(self._thread_storage, CONTEXT_KEY, None)
+        if current_context is None:
+            current_context = {}
+            setattr(self._thread_storage, CONTEXT_KEY, current_context)
+        return current_context
 
     def _log(self, *args, **kwargs) -> None:
         extra = kwargs.get("extra")
@@ -23,57 +35,63 @@ class ContextLogger(Logger):
             self.context.update(kwargs)
 
     def set_context(self, data: dict):
-        self.context = data
+        self.reset_context()
+        self.update_context(data=data)
 
     def reset_context(self):
-        self.set_context({})
+        self.context.clear()
 
 
-class ExtraDataFormatter(Formatter):
+class ContextFormatter(Formatter):
     def format(self, record: LogRecord) -> str:
-        message = super().format(record)
+        message = original_message = record.msg
         extra = getattr(record, "extra", None)
+        context = getattr(record, "context", None)
         if extra:
-            message += f" extra: {extra}"
-        return message
+            message += f" | {extra}"
+        if context:
+            message += f" | {context}"
+        record.msg = message
+        result = super().format(record)
+        record.msg = original_message
+        return result
 
 
 class JsonFormatter(Formatter):
-    def __init__(self, detailed: bool = False, indented: bool = False):
+    def __init__(self, indented: bool = False, tz: Optional[timezone] = None):
         super().__init__()
-        self.detailed = detailed
         self.indent = 2 if indented else None
-        self.tz = datetime.now().astimezone().tzinfo
+        self.tz = tz or datetime.now().astimezone().tzinfo
 
     def format(self, record: LogRecord) -> str:
-        data: dict = {
-            "datetime": datetime.fromtimestamp(record.created, self.tz).isoformat(sep=" ", timespec="milliseconds"),
-            "message": record.msg or record.message,
+        data = {
+            # Base
+            "date_time": self._format_date_time(record.created),
+            "level": record.levelname,
+            "message": super().format(record),
+            "extra": getattr(record, "extra", None),
+            "context": getattr(record, "context", None),
+            # Debug
+            "func_name": record.funcName,
+            "file_path": record.pathname,
+            "line_number": record.lineno,
+            # More
+            "level_code": record.levelno,
+            "timestamp": record.created,
+            "logger": record.name,
+            "thread_name": record.threadName,
         }
-        context = getattr(record, "context", None)
-        extra = getattr(record, "extra", None)
-        if context:
-            data["context"] = context
-        if extra:
-            data["extra"] = extra
-        if self.detailed:
-            data.update(
-                {
-                    "level": record.levelname,
-                    "func_name": record.funcName,
-                    "module": record.module,
-                    "file_path": record.pathname,
-                    "line_number": record.lineno,
-                    "process": record.process,
-                    "thread": record.thread,
-                    "process_name": record.processName,
-                    "thread_name": record.threadName,
-                    "exc_info": record.exc_info,
-                    "level_code": record.levelno,
-                    "timestamp": record.created,
-                }
-            )
-        return json.dumps(data, indent=self.indent, ensure_ascii=False)
+        exc_info = getattr(record, "exc_info", None)
+        if exc_info:
+            data["exc_info"] = self.formatException(exc_info)
+        try:
+            return json.dumps(data, indent=self.indent, ensure_ascii=False)
+        except Exception as e:  # noqa
+            log.warning(f"Log serialization failed: {e}")
+            return str(data)
+
+    def _format_date_time(self, timestamp: float) -> str:
+        return datetime.fromtimestamp(timestamp, self.tz).isoformat(sep=" ", timespec="milliseconds")
 
 
 class LevelRangeFilter(Filter):
@@ -98,30 +116,21 @@ def get_logger(name: str) -> ContextLogger:
 log = get_logger(__name__)
 
 
-def configure_logging(
-    formatter: str = None, level: str = None, detailed_json: bool = True, indented_json: bool = False
-):
+def configure_logging(formatter: str = None, level: str = None, indented_json: bool = False):
     config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "simple": {"class": "utils.logging.ExtraDataFormatter"},
-            "debug": {
-                "class": "utils.logging.ExtraDataFormatter",
-                "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s @@@ "
-                "[%(threadName)s] [%(name)s:%(lineno)s]",
-                "datefmt": "%Y-%m-%d %H:%M:%S",
-            },
-            "json": {
-                "()": "utils.logging.JsonFormatter",
-                "detailed": detailed_json,
-                "indented": indented_json,
-            },
+            "simple": {},
             "test": {
-                "class": "utils.logging.ExtraDataFormatter",
+                "class": "utils.logging.ContextFormatter",
                 "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s "
                 "[%(threadName)s] [%(name)s:%(lineno)s]",
                 "datefmt": "%H:%M:%S",
+            },
+            "json": {
+                "()": "utils.logging.JsonFormatter",
+                "indented": indented_json,
             },
         },
         "filters": {
@@ -138,17 +147,21 @@ def configure_logging(
             "console_err": {
                 "class": "logging.StreamHandler",
                 "filters": ["err_filter"],
-                "formatter": formatter or "debug",
+                "formatter": formatter or "json",
                 "stream": sys.stdout,
                 # "stream": sys.stderr,
             },
             "file": {
                 "class": "logging.FileHandler",
                 "filename": "run.log",
-                "formatter": formatter or "debug",
+                "formatter": "json",
             },
         },
         "root": {"handlers": ["console_out", "console_err", "file"], "level": level or "DEBUG"},
+        "loggers": {
+            "telegram": {"level": "INFO"},
+            "apscheduler": {"level": "INFO"},
+        },
     }
     dictConfig(config)
     log.debug("Logging configured")

@@ -10,7 +10,7 @@ from telegram.ext import (
 from utils import config, configure_logging, get_logger
 
 log = get_logger(__name__)
-configure_logging(level="INFO", formatter="json", detailed_json=False)
+configure_logging(level="DEBUG", formatter="json")
 
 
 # Define a few command handlers. These usually take the two arguments update and context.
