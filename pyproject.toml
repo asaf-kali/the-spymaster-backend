@@ -10,5 +10,4 @@ ignore_missing_imports = true
 ignore_errors = true
 
 [tool.coverage.run]
-parallel = true
 source = ["api", "the_spymaster", "telegram_bot"]

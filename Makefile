@@ -1,4 +1,5 @@
 PYTHON_TEST_COMMAND=pytest -s
+DEL_COMMAND=gio trash
 LINE_LENGTH=120
 
 # Install
@@ -30,6 +31,7 @@ cover:
 	coverage run -m $(PYTHON_TEST_COMMAND)
 	coverage html
 	xdg-open htmlcov/index.html &
+	$(DEL_COMMAND) .coverage*
 
 # Lint
 
