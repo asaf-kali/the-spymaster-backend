@@ -8,13 +8,16 @@ class Config:
     def get(self, key: str, default=None) -> any:
         return self.settings.get(key, default)
 
+    def load(self):
+        self._settings = Dynaconf(
+            environments=True,
+            settings_files=["settings.toml", ".secrets.toml"],
+        )
+
     @property
     def settings(self) -> Dynaconf:
         if not self._settings:
-            self._settings = Dynaconf(
-                environments=True,
-                settings_files=["settings.toml", ".secrets.toml"],
-            )
+            self.load()
         return self._settings
 
     @property
@@ -36,6 +39,22 @@ class Config:
     @property
     def telegram_token(self) -> str:
         return self.get("TELEGRAM_TOKEN")
+
+    @property
+    def recaptcha_site_key(self) -> str:
+        return self.get("RECAPTCHA_SITE_KEY")
+
+    @property
+    def recaptcha_private_key(self) -> str:
+        return self.get("RECAPTCHA_PRIVATE_KEY")
+
+    @property
+    def google_oauth_client_id(self) -> str:
+        return self.get("GOOGLE_OAUTH_CLIENT_ID")
+
+    @property
+    def google_oauth_client_secret(self) -> str:
+        return self.get("GOOGLE_OAUTH_CLIENT_SECRET")
 
 
 config = Config()

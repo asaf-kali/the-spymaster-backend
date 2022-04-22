@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-ENVIRONMENT = config.environment
 DEBUG = config.django_debug
 
 SECRET_KEY = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09" if DEBUG else config.django_secret_key
@@ -34,7 +33,7 @@ if DEBUG:
     sentry_sdk.init(
         dsn=config.sentry_dsn,
         integrations=[DjangoIntegration(), LoggingIntegration(event_level=None)],
-        environment=ENVIRONMENT.verbose_name,
+        environment=config.env_verbose_name,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
@@ -44,20 +43,36 @@ if DEBUG:
         send_default_pii=True,
     )
 
-ALLOWED_HOSTS = []
+SITE_ID = 1
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+    # Rest
+    "rest_framework",
+    "rest_framework.authtoken",
+    "django_filters",
+    # Auth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    # App
+    "api",
 ]
 
 MIDDLEWARE = [
+    # "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -65,7 +80,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "api.middleware.SpymasterExceptionHandlerMiddleware",
 ]
+if DEBUG:
+    MIDDLEWARE += ["qinspect.middleware.QueryInspectMiddleware"]
 
 ROOT_URLCONF = "the_spymaster.urls"
 
@@ -119,11 +137,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
+TIME_ZONE = "Asia/Jerusalem"
 USE_I18N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
@@ -135,3 +150,49 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Auth
+AUTH_USER_MODEL = "api.SpymasterUser"
+LOGIN_REDIRECT_URL = "login_complete"
+LOGOUT_REDIRECT_URL = "index"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DEBUG else "https"
+GOOGLE_OAUTH_CLIENT_ID = config.google_oauth_client_id
+GOOGLE_OAUTH_CLIENT_SECRET = config.google_oauth_client_secret
+
+# CAPTCHA
+RECAPTCHA_SITE_KEY = config.recaptcha_site_key
+RECAPTCHA_PRIVATE_KEY = config.recaptcha_private_key
+SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+
+# Social Account
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ]
+    }
+}
+SOCIALACCOUNT_ADAPTER = "api.views.social_hooks.CustomSocialAccountAdapter"
+
+# REST
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "10/hour",
+    },
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "PAGE_SIZE": 50,
+}
+
+# Query inspect
+QUERY_INSPECT_ENABLED = DEBUG
+QUERY_INSPECT_LOG_QUERIES = DEBUG

@@ -1,3 +1,4 @@
+PYTHON_TEST_COMMAND=pytest -s
 LINE_LENGTH=120
 
 # Install
@@ -19,10 +20,10 @@ install: install-dev test
 # Test
 
 test:
-	python -m pytest -s
+	python -m $(PYTHON_TEST_COMMAND)
 
 cover:
-	coverage run --source='.' manage.py test
+	coverage run --source=. $(PYTHON_TEST_COMMAND)
 	coverage html
 	coverage report
 	xdg-open htmlcov/index.html &
