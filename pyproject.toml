@@ -11,4 +11,4 @@ ignore_errors = true
 
 [tool.coverage.run]
 parallel = true
-source = ["."]
+source = ["api", "the_spymaster", "telegram_bot"]

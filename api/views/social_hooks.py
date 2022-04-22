@@ -60,7 +60,7 @@ def _generate_key_response(request: WSGIRequest) -> HttpResponse:
     # if nonce:
     #     log.debug(f"Generate key response called with nonce {wrap(nonce)}")
     #     params.update({"nonce": nonce})
-    url = callback_url if callback_url else "/"
+    url = callback_url or "/"
     log.debug(f"Redirecting to {wrap(url)}")
     return redirect(url)
 
