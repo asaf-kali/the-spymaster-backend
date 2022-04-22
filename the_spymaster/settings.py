@@ -21,6 +21,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from the_spymaster.utils import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+ENVIRONMENT = config.env_verbose_name
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config.django_debug
 SECRET_KEY = config.django_secret_key
@@ -31,7 +32,7 @@ if DEBUG:
     sentry_sdk.init(
         dsn=config.sentry_dsn,
         integrations=[DjangoIntegration(), LoggingIntegration(event_level=None)],
-        environment=config.env_verbose_name,
+        environment=ENVIRONMENT,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
@@ -154,6 +155,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {
+            "class": "the_spymaster.utils.logging.ContextFormatter",
             "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s [%(name)s]",
             "datefmt": "%H:%M:%S",
         },
@@ -199,7 +201,7 @@ LOGGING = {
             "when": "midnight",
             "backupCount": 14,
         },
-        "django_file": {
+        "debug_file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "debug.log"),
             "formatter": "json",
@@ -210,7 +212,7 @@ LOGGING = {
     "root": {"handlers": ["console_out", "console_err", "root_file"], "level": config.root_log_level},
     "loggers": {
         "api": {
-            "handlers": ["spymaster_file", "console_out", "console_err"],
+            "handlers": ["console_out", "console_err", "spymaster_file"],
             "level": "DEBUG",
             "propagate": False,
         },
@@ -219,7 +221,7 @@ LOGGING = {
         "apscheduler": {"level": "INFO"},
         "qinspect": {"level": "DEBUG"},
         # Django
-        "django": {"handlers": ["django_file", "console_err"], "level": "DEBUG", "propagate": False},
+        "django": {"handlers": ["debug_file", "console_err"], "level": "DEBUG", "propagate": False},
         "django.utils.autoreload": {"level": "INFO"},
     },
 }

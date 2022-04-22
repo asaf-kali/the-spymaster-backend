@@ -45,8 +45,6 @@ class UserDetailsView(GenericViewSet, ViewContextMixin):
 
     @action(detail=False)
     def me(self, request: Request, *args, **kwargs):
-        # if kwargs["pk"] != "me":
-        #     raise ForbiddenError("Can't retrieve anyone else but 'me'")
         return JsonResponse(data=UserDetailsSerializer(request.user).data, status=status.HTTP_200_OK)
 
 

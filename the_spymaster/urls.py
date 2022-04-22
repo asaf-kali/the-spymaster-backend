@@ -22,6 +22,6 @@ urlpatterns = [
     path("", include("api.urls")),
     path("admin/", admin.site.urls),
     path("rest-auth/", include("dj_rest_auth.urls")),
-    re_path(r"^favicon(\.ico)?$", icon_view),
     # path("accounts/", include("allauth.urls")),
+    re_path(r"^favicon(\.ico)?$", icon_view),
 ]

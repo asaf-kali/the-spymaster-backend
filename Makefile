@@ -17,6 +17,10 @@ install-dev:
 
 install: install-dev test
 
+dev-init:
+	python manage.py migrate
+	python manage.py dev_init
+
 # Test
 
 test:

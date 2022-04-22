@@ -19,7 +19,7 @@ class ContextLogger(Logger):
         current_context = getattr(self._thread_storage, CONTEXT_KEY, None)
         if current_context is None:
             current_context = {}
-            setattr(self._thread_storage, CONTEXT_KEY, current_context)
+            self.set_context(current_context)
         return current_context
 
     def _log(self, *args, **kwargs) -> None:
@@ -28,17 +28,18 @@ class ContextLogger(Logger):
         super()._log(*args, **kwargs)  # noqa
 
     def update_context(self, data: dict = None, **kwargs):
+        new_context = self.context
         if data:
-            self.context.update(data)
+            new_context.update(data)
         if kwargs:
-            self.context.update(kwargs)
+            new_context.update(kwargs)
+        self.set_context(new_context)
 
     def set_context(self, data: dict):
-        self.reset_context()
-        self.update_context(data=data)
+        setattr(self._thread_storage, CONTEXT_KEY, data)
 
     def reset_context(self):
-        self.context.clear()
+        self.set_context({})
 
 
 class ContextFormatter(Formatter):

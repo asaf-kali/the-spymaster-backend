@@ -15,6 +15,6 @@ class ViewContextMixin(ViewSetMixin):
             user = request.user
         except AuthenticationFailed:
             user = AnonymousUser()
-        log.update_context(user=user.id, method=request.method, path=request.path)
+        log.update_context(user_id=user.id, method=request.method, path=request.path)
         log.debug(f"{wrap(request.method)} to {wrap(request.path)} by {wrap(user)}")
         return request
