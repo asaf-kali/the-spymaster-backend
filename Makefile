@@ -33,3 +33,15 @@ lint-check:
 
 lint: lint-only
 	pre-commit run --all-files
+
+# Django
+
+migrate:
+	python manage.py makemigrations
+	python manage.py migrate
+
+save:
+	python manage.py dumpdata print_manager -o $(FIXTURE_FILE)
+
+run-server:
+	python manage.py runserver
