@@ -1,0 +1,16 @@
+[default]
+env_verbose_name = "Not set"
+django_debug = false
+
+[local]
+django_debug = true
+
+[dev]
+env_verbose_name = "Dev"
+django_debug = true
+
+[stage]
+env_verbose_name = "Staging"
+
+[prod]
+env_verbose_name = "Production"

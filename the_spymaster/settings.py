@@ -12,21 +12,39 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
 
+from utils import config
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09"
+ENVIRONMENT = config.environment
+DEBUG = config.django_debug
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09" if DEBUG else config.django_secret_key
+
+if DEBUG:
+    sentry_sdk.init(
+        dsn=config.sentry_dsn,
+        integrations=[DjangoIntegration(), LoggingIntegration(event_level=None)],
+        environment=ENVIRONMENT.verbose_name,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0,
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True,
+    )
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -69,7 +87,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "the_spymaster.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -79,7 +96,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -99,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -110,7 +125,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

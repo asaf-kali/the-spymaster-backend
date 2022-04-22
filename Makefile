@@ -25,7 +25,7 @@ cover:
 	coverage run --source='.' manage.py test
 	coverage html
 	coverage report
-	xdg-open htmlcov/index.html
+	xdg-open htmlcov/index.html &
 
 # Lint
 
