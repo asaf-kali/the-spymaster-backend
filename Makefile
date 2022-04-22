@@ -16,8 +16,16 @@ install-dev:
 
 install: install-dev test
 
+# Test
+
 test:
 	python -m pytest -s
+
+cover:
+	coverage run --source='.' manage.py test
+	coverage html
+	coverage report
+	xdg-open htmlcov/index.html
 
 # Lint
 
