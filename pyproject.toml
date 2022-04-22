@@ -8,3 +8,7 @@ profile = "black"
 [tool.mypy]
 ignore_missing_imports = true
 ignore_errors = true
+
+[tool.coverage.run]
+parallel = true
+source = ["."]

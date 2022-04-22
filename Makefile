@@ -27,9 +27,8 @@ test:
 	python -m $(PYTHON_TEST_COMMAND)
 
 cover:
-	coverage run --source=. $(PYTHON_TEST_COMMAND)
+	coverage run -m $(PYTHON_TEST_COMMAND)
 	coverage html
-	coverage report
 	xdg-open htmlcov/index.html &
 
 # Lint
