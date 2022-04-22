@@ -10,6 +10,9 @@ indented_json = 0
 formatter = "simple"
 root_log_level = "INFO"
 
+# App
+language_data_folder = "/home/akali/projects/codenames/language_data"
+
 [local]
 env_verbose_name = "Local"
 django_debug = true

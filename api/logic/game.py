@@ -10,6 +10,7 @@ from codenames.utils.loader.model_loader import (
     set_language_data_folder,
 )
 from codenames.utils.model_adapters import HEBREW_SUFFIX_ADAPTER
+from django.conf import settings
 
 from api.logic.boards import HEBREW_BOARD_6
 from the_spymaster.utils import get_logger, wrap
@@ -17,12 +18,16 @@ from the_spymaster.utils import get_logger, wrap
 log = get_logger(__name__)
 
 model_id = ModelIdentifier("hebrew", "skv-ft-150", True)
-set_language_data_folder("/home/akali/projects/codenames/language_data")
+set_language_data_folder(settings.LANGUAGE_DATA_FOLDER)
 load_model_async(model_identifier=model_id)
 adapter = HEBREW_SUFFIX_ADAPTER if model_id.language == "hebrew" and model_id.is_stemmed else DEFAULT_MODEL_ADAPTER
 
 
 def start_game_in_new_thread() -> str:
+    """
+    Starts a new game in a new thread.
+    :return: The game id.
+    """
     game_id = _create_game_id()
     game_thread = Thread(target=start_game, args=(game_id,))
     game_thread.start()
@@ -30,6 +35,10 @@ def start_game_in_new_thread() -> str:
 
 
 def start_game(game_id: str):
+    """
+    Starts a new game.
+    :param game_id: The new game id.
+    """
     log.update_context(game_id=game_id)
     log.info("Starting game...")
     game_manager = None
