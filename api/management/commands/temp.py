@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from utils import get_logger
+from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
 

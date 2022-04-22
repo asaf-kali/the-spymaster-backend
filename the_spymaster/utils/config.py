@@ -5,6 +5,9 @@ class Config:
     def __init__(self, settings: Dynaconf = None):
         self._settings = settings
 
+    def __getattr__(self, item) -> any:
+        return self.get(item)
+
     def get(self, key: str, default=None) -> any:
         return self.settings.get(key, default)
 

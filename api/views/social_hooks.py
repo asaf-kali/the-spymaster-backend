@@ -18,7 +18,7 @@ from django.urls import reverse
 from api.logic.errors import BadRequestError, UnauthorizedError
 from api.models import SpymasterUser
 from api.views import log
-from utils import wrap
+from the_spymaster.utils import wrap
 
 
 def _create_email_address(existing_user: SpymasterUser):

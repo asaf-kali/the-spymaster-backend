@@ -9,25 +9,23 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import logging
+import os
+import sys
 from pathlib import Path
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-from utils import config
+from the_spymaster.utils import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
 DEBUG = config.django_debug
-
-SECRET_KEY = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09" if DEBUG else config.django_secret_key
+SECRET_KEY = config.django_secret_key
+SITE_ID = 1
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 if DEBUG:
     sentry_sdk.init(
@@ -42,10 +40,6 @@ if DEBUG:
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
     )
-
-SITE_ID = 1
-
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Application definition
 
@@ -90,7 +84,7 @@ ROOT_URLCONF = "the_spymaster.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": ["templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -150,6 +144,85 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Logging
+LOGS_PARENT = BASE_DIR  # if DEBUG else os.path.join(BASE_DIR, "../")
+LOGGING_DIR = os.path.join(LOGS_PARENT, "logs")
+os.makedirs(LOGGING_DIR, exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s [%(name)s]",
+            "datefmt": "%H:%M:%S",
+        },
+        "debug": {
+            "class": "the_spymaster.utils.logging.ContextFormatter",
+            "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s @@@ "
+            "[%(name)s:%(lineno)s] [%(threadName)s]",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "json": {
+            "()": "the_spymaster.utils.logging.JsonFormatter",
+            "indented": config.indented_json,
+        },
+    },
+    "filters": {
+        "std_filter": {"()": "the_spymaster.utils.logging.LevelRangeFilter", "high": logging.WARNING},
+        "err_filter": {"()": "the_spymaster.utils.logging.LevelRangeFilter", "low": logging.WARNING},
+    },
+    "handlers": {
+        "console_out": {
+            "class": "logging.StreamHandler",
+            "filters": ["std_filter"],
+            "formatter": config.formatter,
+            "stream": sys.stdout,
+        },
+        "console_err": {
+            "class": "logging.StreamHandler",
+            "filters": ["err_filter"],
+            "formatter": config.formatter,
+            "stream": sys.stderr,
+        },
+        "spymaster_file": {
+            "class": "logging.handlers.WatchedFileHandler",
+            "filename": os.path.join(LOGGING_DIR, "spymaster.log"),
+            "formatter": "debug",
+            "level": "DEBUG",
+        },
+        "root_file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(LOGGING_DIR, "root.log"),
+            "formatter": "json",
+            "level": "INFO",
+            "when": "midnight",
+            "backupCount": 14,
+        },
+        "django_file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(LOGGING_DIR, "debug.log"),
+            "formatter": "json",
+            "when": "midnight",
+            "backupCount": 7,
+        },
+    },
+    "root": {"handlers": ["console_out", "console_err", "root_file"], "level": config.root_log_level},
+    "loggers": {
+        "api": {
+            "handlers": ["spymaster_file", "console_out", "console_err"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        # 3rd parties
+        "telegram": {"level": "INFO"},
+        "apscheduler": {"level": "INFO"},
+        "qinspect": {"level": "DEBUG"},
+        # Django
+        "django": {"handlers": ["django_file", "console_err"], "level": "DEBUG", "propagate": False},
+        "django.utils.autoreload": {"level": "INFO"},
+    },
+}
 
 # Auth
 AUTH_USER_MODEL = "api.SpymasterUser"

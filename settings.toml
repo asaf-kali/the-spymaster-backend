@@ -1,8 +1,17 @@
 [default]
 env_verbose_name = "Not set"
+
+# Django
+django_secret_key = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09"
 django_debug = false
 
+# Logging
+indented_json = 0
+formatter = "simple"
+root_log_level = "INFO"
+
 [local]
+env_verbose_name = "Local"
 django_debug = true
 
 [dev]

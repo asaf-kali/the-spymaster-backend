@@ -1,0 +1,113 @@
+{% load static %}
+<html>
+<head>
+    <script
+            src="https://code.jquery.com/jquery-3.6.0.slim.js"
+            integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY="
+            crossorigin="anonymous"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></script>
+    <script src="{% static 'scripts/recaptcha.js' %}"></script>
+    <title>The Spymaster</title>
+</head>
+<body>
+
+<a href="{% url 'admin:index' %}">Admin</a><br><br>
+User: {{ user.username }}
+<br>
+{% if user.is_authenticated %}
+    Email: {{ user.email }}<br>
+    ID: {{ user.id }}<br><br>
+    <form method="POST" action="{% url 'logout' %}?next=/">
+        <input type="submit" value="Logout">
+        {% csrf_token %}
+    </form>
+{% else %}
+    <a href="{% url 'google_oauth' %}?action=reauthenticate">Log in</a>
+{% endif %}
+<br><br>
+<div>
+    My cool test<br><br>
+    <label>
+        Address:
+        <input id="address" name="address"/>
+    </label>
+    <button id="x" onclick="onClick();">Submit</button>
+    <div id="result">
+
+    </div>
+</div>
+
+{#<script>#}
+{#    function onSubmit(token) {#}
+{#        document.getElementById("demo-form").submit();#}
+{#    }#}
+{#</script>#}
+<script>
+
+    {#const EMPTY_TOKEN = "";#}
+    {##}
+    {#async function sleep(ms) {#}
+    {#    return new Promise(r => setTimeout(r, ms));#}
+
+    {##}
+    {#async function getToken() {#}
+    {#    return new Promise(async resolve => {#}
+    {#        let token = EMPTY_TOKEN;#}
+    {#        while (token === EMPTY_TOKEN) {#}
+    {#            await sleep(100);#}
+    {#            token = $('[name="g-recaptcha-response"]').val();#}
+    {#        }#}
+    {#        resolve(token);#}
+    {#    });#}
+    {##}
+
+    {##}
+    {#function startRecaptcha(actionName) {#}
+    {#    grecaptcha.ready(() => {#}
+    {#        console.log(`grecaptcha is ready`);#}
+    {#        grecaptcha.execute('{{ recaptcha_site_key }}', {action: actionName}).then(verify);#}
+    {#    });#}
+
+    async function parse(token) {
+        console.log(`Token is '${token}', verifying`);
+        const address = $("#address").val();
+        const params = {recaptcha_token: token, address: address};
+        const parseUrl = "?" + new URLSearchParams(params);
+        fetch(parseUrl).then(response => response.text()).then((text) => {
+            console.log(`Result: ${text}`);
+            $("#result").html(text);
+        });
+    }
+
+    function onClick(e) {
+        console.log("Click");
+        {#startRecaptcha('Check address');#}
+        callRecaptcha('Check address', parse);
+    }
+
+</script>
+<script>
+    {##}
+    {#    const captchaUrl = "{% url 'captcha-generate' %}";#}
+    {#    fetch(captchaUrl).then((response) => {#}
+    {#        return response.text();#}
+    {#    }).then((html) => {#}
+    {#        document.getElementById("captcha-holder").innerHTML = html;#}
+    {#        console.log(html);#}
+    {#    }).catch((err) => {#}
+    {#        // There was an error#}
+    {#        console.warn('Something went wrong.', err);#}
+    {#    });#}
+    {##}
+    {#    function recaptcha_callback() {#}
+    {#        alert("callback working");#}
+    {#        $('.button').prop("disabled", false);#}
+    {#    }#}
+    {#fetch().then((response) => {#}
+    {#    response.text().then((text) => {#}
+    {#        console.log(text);#}
+    {#        $("#captcha-holder").innerHTML = text;#}
+    {#    });#}
+</script>
+</body>
+</html>

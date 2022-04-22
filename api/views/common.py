@@ -3,7 +3,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.viewsets import ViewSetMixin
 
-from utils.logging import get_logger, wrap
+from the_spymaster.utils import get_logger, wrap
 
 log = get_logger(__name__)
 

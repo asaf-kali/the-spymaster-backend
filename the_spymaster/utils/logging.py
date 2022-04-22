@@ -1,6 +1,5 @@
 import json
 import logging
-import sys
 import threading
 from datetime import datetime, timezone
 from logging import Filter, Formatter, Logger, LogRecord
@@ -87,8 +86,13 @@ class JsonFormatter(Formatter):
         try:
             return json.dumps(data, indent=self.indent, ensure_ascii=False)
         except Exception as e:  # noqa
-            log.warning(f"Log serialization failed: {e}")
-            return str(data)
+            log.debug(f"Log serialization failed, trying without extra: {e}")
+            data.pop("extra")
+            try:
+                return json.dumps(data, indent=self.indent, ensure_ascii=False)
+            except Exception as e:  # noqa
+                log.warning("Log serialization failed")
+                return str(data)
 
     def _format_date_time(self, timestamp: float) -> str:
         return datetime.fromtimestamp(timestamp, self.tz).isoformat(sep=" ", timespec="milliseconds")
@@ -116,54 +120,10 @@ def get_logger(name: str) -> ContextLogger:
 log = get_logger(__name__)
 
 
-def configure_logging(formatter: str = None, level: str = None, indented_json: bool = False):
-    config = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "simple": {},
-            "test": {
-                "class": "utils.logging.ContextFormatter",
-                "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s "
-                "[%(threadName)s] [%(name)s:%(lineno)s]",
-                "datefmt": "%H:%M:%S",
-            },
-            "json": {
-                "()": "utils.logging.JsonFormatter",
-                "indented": indented_json,
-            },
-        },
-        "filters": {
-            "std_filter": {"()": "utils.logging.LevelRangeFilter", "high": logging.WARNING},
-            "err_filter": {"()": "utils.logging.LevelRangeFilter", "low": logging.WARNING},
-        },
-        "handlers": {
-            "console_out": {
-                "class": "logging.StreamHandler",
-                "filters": ["std_filter"],
-                "formatter": formatter or "simple",
-                "stream": sys.stdout,
-            },
-            "console_err": {
-                "class": "logging.StreamHandler",
-                "filters": ["err_filter"],
-                "formatter": formatter or "json",
-                "stream": sys.stdout,
-                # "stream": sys.stderr,
-            },
-            "file": {
-                "class": "logging.FileHandler",
-                "filename": "run.log",
-                "formatter": "json",
-            },
-        },
-        "root": {"handlers": ["console_out", "console_err", "file"], "level": level or "DEBUG"},
-        "loggers": {
-            "telegram": {"level": "INFO"},
-            "apscheduler": {"level": "INFO"},
-        },
-    }
-    dictConfig(config)
+def configure_logging():
+    from the_spymaster import settings
+
+    dictConfig(settings.LOGGING)
     log.debug("Logging configured")
 
 

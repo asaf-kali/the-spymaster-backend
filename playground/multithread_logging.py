@@ -2,9 +2,9 @@ from random import random
 from threading import Thread
 from time import sleep
 
-from utils import configure_logging, get_logger
+from the_spymaster.utils import configure_logging, get_logger
 
-configure_logging(formatter="test", level="DEBUG")
+configure_logging()
 log = get_logger(__name__)
 
 

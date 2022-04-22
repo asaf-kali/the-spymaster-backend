@@ -19,7 +19,7 @@ from api.views.social_hooks import (
     CustomOAuth2LoginView,
     _generate_key_response,
 )
-from utils import get_logger, wrap
+from the_spymaster.utils import get_logger, wrap
 
 log = get_logger(__name__)
 

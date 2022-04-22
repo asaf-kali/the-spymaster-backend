@@ -1,6 +1,6 @@
 from rest_framework import status
 
-from utils import get_logger, wrap
+from the_spymaster.utils import get_logger, wrap
 
 log = get_logger(__name__)
 
