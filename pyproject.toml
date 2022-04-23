@@ -1,3 +1,10 @@
+[tool.pytest.ini_options]
+addopts = "-s --disable-pytest-warnings"
+DJANGO_SETTINGS_MODULE = "the_spymaster.settings"
+
+[tool.coverage.run]
+source = ["api", "the_spymaster", "telegram_bot"]
+
 [tool.black]
 line-length = 120
 
@@ -8,6 +15,3 @@ profile = "black"
 [tool.mypy]
 ignore_missing_imports = true
 ignore_errors = true
-
-[tool.coverage.run]
-source = ["api", "the_spymaster", "telegram_bot"]
