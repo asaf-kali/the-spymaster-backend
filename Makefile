@@ -7,6 +7,7 @@ LINE_LENGTH=120
 install-run:
 	pip install --upgrade pip
 	pip install -r requirements.txt
+	pip install codenames.tar.gz
 
 install-test:
 	@make install-run --no-print-directory
