@@ -28,7 +28,7 @@ def start_game_in_new_thread() -> str:
     Starts a new game in a new thread.
     :return: The game id.
     """
-    game_id = _create_game_id()
+    game_id = _create_game_code()
     game_thread = Thread(target=start_game, args=(game_id,))
     game_thread.start()
     return game_id
@@ -69,5 +69,5 @@ def _print_results(game_manager: Optional[GameManager]):
     log.info(f"Winner: {game_manager.winner}")
 
 
-def _create_game_id() -> str:
+def _create_game_code() -> str:
     return uuid4().hex[:6]
