@@ -19,3 +19,7 @@ class HintResponse(BaseResponse):
 class GuessResponse(BaseResponse):
     given_guess: GivenGuess
     game_state: GameState
+
+
+class GetGameStateResponse(BaseResponse):
+    game_state: GameState

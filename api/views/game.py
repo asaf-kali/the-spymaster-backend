@@ -3,8 +3,18 @@ from rest_framework.viewsets import GenericViewSet
 
 from api.logic.errors import BadRequestError
 from api.models.game import Game
-from api.models.request import GuessRequest, HintRequest, StartGameRequest
-from api.models.response import GuessResponse, HintResponse, StartGameResponse
+from api.models.request import (
+    GetGameStateRequest,
+    GuessRequest,
+    HintRequest,
+    StartGameRequest,
+)
+from api.models.response import (
+    GetGameStateResponse,
+    GuessResponse,
+    HintResponse,
+    StartGameResponse,
+)
 from api.views import ViewContextMixin
 from api.views.endpoint import endpoint
 from the_spymaster.utils import get_logger
@@ -38,6 +48,11 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
         game.state_json = game_state.json()
         game.save()
         return GuessResponse(given_guess=given_guess, game_state=game_state)
+
+    @endpoint(methods=["GET"], url_path="get-state")
+    def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
+        game = _get_game(request.game_id)
+        return GetGameStateResponse(game_state=game.state)
 
 
 def _get_game(game_id: int) -> Game:

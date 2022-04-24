@@ -29,3 +29,7 @@ class HintRequest(BaseRequest):
 class GuessRequest(BaseRequest):
     game_id: int
     card_index: int
+
+
+class GetGameStateRequest(BaseRequest):
+    game_id: int

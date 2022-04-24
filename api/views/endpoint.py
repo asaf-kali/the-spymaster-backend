@@ -1,5 +1,5 @@
 import functools
-from typing import Tuple, Type
+from typing import List, Tuple, Type
 
 from django.http import JsonResponse
 from pydantic import BaseModel, ValidationError
@@ -7,7 +7,9 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 
 from api.logic.errors import BadRequestError
-from api.views import log
+from the_spymaster.utils import get_logger
+
+log = get_logger(__name__)
 
 
 class EndpointConfigurationError(Exception):
@@ -33,26 +35,36 @@ def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]
     return request_model, response_model
 
 
-def endpoint(func):
-    endpoint_name = func.__name__
-    request_model, response_model = _get_request_response_models(func)
+def endpoint(func=None, *, detail: bool = False, methods: List[str] = None, url_path: str = None, url_name: str = None):
+    methods = methods or ["POST"]
 
-    @functools.wraps(func)
-    def wrapper(view, request: Request, *args, **kwargs):
-        log.set_context(dict(endpoint_name=endpoint_name))
-        log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
-        parsed_request = _parse_request(request_model=request_model, drf_request=request)
-        response = func(view, parsed_request)
-        response_data = response.dict()
-        status_code = response_data.pop("status_code")
-        return JsonResponse(response_data, status=status_code)
+    def decorator(f):
+        endpoint_name = f.__name__
+        request_model, response_model = _get_request_response_models(f)
+        log.debug(f"Registering endpoint {endpoint_name}")
 
-    return action(detail=False, methods=["post"])(wrapper)
+        @functools.wraps(f)
+        def wrapper(view, request: Request, *args, **kwargs):
+            log.set_context(dict(endpoint_name=endpoint_name))
+            log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
+            parsed_request = _parse_request(request_model=request_model, drf_request=request)
+            response = f(view, parsed_request)
+            response_data = response.dict()
+            status_code = response_data.pop("status_code")
+            return JsonResponse(response_data, status=status_code)
+
+        return action(detail=detail, methods=methods, url_path=url_path, url_name=url_name)(wrapper)
+
+    if func:
+        return decorator(func)
+    return decorator
 
 
 def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> BaseModel:
+    query_params = {k: v for k, v in drf_request.query_params.items()}
+    data = {**query_params, **drf_request.data}
     try:
-        parsed_request = request_model(drf_request=drf_request, **drf_request.data)
+        parsed_request = request_model(drf_request=drf_request, **data)
     except Exception as e:
         details = e.errors() if isinstance(e, ValidationError) else str(e)
         raise BadRequestError("Request parsing failed.", details=details) from e

@@ -1,4 +1,5 @@
 import sentry_sdk
+from codenames.game import GameRuleError
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.handlers.wsgi import WSGIRequest
@@ -14,7 +15,6 @@ log = get_logger(__name__)
 
 class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
     def process_exception(self, request: WSGIRequest, exception: Exception):
-        log.error(exception)
         if isinstance(exception, ValidationError):
             return JsonResponse({"message": str(exception)}, status=status.HTTP_400_BAD_REQUEST)
         if isinstance(exception, BadRequestError):
@@ -24,6 +24,11 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
         if isinstance(exception, PermissionDenied):
             log.warning(f"User {wrap(request.user)} can't access {wrap(request.path)}!")
             raise exception
+        if isinstance(exception, GameRuleError):
+            return JsonResponse(
+                {"message": "Invalid move", "details": str(exception)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        log.exception(exception)
         sentry_sdk.capture_exception(exception)
         if settings.DEBUG:
             return JsonResponse({"message": str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
