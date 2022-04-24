@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import status
 
-from api.logic.errors import BadRequestError, SpymasterError
+from api.logic.errors import BadRequestError
 from the_spymaster.utils import get_logger, wrap
 
 log = get_logger(__name__)
@@ -18,11 +18,13 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
         if isinstance(exception, ValidationError):
             return JsonResponse({"message": str(exception)}, status=status.HTTP_400_BAD_REQUEST)
         if isinstance(exception, BadRequestError):
-            return JsonResponse({"message": exception.message}, status=exception.status)
+            return JsonResponse(
+                {"message": exception.message, "details": exception.details}, status=exception.status_code
+            )
         if isinstance(exception, PermissionDenied):
             log.warning(f"User {wrap(request.user)} can't access {wrap(request.path)}!")
             raise exception
         sentry_sdk.capture_exception(exception)
-        if isinstance(exception, SpymasterError) and settings.DEBUG:
+        if settings.DEBUG:
             return JsonResponse({"message": str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         raise exception

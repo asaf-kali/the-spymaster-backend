@@ -5,13 +5,23 @@ from django.core import management
 from django.core.management import BaseCommand
 from rest_framework.authtoken.models import Token
 
-from api.logic.errors import EnvironmentSafetyError
+from api.logic.errors import SpymasterError
 from api.models import SpymasterUser
-from the_spymaster.utils import get_logger
+from the_spymaster.utils import get_logger, wrap
 
 log = get_logger(__name__)
 DEFAULT_EMAIL = "admin@the-spymaster.xyz"
 DEFAULT_PASSWORD = "qweasd"
+
+
+class EnvironmentSafetyError(SpymasterError):
+    operation_name: str
+    environment: str
+
+    def __init__(self, operation_name: str, environment: str):
+        self.operation_name = operation_name
+        self.environment = environment
+        super().__init__(f"Can't perform {wrap(self.operation_name)} on {wrap(self.environment)} environment")
 
 
 def _create_user(

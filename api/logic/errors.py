@@ -1,6 +1,9 @@
+from typing import Optional
+
 from rest_framework import status
 
-from the_spymaster.utils import get_logger, wrap
+from api.models.base import JsonType
+from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
 
@@ -9,47 +12,40 @@ class SpymasterError(Exception):
     pass
 
 
-class EnvironmentSafetyError(SpymasterError):
-    operation_name: str
-    environment: str
-
-    def __init__(self, operation_name: str, environment: str):
-        self.operation_name = operation_name
-        self.environment = environment
-        super().__init__(f"Can't perform {wrap(self.operation_name)} on {wrap(self.environment)} environment")
-
-
-class ConfigurationError(SpymasterError):
-    pass
-
-
-class BadRequestError(SpymasterError):
-    status = status.HTTP_400_BAD_REQUEST
-
-    def __init__(self, message: str):
+class ApiError(SpymasterError):
+    def __init__(
+        self,
+        message: str = "Internal server error",
+        status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
+        details: Optional[JsonType] = None,
+    ):
         self.message = message
+        self.status_code = status_code
+        self.details = details
         super().__init__(message)
 
 
-class MissingArgumentError(BadRequestError):
-    arg_name: str
-
-    def __init__(self, arg_name: str):
-        self.arg_name = arg_name
-        super().__init__(f"Missing argument {arg_name}")
+class BadRequestError(ApiError):
+    def __init__(
+        self, message: str, status_code: int = status.HTTP_400_BAD_REQUEST, details: Optional[JsonType] = None
+    ):
+        super().__init__(message=message, status_code=status_code, details=details)
 
     @staticmethod
-    def from_key_error(e: KeyError) -> "MissingArgumentError":
-        return MissingArgumentError(str(e))
+    def from_key_error(e: KeyError) -> "BadRequestError":
+        return BadRequestError(f"Missing argument {e}")
 
 
 class UnauthorizedError(BadRequestError):
-    status = status.HTTP_401_UNAUTHORIZED
+    def __init__(self, message: str):
+        super().__init__(message=message, status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 class ForbiddenError(BadRequestError):
-    status = status.HTTP_403_FORBIDDEN
+    def __init__(self, message: str):
+        super().__init__(message=message, status_code=status.HTTP_403_FORBIDDEN)
 
 
 class NotFoundError(BadRequestError):
-    status = status.HTTP_404_NOT_FOUND
+    def __init__(self, message: str):
+        super().__init__(message=message, status_code=status.HTTP_404_NOT_FOUND)

@@ -27,12 +27,9 @@ class ContextLogger(Logger):
         kwargs["extra"] = {"extra": extra, "context": self.context}
         super()._log(*args, **kwargs)  # noqa
 
-    def update_context(self, data: dict = None, **kwargs):
+    def update_context(self, **kwargs):
         new_context = self.context
-        if data:
-            new_context.update(data)
-        if kwargs:
-            new_context.update(kwargs)
+        new_context.update(kwargs)
         self.set_context(new_context)
 
     def set_context(self, data: dict):
