@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 from rest_framework.request import Request
 
@@ -18,6 +16,16 @@ class BaseRequest(BaseModel):
         return self.drf_request.user
 
 
-class TestRequest(BaseRequest):
+class StartGameRequest(BaseRequest):
+    language: str = "english"
+
+
+class HintRequest(BaseRequest):
     game_id: int
-    message: Optional[str] = None
+    word: str
+    card_amount: int
+
+
+class GuessRequest(BaseRequest):
+    game_id: int
+    card_index: int
