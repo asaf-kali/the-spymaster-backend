@@ -1,16 +1,21 @@
 from codenames.game import Guess, Hint, build_game_state
 from django.http import HttpResponse, JsonResponse
-from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.viewsets import GenericViewSet
 
 from api.logic.errors import BadRequestError
 from api.models.game import Game
+from api.models.request import TestRequest
+from api.models.response import TestResponse
 from api.views import ViewContextMixin
+from api.views.endpoint import endpoint
+from the_spymaster.utils import get_logger
+
+log = get_logger(__name__)
 
 
 class GameManagerView(GenericViewSet, ViewContextMixin):
-    @action(detail=False, methods=["post"])
+    @endpoint
     def start(self, request: Request) -> HttpResponse:
         language = request.data.get("language") or "english"
         game_state = build_game_state(language=language)
@@ -18,7 +23,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
         data = {"game_id": game.id, "game_state": game_state.dict()}
         return JsonResponse(data=data)
 
-    @action(detail=False, methods=["post"])
+    @endpoint
     def hint(self, request: Request) -> HttpResponse:
         try:
             game_id = int(request.data.get("game_id"))
@@ -38,7 +43,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
         data = {"given_hint": given_hint.dict(), "game_state": game_state.dict()}
         return JsonResponse(data=data)
 
-    @action(detail=False, methods=["post"])
+    @endpoint
     def guess(self, request: Request) -> HttpResponse:
         try:
             game_id = int(request.data.get("game_id"))
@@ -56,3 +61,8 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
         game.save()
         data = {"given_guess": given_guess.dict(), "game_state": game_state.dict()}
         return JsonResponse(data=data)
+
+    @endpoint
+    def test(self, request: TestRequest) -> TestResponse:
+        log.info("Test request received")
+        return TestResponse(message=request.message or "Test response")
