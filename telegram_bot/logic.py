@@ -3,8 +3,9 @@ from typing import Dict, Optional, Type
 from codenames.game import Card, CardColor, GameState, PlayerRole, TeamColor
 from pydantic import BaseModel
 from requests import HTTPError
-from telegram import ReplyKeyboardMarkup, Update
+from telegram import Message, ReplyKeyboardMarkup, Update
 from telegram import User as TelegramUser
+from telegram.error import BadRequest as TelegramBadRequest
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
@@ -26,6 +27,7 @@ RED_EMOJI = CardColor.RED.emoji
 class Session(BaseModel):
     game_id: int
     state: GameState
+    last_keyboard_message: Optional[int]
 
 
 class EventHandler:
@@ -80,13 +82,15 @@ class EventHandler:
     def trigger(self, other: Type["EventHandler"]):
         other(bot=self.bot, update=self.update, context=self.context).handle()
 
-    def send_message(self, text: str, **kwargs):
-        self.context.bot.send_message(chat_id=self.chat_id, text=text, **kwargs)
+    def send_text(self, text: str, **kwargs) -> Message:
+        return self.context.bot.send_message(chat_id=self.chat_id, text=text, **kwargs)
 
-    def send_markdown(self, text: str, **kwargs):
-        self.send_message(text=text, parse_mode="Markdown", **kwargs)
+    def send_markdown(self, text: str, **kwargs) -> Message:
+        return self.send_text(text=text, parse_mode="Markdown", **kwargs)
 
     def fast_forward(self):
+        if self.session.last_keyboard_message:
+            self.remove_keyboard()
         session = self.session
         if session is None:
             return
@@ -95,19 +99,30 @@ class EventHandler:
         self.send_board()
         if session.state.is_game_over:
             self.send_game_summary()
+            self.session.game_id = None
+            self.trigger(HelpMessageHandler)
+
+    def remove_keyboard(self):
+        try:
+            self.context.bot.edit_message_reply_markup(
+                chat_id=self.chat_id, message_id=self.session.last_keyboard_message
+            )
+        except TelegramBadRequest:
+            pass
+        self.session.last_keyboard_message = None
 
     def send_game_summary(self):
         hint_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in self.session.state.raw_hints]
         intents = "\n".join(hint_strings)
         self.send_markdown(f"Hinters intents were:\n{intents}")
-        self.send_message(f"Winner: {self.session.state.winner}")
+        self.send_text(f"Winner: {self.session.state.winner}")
 
     def _next_move(self):
         session = self.session
         team_color = session.state.current_team_color.value.title()
         if session.state.current_player_role == PlayerRole.HINTER:
             self.send_score()
-            self.send_message(f"{team_color} hinter is thinking...")
+            self.send_text(f"{team_color} hinter is thinking...")
         request = NextMoveRequest(game_id=session.game_id)
         response = self.client.next_move(request)
         session.state = response.game_state
@@ -130,8 +145,9 @@ class EventHandler:
         board_to_send = state.board if state.is_game_over else state.board.censured
         table = board_to_send.as_table
         keyboard = build_keyboard(table, is_game_over=state.is_game_over)
-        message = "Game over!" if state.is_game_over else "It's your turn!"
-        self.send_message(message, reply_markup=keyboard)
+        text = "Game over!" if state.is_game_over else "It's your turn!"
+        message = self.send_text(text, reply_markup=keyboard)
+        self.session.last_keyboard_message = message.message_id
 
 
 def build_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
@@ -156,7 +172,7 @@ class StartEventHandler(EventHandler):
         response = self.client.start_game(request)
         session = Session(game_id=response.game_id, state=response.game_state)
         self.bot.set_session(self.user.id, session=session)
-        self.send_message(f"Game started with id {response.game_id}")
+        self.send_markdown(f"Game *#{response.game_id}* is starting!")
         self.fast_forward()
 
 
@@ -170,7 +186,7 @@ class ProcessMessageHandler(EventHandler):
         try:
             card_index = _get_card_index(session=session, text=text)
         except:  # noqa
-            self.send_message(f"Card '{text}' not found. Please reply with card index (0-24) or a word on the board.")
+            self.send_text(f"Card '{text}' not found. Please reply with card index (0-24) or a word on the board.")
             return None
         request = GuessRequest(game_id=session.game_id, card_index=card_index)
         response = self.client.guess(request)
@@ -210,12 +226,12 @@ class ErrorHandler(EventHandler):
         except:  # noqa
             log.exception("Failed to handle error")
         log.exception(e)
-        self.send_message(f"Something went wrong: {e}")
+        self.send_text(f"Something went wrong: {e}")
 
     def _handle_http_error(self, e: HTTPError):
         data = e.response.json()
         response = ErrorResponse(**data)
-        self.send_message(f"{response.message}: {response.details}")
+        self.send_text(f"{response.message}: {response.details}")
 
 
 class TheSpymasterBot:
