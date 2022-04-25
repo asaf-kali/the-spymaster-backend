@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Type
 
-from codenames.game import CardColor, GameState, PlayerRole, TeamColor
+from codenames.game import Card, CardColor, GameState, PlayerRole, TeamColor
 from pydantic import BaseModel
 from requests import HTTPError
 from telegram import ReplyKeyboardMarkup, Update
@@ -94,7 +94,13 @@ class EventHandler:
             self._next_move()
         self.send_board()
         if session.state.is_game_over:
-            self.send_message(f"Game over! Winner: {session.state.winner}")
+            self.send_game_summary()
+
+    def send_game_summary(self):
+        hint_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in self.session.state.raw_hints]
+        intents = "\n".join(hint_strings)
+        self.send_markdown(f"Hinters intents were:\n{intents}")
+        self.send_message(f"Winner: {self.session.state.winner}")
 
     def _next_move(self):
         session = self.session
@@ -107,7 +113,7 @@ class EventHandler:
         session.state = response.game_state
         if response.given_hint:
             given_hint = response.given_hint
-            self.send_markdown(rf"{team_color} hinter says '*{given_hint.word}*', *{given_hint.card_amount}* cards.")
+            self.send_markdown(rf"{team_color} hinter says '*{given_hint.word}*', *{given_hint.card_amount}* card(s).")
         if response.given_guess:
             given_guess = response.given_guess
             self.send_markdown(
@@ -116,24 +122,29 @@ class EventHandler:
 
     def send_score(self):
         score = self.session.state.remaining_score
-        message = f"Score: {score[TeamColor.BLUE]}{BLUE_EMOJI} - {score[TeamColor.RED]}{RED_EMOJI}"
-        self.send_message(message)
+        message = f"{BLUE_EMOJI} *{score[TeamColor.BLUE]}*   remaining card(s)   *{score[TeamColor.RED]}* {RED_EMOJI}"
+        self.send_markdown(message)
 
     def send_board(self):
         state = self.session.state
         board_to_send = state.board if state.is_game_over else state.board.censured
-        table = board_to_send.table_view(raw_cards=True)
-        keyboard = build_keyboard(table)
+        table = board_to_send.as_table
+        keyboard = build_keyboard(table, is_game_over=state.is_game_over)
         message = "Game over!" if state.is_game_over else "It's your turn!"
         self.send_message(message, reply_markup=keyboard)
 
 
-def build_keyboard(table) -> ReplyKeyboardMarkup:
+def build_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
     reply_keyboard = []
     for row in table.rows:
         row_keyboard = []
-        for word in row:
-            row_keyboard.append(word)
+        for card in row:
+            card: Card
+            if is_game_over:
+                content = f"{card.color.emoji} {card.word}"
+            else:
+                content = card.color.emoji if card.revealed else card.word
+            row_keyboard.append(content)
         reply_keyboard.append(row_keyboard)
     return ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
