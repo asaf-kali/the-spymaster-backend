@@ -1,6 +1,7 @@
 from typing import Callable
 
 import requests
+from requests import Response
 
 from api.models.request import (
     GetGameStateRequest,
@@ -22,6 +23,17 @@ log = get_logger(__name__)
 DEFAULT_BASE_URL = "http://localhost:8000/api/v1/game"
 
 
+def _log_data(url: str, response: Response):
+    try:
+        data = response.json()
+    except Exception:
+        data = response.content
+    log.debug(
+        f"Got status code {response.status_code}.",
+        extra={"status_code": response.status_code, "url": url, "data": data},
+    )
+
+
 class TheSpymasterClient:
     def __init__(self, base_url: str = DEFAULT_BASE_URL):
         self.base_url = base_url
@@ -29,9 +41,9 @@ class TheSpymasterClient:
     def _http_call(self, endpoint: str, method: Callable, **kwargs) -> dict:
         url = f"{self.base_url}/{endpoint}"
         response = method(url, **kwargs)
+        _log_data(url=url, response=response)
         response.raise_for_status()
         data = response.json()
-        log.debug(f"Got response from {url}", extra={"data": data})
         return data
 
     def _get(self, endpoint: str, data: dict) -> dict:

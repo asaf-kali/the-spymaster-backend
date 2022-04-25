@@ -193,6 +193,12 @@ LOGGING = {
             "formatter": "debug",
             "level": "DEBUG",
         },
+        "bot_file": {
+            "class": "logging.handlers.WatchedFileHandler",
+            "filename": os.path.join(LOGGING_DIR, "bot.log"),
+            "formatter": "json",
+            "level": "DEBUG",
+        },
         "root_file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "root.log"),
@@ -213,6 +219,11 @@ LOGGING = {
     "loggers": {
         "api": {
             "handlers": ["console_out", "console_err", "spymaster_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "telegram_bot": {
+            "handlers": ["console_out", "console_err", "bot_file"],
             "level": "DEBUG",
             "propagate": False,
         },
