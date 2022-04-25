@@ -6,6 +6,7 @@ django-filter==21.1
 # REST
 djangorestframework==3.13.1
 dj-rest-auth==2.2.4
+requests
 # django-cors-headers==3.7.0
 
 # Other

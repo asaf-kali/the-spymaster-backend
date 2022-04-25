@@ -44,7 +44,7 @@ lint-check:
 	black . --check
 	isort . --check
 	mypy .
-	flake8 . --max-line-length=$(LINE_LENGTH) --ignore=E203,W503
+	flake8 . --max-line-length=$(LINE_LENGTH) --ignore=E203,W503,E402
 
 lint: lint-only
 	pre-commit run --all-files

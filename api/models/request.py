@@ -1,22 +1,26 @@
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
 from rest_framework.request import Request
 
-from api.models import SpymasterUser
+if TYPE_CHECKING:
+    from api.models import SpymasterUser
+
 from api.models.game import Solver
 
 
 class BaseRequest(BaseModel):
-    drf_request: Request
+    drf_request: Optional[Request] = None
 
     class Config:
         fields = {"drf_request": {"exclude": True}}
         arbitrary_types_allowed = True
 
     @property
-    def preforming_user(self) -> SpymasterUser:
+    def preforming_user(self) -> Optional["SpymasterUser"]:
+        if not self.drf_request:
+            return None
         return self.drf_request.user
 
 
