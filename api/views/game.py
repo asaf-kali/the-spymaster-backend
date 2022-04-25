@@ -16,7 +16,7 @@ from api.models.response import (
     StartGameResponse,
 )
 from api.views import ViewContextMixin
-from api.views.endpoint import endpoint
+from api.views.endpoint import HttpMethod, endpoint
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
@@ -49,8 +49,9 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
         game.save()
         return GuessResponse(given_guess=given_guess, game_state=game_state)
 
-    @endpoint(methods=["GET"], url_path="get-state")
+    @endpoint(methods=[HttpMethod.GET], url_path="get-state")
     def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
+        log.info("Hi")
         game = _get_game(request.game_id)
         return GetGameStateResponse(game_state=game.state)
 

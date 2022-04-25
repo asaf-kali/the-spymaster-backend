@@ -1,4 +1,5 @@
 import functools
+from enum import Enum
 from typing import List, Tuple, Type
 
 from django.http import JsonResponse
@@ -6,14 +7,22 @@ from pydantic import BaseModel, ValidationError
 from rest_framework.decorators import action
 from rest_framework.request import Request
 
-from api.logic.errors import BadRequestError
+from api.logic.errors import BadRequestError, SpymasterError
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
 
 
-class EndpointConfigurationError(Exception):
+class EndpointConfigurationError(SpymasterError):
     pass
+
+
+class HttpMethod(str, Enum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    DELETE = "DELETE"
+    PATCH = "PATCH"
 
 
 def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]]:
@@ -35,8 +44,11 @@ def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]
     return request_model, response_model
 
 
-def endpoint(func=None, *, detail: bool = False, methods: List[str] = None, url_path: str = None, url_name: str = None):
-    methods = methods or ["POST"]
+def endpoint(
+    func=None, *, detail: bool = False, methods: List[HttpMethod] = None, url_path: str = None, url_name: str = None
+):
+    methods = methods or [HttpMethod.POST]
+    str_methods = [m.value for m in methods]
 
     def decorator(f):
         endpoint_name = f.__name__
@@ -53,7 +65,7 @@ def endpoint(func=None, *, detail: bool = False, methods: List[str] = None, url_
             status_code = response_data.pop("status_code")
             return JsonResponse(response_data, status=status_code)
 
-        return action(detail=detail, methods=methods, url_path=url_path, url_name=url_name)(wrapper)
+        return action(detail=detail, methods=str_methods, url_path=url_path, url_name=url_name)(wrapper)
 
     if func:
         return decorator(func)

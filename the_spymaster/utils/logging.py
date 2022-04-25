@@ -7,12 +7,13 @@ from logging.config import dictConfig
 from typing import Optional
 
 CONTEXT_KEY = "_logging_context"
+_thread_storage = threading.local()
 
 
 class ContextLogger(Logger):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._thread_storage = threading.local()
+        self._thread_storage = _thread_storage
 
     @property
     def context(self) -> dict:
