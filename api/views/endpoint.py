@@ -4,10 +4,12 @@ from typing import List, Tuple, Type
 
 from django.http import JsonResponse
 from pydantic import BaseModel, ValidationError
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.request import Request
 
 from api.logic.errors import BadRequestError, SpymasterError
+from api.models.response import BaseResponse
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
@@ -61,7 +63,7 @@ def endpoint(
             log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
             response = f(view, parsed_request)
-            response_data = response.dict()
+            response_data = _get_response_data(response)
             status_code = response_data.pop("status_code")
             return JsonResponse(response_data, status=status_code)
 
@@ -81,3 +83,9 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
         details = e.errors() if isinstance(e, ValidationError) else str(e)
         raise BadRequestError("Request parsing failed.", details=details) from e
     return parsed_request
+
+
+def _get_response_data(response: BaseResponse) -> dict:
+    if response is None:
+        return {"status_code": status.HTTP_204_NO_CONTENT, "message": "No content"}
+    return response.dict()

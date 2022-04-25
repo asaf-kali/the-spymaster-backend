@@ -1,5 +1,10 @@
+from typing import Optional
+
 from codenames.game import GameState, GivenGuess, GivenHint
+from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
+
+from api.models.game import Solver
 
 
 class BaseResponse(BaseModel):
@@ -22,4 +27,12 @@ class GuessResponse(BaseResponse):
 
 
 class GetGameStateResponse(BaseResponse):
+    game_state: GameState
+
+
+class NextMoveResponse(BaseResponse):
+    used_solver: Solver
+    used_model_identifier: ModelIdentifier
+    given_hint: Optional[GivenHint] = None
+    given_guess: Optional[GivenGuess] = None
     game_state: GameState

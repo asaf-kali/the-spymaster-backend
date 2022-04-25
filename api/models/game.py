@@ -1,5 +1,13 @@
+from enum import Enum
+
 from codenames.game import GameState
 from django.db import models
+
+
+class Solver(str, Enum):
+    NAIVE = "naive"
+    OLYMPIC = "olympic"
+    SNA = "sna"
 
 
 class Game(models.Model):

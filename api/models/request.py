@@ -1,7 +1,11 @@
+from typing import List, Optional
+
+from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
 from rest_framework.request import Request
 
 from api.models import SpymasterUser
+from api.models.game import Solver
 
 
 class BaseRequest(BaseModel):
@@ -24,6 +28,7 @@ class HintRequest(BaseRequest):
     game_id: int
     word: str
     card_amount: int
+    for_words: List[str] = None
 
 
 class GuessRequest(BaseRequest):
@@ -33,3 +38,9 @@ class GuessRequest(BaseRequest):
 
 class GetGameStateRequest(BaseRequest):
     game_id: int
+
+
+class NextMoveRequest(BaseRequest):
+    game_id: int
+    model_identifier: Optional[ModelIdentifier] = None
+    solver: Solver = Solver.NAIVE

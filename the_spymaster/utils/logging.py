@@ -45,6 +45,7 @@ class ContextFormatter(Formatter):
         message = original_message = record.msg
         extra = getattr(record, "extra", None)
         context = getattr(record, "context", None)
+        message = str(message)
         if extra:
             message += f" | {extra}"
         if context:
