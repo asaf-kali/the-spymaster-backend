@@ -14,9 +14,9 @@ from telegram.ext import (
     Updater,
 )
 
-from api.client import TheSpymasterClient
 from api.models.request import GuessRequest, NextMoveRequest, StartGameRequest
 from api.models.response import ErrorResponse
+from telegram_bot.client import TheSpymasterClient
 from the_spymaster.utils import config, get_logger
 
 log = get_logger(__name__)
@@ -140,12 +140,13 @@ class EventHandler:
         message = f"{BLUE_EMOJI} *{score[TeamColor.BLUE]}*   remaining card(s)   *{score[TeamColor.RED]}* {RED_EMOJI}"
         self.send_markdown(message)
 
-    def send_board(self):
+    def send_board(self, text: str = None):
         state = self.session.state
         board_to_send = state.board if state.is_game_over else state.board.censured
         table = board_to_send.as_table
         keyboard = build_keyboard(table, is_game_over=state.is_game_over)
-        text = "Game over!" if state.is_game_over else "It's your turn!"
+        if text is None:
+            text = "Game over!" if state.is_game_over else "It's your turn!"
         message = self.send_text(text, reply_markup=keyboard)
         self.session.last_keyboard_message = message.message_id
 
@@ -186,7 +187,7 @@ class ProcessMessageHandler(EventHandler):
         try:
             card_index = _get_card_index(session=session, text=text)
         except:  # noqa
-            self.send_text(f"Card '{text}' not found. Please reply with card index (0-24) or a word on the board.")
+            self.send_board(f"Card '{text}' not found. Please reply with card index (0-24) or a word on the board.")
             return None
         request = GuessRequest(game_id=session.game_id, card_index=card_index)
         response = self.client.guess(request)
