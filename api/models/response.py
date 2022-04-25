@@ -1,14 +1,22 @@
-from typing import Optional
+from typing import Any, Optional
 
 from codenames.game import GameState, GivenGuess, GivenHint
 from codenames.utils.loader.model_loader import ModelIdentifier
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 
 from api.models.game import Solver
 
 
 class BaseResponse(BaseModel):
     status_code: int = 200
+
+
+class ErrorResponse(BaseModel):
+    message: Optional[str]
+    details: Any
+
+    class Config:
+        extra = Extra.allow
 
 
 class StartGameResponse(BaseResponse):
@@ -22,7 +30,7 @@ class HintResponse(BaseResponse):
 
 
 class GuessResponse(BaseResponse):
-    given_guess: GivenGuess
+    given_guess: Optional[GivenGuess]
     game_state: GameState
 
 

@@ -1,3 +1,3 @@
-import typing as t
+from typing import Dict, Union
 
-JsonType = t.Union[str, int, float, bool, None, t.Dict[str, t.Any], t.List[t.Any]]
+JsonType = Union[str, int, float, bool, list, Dict[str, any], None]
