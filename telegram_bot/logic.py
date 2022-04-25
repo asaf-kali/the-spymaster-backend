@@ -1,9 +1,9 @@
 from typing import Dict, Optional, Type
 
-from codenames.game import GameState, PlayerRole, TeamColor
+from codenames.game import CardColor, GameState, PlayerRole, TeamColor
 from pydantic import BaseModel
 from requests import HTTPError
-from telegram import Update
+from telegram import ReplyKeyboardMarkup, Update
 from telegram import User as TelegramUser
 from telegram.ext import (
     CallbackContext,
@@ -19,6 +19,8 @@ from api.models.response import ErrorResponse
 from the_spymaster.utils import config, get_logger
 
 log = get_logger(__name__)
+BLUE_EMOJI = CardColor.BLUE.emoji
+RED_EMOJI = CardColor.RED.emoji
 
 
 class Session(BaseModel):
@@ -64,7 +66,10 @@ class EventHandler:
     def handler(cls, bot: "TheSpymasterBot"):
         def dispatch(update: Update, context: CallbackContext):
             instance = cls(bot, update, context)
-            log.update_context(user_id=instance.user.id, game_id=instance.game_id)
+            try:
+                log.update_context(user_id=instance.user.id, game_id=instance.game_id)
+            except Exception as e:
+                log.warning(f"Failed to update context: {e}")
             instance.handle()
 
         return dispatch
@@ -87,7 +92,7 @@ class EventHandler:
             return
         while not session.state.is_game_over and not _is_blue_guesser_turn(session):
             self._next_move()
-        self._send_board()
+        self.send_board()
         if session.state.is_game_over:
             self.send_message(f"Game over! Winner: {session.state.winner}")
 
@@ -95,6 +100,7 @@ class EventHandler:
         session = self.session
         team_color = session.state.current_team_color.value.title()
         if session.state.current_player_role == PlayerRole.HINTER:
+            self.send_score()
             self.send_message(f"{team_color} hinter is thinking...")
         request = NextMoveRequest(game_id=session.game_id)
         response = self.client.next_move(request)
@@ -108,10 +114,28 @@ class EventHandler:
                 rf"{team_color} guesser says '*{given_guess.guessed_card.word}*', {given_guess.correct}!"
             )
 
-    def _send_board(self):
+    def send_score(self):
+        score = self.session.state.remaining_score
+        message = f"Score: {score[TeamColor.BLUE]}{BLUE_EMOJI} - {score[TeamColor.RED]}{RED_EMOJI}"
+        self.send_message(message)
+
+    def send_board(self):
         state = self.session.state
         board_to_send = state.board if state.is_game_over else state.board.censured
-        self.send_message(board_to_send.printable_string)
+        table = board_to_send.table_view(raw_cards=True)
+        keyboard = build_keyboard(table)
+        message = "Game over!" if state.is_game_over else "It's your turn!"
+        self.send_message(message, reply_markup=keyboard)
+
+
+def build_keyboard(table) -> ReplyKeyboardMarkup:
+    reply_keyboard = []
+    for row in table.rows:
+        row_keyboard = []
+        for word in row:
+            row_keyboard.append(word)
+        reply_keyboard.append(row_keyboard)
+    return ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 class StartEventHandler(EventHandler):
@@ -152,7 +176,7 @@ class ProcessMessageHandler(EventHandler):
 class HelpMessageHandler(EventHandler):
     def handle(self):
         log.info("Got help message")
-        message = rf"""Hi {self.user.name}!
+        message = f"""Hi {self.user.name}!
 /start - start a new game.
 /help - show this help.
 
