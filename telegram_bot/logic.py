@@ -136,7 +136,9 @@ class EventHandler:
     def trigger(self, other: Type["EventHandler"]):
         other(bot=self.bot, update=self.update, context=self.context).handle()
 
-    def send_text(self, text: str, **kwargs) -> Message:
+    def send_text(self, text: str, put_log: bool = False, **kwargs) -> Message:
+        if put_log:
+            log.info(text)
         return self.context.bot.send_message(chat_id=self.chat_id, text=text, **kwargs)
 
     def send_markdown(self, text: str, **kwargs) -> Message:
@@ -169,7 +171,7 @@ class EventHandler:
         hint_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in self.state.raw_hints]
         intents = "\n".join(hint_strings)
         self.send_markdown(f"Hinters intents were:\n{intents}")
-        self.send_text(f"Winner: {self.state.winner}")
+        self.send_text(f"Winner: {self.state.winner}", put_log=True)
 
     def _next_move(self):
         team_color = self.state.current_team_color.value.title()
@@ -186,7 +188,7 @@ class EventHandler:
             if response.given_hint:
                 given_hint = response.given_hint
                 text = f"{team_color} hinter says '*{given_hint.word}*' with *{given_hint.card_amount}* card(s)."
-                self.send_markdown(text)
+                self.send_markdown(text, put_log=True)
             if response.given_guess:
                 given_guess = response.given_guess
                 text = f"{team_color} guesser says '*{given_guess.guessed_card.word}*', {given_guess.correct}!"
@@ -227,7 +229,7 @@ class EventHandler:
     def _handle_http_error(self, e: HTTPError):
         data = e.response.json()
         response = ErrorResponse(**data)
-        self.send_text(f"{response.message}: {response.details}")
+        self.send_text(f"{response.message}: {response.details}", put_log=True)
 
     def _should_skip_turn(self) -> bool:
         dice = random()
@@ -281,9 +283,7 @@ class StartEventHandler(EventHandler):
                 return SessionConfig(language=args[0], difficulty=Difficulty(args[1]), solver=Solver(args[1]))
             raise ValueError(f"Invalid number of arguments: {len(args)}")
         except Exception as e:
-            message = f"Failed to parse configurations: {e}"
-            log.info(message)
-            self.send_text(message)
+            self.send_text(f"Failed to parse configurations: {e}", put_log=True)
             return None
 
 
