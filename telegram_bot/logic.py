@@ -143,8 +143,6 @@ class EventHandler:
         return self.send_text(text=text, parse_mode="Markdown", **kwargs)
 
     def fast_forward(self):
-        if self.session.last_keyboard_message:
-            self.remove_keyboard()
         session = self.session
         if session is None:
             return
@@ -157,6 +155,8 @@ class EventHandler:
             self.trigger(HelpMessageHandler)
 
     def remove_keyboard(self):
+        if not self.session or not self.session.last_keyboard_message:
+            return
         try:
             self.context.bot.edit_message_reply_markup(
                 chat_id=self.chat_id, message_id=self.session.last_keyboard_message
@@ -185,7 +185,7 @@ class EventHandler:
             response = self.client.next_move(request=request)
             if response.given_hint:
                 given_hint = response.given_hint
-                text = f"{team_color} hinter says '*{given_hint.word}*', *{given_hint.card_amount}* card(s)."
+                text = f"{team_color} hinter says '*{given_hint.word}*' with *{given_hint.card_amount}* card(s)."
                 self.send_markdown(text)
             if response.given_guess:
                 given_guess = response.given_guess
@@ -291,6 +291,7 @@ class ProcessMessageHandler(EventHandler):
     def handle(self):
         text = self.update.message.text
         log.info(f"Processing message: '{text}'")
+        self.remove_keyboard()
         session = self.session
         if not session or not session.state:
             self.trigger(HelpMessageHandler)
@@ -299,7 +300,7 @@ class ProcessMessageHandler(EventHandler):
             command = COMMAND_TO_INDEX.get(text, text)
             card_index = _get_card_index(board=session.state.board, text=command)
         except:  # noqa
-            self.send_board(f"Card '{text}' not found. Please reply with card index (0-24) or a word on the board.")
+            self.send_board(f"Card '{text}' not found. Please reply with card index (1-25) or a word on the board.")
             return None
         request = GuessRequest(game_id=self.game_id, card_index=card_index)
         response = self.client.guess(request)
@@ -309,7 +310,8 @@ class ProcessMessageHandler(EventHandler):
             pass  # This means we passed the turn
         else:
             card = given_guess.guessed_card
-            self.send_markdown(f"Card '*{card.word}*' is {card.color}, {given_guess.correct}!")
+            result = "Correct" if given_guess.correct else "Wrong"
+            self.send_markdown(f"Card '*{card.word}*' is {card.color}, {result}!")
         self.fast_forward()
 
 
@@ -321,17 +323,19 @@ class HelpMessageHandler(EventHandler):
 /help - show this message.
 
 Optional arguments:
-/start language difficulty solver
+/start  language  difficulty  solver
 language = {{english, hebrew}}
 difficulty = {{hard, medium, easy}}
 solver = {{naive, olympic, sna}}
+For example: `/start hebrew easy`
 
 How to play:
-You are the blue guesser. The bot will play all other players.
-When the blue hinter sends a hint, you can reply with a card index (0-24) or just type the word on the board.
-To pass the turn write '-1', to quit write '-2'.
+You are the blue guesser. The bot will play all other roles. \
+When the blue hinter sends a hint, you can reply with a card index (1-25), \
+or just click the word on the keyboard. \
+Use '-pass' and '-quit' to pass the turn and quit the game.
 """
-        self.send_text(message)
+        self.send_markdown(message)
 
 
 class TheSpymasterBot:
@@ -370,7 +374,10 @@ def _is_blue_guesser_turn(session):
 
 def _get_card_index(board: Board, text: str) -> int:
     try:
-        return int(text)
+        index = int(text)
+        if index > 0:
+            index -= 1
+        return index
     except ValueError:
         pass
     return board.find_card_index(text)
