@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 import threading
 from datetime import datetime, timezone
 from logging import Filter, Formatter, Logger, LogRecord
@@ -7,6 +8,7 @@ from logging.config import dictConfig
 from typing import Optional
 
 CONTEXT_KEY = "_logging_context"
+EMPTY_EXEC_INFO = (None, None, None)
 _thread_storage = threading.local()
 
 
@@ -80,8 +82,8 @@ class JsonFormatter(Formatter):
             "logger": record.name,
             "thread_name": record.threadName,
         }
-        exc_info = getattr(record, "exc_info", None)
-        if exc_info:
+        exc_info = getattr(record, "exc_info", None) or sys.exc_info()
+        if exc_info and exc_info != EMPTY_EXEC_INFO and record.levelno >= logging.ERROR:
             data["exc_info"] = self.formatException(exc_info)
         try:
             return json.dumps(data, indent=self.indent, ensure_ascii=False)

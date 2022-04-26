@@ -1,6 +1,9 @@
 .idea/
 *.env
 *.sqlite3
+node_modules/
+package-lock.json
+logs/
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,linux,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,linux,pycharm
