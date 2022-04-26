@@ -1,3 +1,5 @@
+from enum import Enum
+from random import random
 from typing import Dict, Optional, Type
 
 from codenames.game import (
@@ -35,8 +37,26 @@ RED_EMOJI = CardColor.RED.emoji
 COMMAND_TO_INDEX = {"-pass": PASS_GUESS, "-quit": QUIT_GAME}
 
 
+class Difficulty(str, Enum):
+    EASY = "easy"
+    MEDIUM = "medium"
+    HARD = "hard"
+
+    @property
+    def pass_probability(self) -> float:
+        return DIFFICULTY_TO_PASS_PROBABILITY[self]
+
+
+DIFFICULTY_TO_PASS_PROBABILITY: Dict[Difficulty, float] = {
+    Difficulty.EASY: 0.4,
+    Difficulty.MEDIUM: 0.2,
+    Difficulty.HARD: 0,
+}
+
+
 class SessionConfig(BaseModel):
     language: str = "english"
+    difficulty: Difficulty = Difficulty.MEDIUM
     solver: Solver = Solver.NAIVE
 
 
@@ -146,41 +166,47 @@ class EventHandler:
         self.session.last_keyboard_message = None
 
     def send_game_summary(self):
-        hint_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in self.session.state.raw_hints]
+        hint_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in self.state.raw_hints]
         intents = "\n".join(hint_strings)
         self.send_markdown(f"Hinters intents were:\n{intents}")
-        self.send_text(f"Winner: {self.session.state.winner}")
+        self.send_text(f"Winner: {self.state.winner}")
 
     def _next_move(self):
-        session = self.session
-        team_color = session.state.current_team_color.value.title()
-        if session.state.current_player_role == PlayerRole.HINTER:
+        team_color = self.state.current_team_color.value.title()
+        if self.state.current_player_role == PlayerRole.HINTER:
             self.send_score()
             self.send_text(f"{team_color} hinter is thinking...")
-        request = NextMoveRequest(game_id=session.game_id)
-        response = self.client.next_move(request)
-        session.state = response.game_state
-        if response.given_hint:
-            given_hint = response.given_hint
-            self.send_markdown(rf"{team_color} hinter says '*{given_hint.word}*', *{given_hint.card_amount}* card(s).")
-        if response.given_guess:
-            given_guess = response.given_guess
-            self.send_markdown(
-                rf"{team_color} guesser says '*{given_guess.guessed_card.word}*', {given_guess.correct}!"
-            )
+        if self._should_skip_turn():
+            self.send_text(f"{team_color} guesser has skipped the turn.")
+            request = GuessRequest(game_id=self.game_id, card_index=PASS_GUESS)
+            response = self.client.guess(request=request)
+        else:
+            request = NextMoveRequest(game_id=self.game_id, solver=self.session.config.solver)
+            response = self.client.next_move(request=request)
+            if response.given_hint:
+                given_hint = response.given_hint
+                text = f"{team_color} hinter says '*{given_hint.word}*', *{given_hint.card_amount}* card(s)."
+                self.send_markdown(text)
+            if response.given_guess:
+                given_guess = response.given_guess
+                text = f"{team_color} guesser says '*{given_guess.guessed_card.word}*', {given_guess.correct}!"
+                self.send_markdown(text)
+        self.session.state = response.game_state
 
     def send_score(self):
-        score = self.session.state.remaining_score
+        score = self.state.remaining_score
         message = f"{BLUE_EMOJI} *{score[TeamColor.BLUE]}*   remaining card(s)   *{score[TeamColor.RED]}* {RED_EMOJI}"
         self.send_markdown(message)
 
     def send_board(self, text: str = None):
-        state = self.session.state
+        state = self.state
         board_to_send = state.board if state.is_game_over else state.board.censured
         table = board_to_send.as_table
         keyboard = build_keyboard(table, is_game_over=state.is_game_over)
         if text is None:
-            text = "Game over!" if state.is_game_over else "It's your turn!"
+            text = "Game over!" if state.is_game_over else "Pick your guess!"
+            if state.bonus_given:
+                text += " (bonus round)"
         message = self.send_text(text, reply_markup=keyboard)
         self.session.last_keyboard_message = message.message_id
 
@@ -203,6 +229,13 @@ class EventHandler:
         response = ErrorResponse(**data)
         self.send_text(f"{response.message}: {response.details}")
 
+    def _should_skip_turn(self) -> bool:
+        dice = random()
+        return (
+            self.state.current_player_role == PlayerRole.GUESSER
+            and dice < self.session.config.difficulty.pass_probability
+        )
+
 
 def build_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
     reply_keyboard = []
@@ -216,7 +249,7 @@ def build_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
                 content = card.color.emoji if card.revealed else card.word
             row_keyboard.append(content)
         reply_keyboard.append(row_keyboard)
-    reply_keyboard.append(["-pass", "-quit"])
+    reply_keyboard.append(list(COMMAND_TO_INDEX.keys()))
     return ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
@@ -225,6 +258,9 @@ class StartEventHandler(EventHandler):
         log.update_context(username=self.username, full_name=self.user_full_name)
         log.info(f"Got start event from {self.user_full_name}")
         session_config = self._parse_config()
+        if session_config is None:
+            return
+        log.debug("Session config", extra={"session_config": session_config.dict()})
         request = StartGameRequest(language=session_config.language)
         response = self.client.start_game(request)
         session = Session(game_id=response.game_id, state=response.game_state, config=session_config)
@@ -232,15 +268,23 @@ class StartEventHandler(EventHandler):
         self.send_markdown(f"Game *#{response.game_id}* is starting!")
         self.fast_forward()
 
-    def _parse_config(self) -> SessionConfig:
-        args = self.update.message.text.lower().split(" ")[1:]
-        if len(args) == 0:
-            return SessionConfig()
-        if len(args) == 1:
-            return SessionConfig(language=args[0])
-        if len(args) == 2:
-            return SessionConfig(language=args[0], solver=Solver(args[1]))
-        raise ValueError(f"Invalid arguments: {args}")
+    def _parse_config(self) -> Optional[SessionConfig]:
+        try:
+            args = self.update.message.text.lower().split(" ")[1:]
+            if len(args) == 0:
+                return SessionConfig()
+            if len(args) == 1:
+                return SessionConfig(language=args[0])
+            if len(args) == 2:
+                return SessionConfig(language=args[0], difficulty=Difficulty(args[1]))
+            if len(args) == 3:
+                return SessionConfig(language=args[0], difficulty=Difficulty(args[1]), solver=Solver(args[1]))
+            raise ValueError(f"Invalid number of arguments: {len(args)}")
+        except Exception as e:
+            message = f"Failed to parse configurations: {e}"
+            log.info(message)
+            self.send_text(message)
+            return None
 
 
 class ProcessMessageHandler(EventHandler):
@@ -257,7 +301,7 @@ class ProcessMessageHandler(EventHandler):
         except:  # noqa
             self.send_board(f"Card '{text}' not found. Please reply with card index (0-24) or a word on the board.")
             return None
-        request = GuessRequest(game_id=session.game_id, card_index=card_index)
+        request = GuessRequest(game_id=self.game_id, card_index=card_index)
         response = self.client.guess(request)
         session.state = response.game_state
         given_guess = response.given_guess
@@ -265,7 +309,7 @@ class ProcessMessageHandler(EventHandler):
             pass  # This means we passed the turn
         else:
             card = given_guess.guessed_card
-            self.send_markdown(rf"Card '*{card.word}*' is {card.color}, {given_guess.correct}!")
+            self.send_markdown(f"Card '*{card.word}*' is {card.color}, {given_guess.correct}!")
         self.fast_forward()
 
 
@@ -274,14 +318,20 @@ class HelpMessageHandler(EventHandler):
         log.info("Got help message")
         message = f"""Hi {self.user.name}!
 /start - start a new game.
-/help - show this help.
+/help - show this message.
+
+Optional arguments:
+/start language difficulty solver
+language = {{english, hebrew}}
+difficulty = {{hard, medium, easy}}
+solver = {{naive, olympic, sna}}
 
 How to play:
 You are the blue guesser. The bot will play all other players.
 When the blue hinter sends a hint, you can reply with a card index (0-24) or just type the word on the board.
 To pass the turn write '-1', to quit write '-2'.
 """
-        self.send_markdown(message)
+        self.send_text(message)
 
 
 class TheSpymasterBot:
