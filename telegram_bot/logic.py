@@ -168,7 +168,7 @@ class EventHandler:
         team_color = self.state.current_team_color.value.title()
         if self.state.current_player_role == PlayerRole.HINTER:
             self.send_score()
-            self.send_text(f"{team_color} hinter is thinking...")
+            self.send_text(f"{team_color} hinter is thinking... 🤔")
         if self._should_skip_turn():
             self.send_text(f"{team_color} guesser has skipped the turn.")
             request = GuessRequest(game_id=self.game_id, card_index=PASS_GUESS)
@@ -213,7 +213,7 @@ class EventHandler:
             log.exception("Failed to handle error")
         log.exception(e)
         try:
-            self.send_text(f"Something went wrong: {e}")
+            self.send_text(f"💔 Something went wrong: {e}")
         except:  # noqa
             pass
 
@@ -241,7 +241,7 @@ class StartEventHandler(EventHandler):
         response = self.client.start_game(request)
         session = Session(game_id=response.game_id, state=response.game_state, config=session_config)
         self.bot.set_session(self.user.id, session=session)
-        self.send_markdown(f"Game *#{response.game_id}* is starting!")
+        self.send_markdown(f"Game *#{response.game_id}* is starting! 🥳")
         return self.fast_forward()
 
 
@@ -268,8 +268,8 @@ class ProcessMessageHandler(EventHandler):
             pass  # This means we passed the turn
         else:
             card = given_guess.guessed_card
-            result = "Correct" if given_guess.correct else "Wrong"
-            self.send_markdown(f"Card '*{card.word}*' is {card.color}, {result}!")
+            result = "Correct! ✅" if given_guess.correct else "Wrong! ❌"
+            self.send_markdown(f"Card '*{card.word}*' is {card.color}, {result}")
         return self.fast_forward()
 
 
@@ -279,7 +279,7 @@ class CustomHandler(EventHandler):
         session = Session(config=game_config)
         self.bot.set_session(self.user.id, session=session)
         keyboard = ReplyKeyboardMarkup([DEFAULT_LANGUAGES], one_time_keyboard=True)
-        self.send_text("Pick language:", reply_markup=keyboard)
+        self.send_text("🌍 Pick language:", reply_markup=keyboard)
         return BotState.ConfigLanguage
 
 
@@ -288,7 +288,7 @@ class ConfigLanguageHandler(EventHandler):
         self.session.config.language = self.update.message.text
         difficulties = [Difficulty.EASY.value, Difficulty.MEDIUM.value, Difficulty.HARD.value]
         keyboard = ReplyKeyboardMarkup([difficulties], one_time_keyboard=True)
-        self.send_text("Pick difficulty:", reply_markup=keyboard)
+        self.send_text("🥵 Pick difficulty:", reply_markup=keyboard)
         return BotState.ConfigDifficulty
 
 
@@ -305,7 +305,7 @@ class ConfigSolverHandler(EventHandler):
 
 class ContinueHandler(EventHandler):
     def handle(self):
-        self.send_text("Not implemented yet.")
+        self.send_text("This is not implemented yet 😢")
 
 
 class ContinueGetIdHandler(EventHandler):
