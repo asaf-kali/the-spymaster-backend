@@ -26,3 +26,7 @@ env_verbose_name = "Staging"
 
 [prod]
 env_verbose_name = "Production"
+
+[rsbpi]
+env_verbose_name = "Raspberry Pi"
+language_data_folder = "/home/pi/.cache/language_data"

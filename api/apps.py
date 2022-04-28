@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.conf import settings
 
 from the_spymaster.utils import get_logger
 
@@ -10,4 +11,4 @@ class ApiConfig(AppConfig):
     name = "api"
 
     def ready(self):
-        log.info(f"{self.verbose_name} is ready")
+        log.info(f"{self.verbose_name} is ready, environment: [{settings.ENVIRONMENT}]")

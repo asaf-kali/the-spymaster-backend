@@ -1,6 +1,8 @@
 PYTHON_TEST_COMMAND=pytest -s
 DEL_COMMAND=gio trash
 LINE_LENGTH=120
+export DJANGO_SETTINGS_MODULE = the_spymaster.settings
+export ENV_FOR_DYNACONF = local
 
 # Install
 
@@ -64,11 +66,12 @@ run-server:
 	python manage.py runserver
 
 run-bot:
-	export DJANGO_SETTINGS_MODULE="the_spymaster.settings" && \
-	export ENV_FOR_DYNACONF="local" && \
 	python -m telegram_bot.main
 
 run:
-	killall python
+	@make kill --no-print-directory
 	@make run-server --no-print-directory &
 	@make run-bot --no-print-directory &
+
+kill:
+	killall python || true
