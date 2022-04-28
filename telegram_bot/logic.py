@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum, auto
 from random import random
-from typing import Dict, Optional, Type
+from typing import Any, Dict, Optional, Type
 
 from codenames.game import (
     PASS_GUESS,
@@ -20,12 +20,14 @@ from telegram.error import BadRequest as TelegramBadRequest
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
+    ConversationHandler,
     Filters,
     MessageHandler,
     Updater,
 )
 
-from api.models.game import Solver
+from api.logic.language import DEFAULT_LANGUAGES
+from api.models.game import Difficulty, GameConfig
 from api.models.request import GuessRequest, NextMoveRequest, StartGameRequest
 from api.models.response import ErrorResponse
 from telegram_bot.client import TheSpymasterClient
@@ -37,34 +39,20 @@ RED_EMOJI = CardColor.RED.emoji
 COMMAND_TO_INDEX = {"-pass": PASS_GUESS, "-quit": QUIT_GAME}
 
 
-class Difficulty(str, Enum):
-    EASY = "easy"
-    MEDIUM = "medium"
-    HARD = "hard"
-
-    @property
-    def pass_probability(self) -> float:
-        return DIFFICULTY_TO_PASS_PROBABILITY[self]
-
-
-DIFFICULTY_TO_PASS_PROBABILITY: Dict[Difficulty, float] = {
-    Difficulty.EASY: 0.4,
-    Difficulty.MEDIUM: 0.2,
-    Difficulty.HARD: 0,
-}
-
-
-class SessionConfig(BaseModel):
-    language: str = "english"
-    difficulty: Difficulty = Difficulty.MEDIUM
-    solver: Solver = Solver.NAIVE
+class BotState(IntEnum):
+    Entry = auto()
+    ConfigLanguage = auto()
+    ConfigDifficulty = auto()
+    ConfigSolver = auto()
+    ContinueGetId = auto()
+    Playing = auto()
 
 
 class Session(BaseModel):
-    game_id: int
-    state: GameState
+    game_id: Optional[int]
+    state: Optional[GameState]
     last_keyboard_message: Optional[int]
-    config: SessionConfig
+    config: Optional[GameConfig]
 
 
 class EventHandler:
@@ -115,14 +103,15 @@ class EventHandler:
 
     @classmethod
     def handler(cls, bot: "TheSpymasterBot"):
-        def dispatch(update: Update, context: CallbackContext):
+        def dispatch(update: Update, context: CallbackContext) -> Any:
             instance = cls(bot, update, context)
             try:
                 log.update_context(user_id=instance.user.id, game_id=instance.game_id)
             except Exception as e:
                 log.warning(f"Failed to update context: {e}")
             try:
-                instance.handle()
+                log.debug(f"Dispatching to event handler: {cls.__name__}")
+                return instance.handle()
             except Exception as e:
                 instance._handle_error(e)
             finally:
@@ -133,8 +122,8 @@ class EventHandler:
     def handle(self):
         raise NotImplementedError()
 
-    def trigger(self, other: Type["EventHandler"]):
-        other(bot=self.bot, update=self.update, context=self.context).handle()
+    def trigger(self, other: Type["EventHandler"]) -> Any:
+        return other(bot=self.bot, update=self.update, context=self.context).handle()
 
     def send_text(self, text: str, put_log: bool = False, **kwargs) -> Message:
         if put_log:
@@ -147,7 +136,7 @@ class EventHandler:
     def fast_forward(self):
         session = self.session
         if session is None:
-            return
+            return None
         while not session.state.is_game_over and not _is_blue_guesser_turn(session):
             self._next_move()
         self.send_board()
@@ -155,6 +144,8 @@ class EventHandler:
             self.send_game_summary()
             self.bot.set_session(self.user.id, None)
             self.trigger(HelpMessageHandler)
+            return None
+        return BotState.Playing
 
     def remove_keyboard(self):
         if not self.session or not self.session.last_keyboard_message:
@@ -197,14 +188,14 @@ class EventHandler:
 
     def send_score(self):
         score = self.state.remaining_score
-        message = f"{BLUE_EMOJI} *{score[TeamColor.BLUE]}*   remaining card(s)   *{score[TeamColor.RED]}* {RED_EMOJI}"
+        message = f"{BLUE_EMOJI}  *{score[TeamColor.BLUE]}*  remaining card(s)  *{score[TeamColor.RED]}*  {RED_EMOJI}"
         self.send_markdown(message)
 
     def send_board(self, text: str = None):
         state = self.state
         board_to_send = state.board if state.is_game_over else state.board.censured
         table = board_to_send.as_table
-        keyboard = build_keyboard(table, is_game_over=state.is_game_over)
+        keyboard = build_board_keyboard(table, is_game_over=state.is_game_over)
         if text is None:
             text = "Game over!" if state.is_game_over else "Pick your guess!"
             if state.bonus_given:
@@ -239,52 +230,19 @@ class EventHandler:
         )
 
 
-def build_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
-    reply_keyboard = []
-    for row in table.rows:
-        row_keyboard = []
-        for card in row:
-            card: Card
-            if is_game_over:
-                content = f"{card.color.emoji} {card.word}"
-            else:
-                content = card.color.emoji if card.revealed else card.word
-            row_keyboard.append(content)
-        reply_keyboard.append(row_keyboard)
-    reply_keyboard.append(list(COMMAND_TO_INDEX.keys()))
-    return ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-
-
 class StartEventHandler(EventHandler):
     def handle(self):
         log.update_context(username=self.username, full_name=self.user_full_name)
         log.info(f"Got start event from {self.user_full_name}")
-        session_config = self._parse_config()
-        if session_config is None:
-            return
+        existing_config = self.session.config if self.session else None
+        session_config = existing_config or GameConfig()
         log.debug("Session config", extra={"session_config": session_config.dict()})
         request = StartGameRequest(language=session_config.language)
         response = self.client.start_game(request)
         session = Session(game_id=response.game_id, state=response.game_state, config=session_config)
         self.bot.set_session(self.user.id, session=session)
         self.send_markdown(f"Game *#{response.game_id}* is starting!")
-        self.fast_forward()
-
-    def _parse_config(self) -> Optional[SessionConfig]:
-        try:
-            args = self.update.message.text.lower().split(" ")[1:]
-            if len(args) == 0:
-                return SessionConfig()
-            if len(args) == 1:
-                return SessionConfig(language=args[0])
-            if len(args) == 2:
-                return SessionConfig(language=args[0], difficulty=Difficulty(args[1]))
-            if len(args) == 3:
-                return SessionConfig(language=args[0], difficulty=Difficulty(args[1]), solver=Solver(args[1]))
-            raise ValueError(f"Invalid number of arguments: {len(args)}")
-        except Exception as e:
-            self.send_text(f"Failed to parse configurations: {e}", put_log=True)
-            return None
+        return self.fast_forward()
 
 
 class ProcessMessageHandler(EventHandler):
@@ -312,7 +270,52 @@ class ProcessMessageHandler(EventHandler):
             card = given_guess.guessed_card
             result = "Correct" if given_guess.correct else "Wrong"
             self.send_markdown(f"Card '*{card.word}*' is {card.color}, {result}!")
-        self.fast_forward()
+        return self.fast_forward()
+
+
+class CustomHandler(EventHandler):
+    def handle(self):
+        game_config = GameConfig()
+        session = Session(config=game_config)
+        self.bot.set_session(self.user.id, session=session)
+        keyboard = ReplyKeyboardMarkup([DEFAULT_LANGUAGES], one_time_keyboard=True)
+        self.send_text("Pick language:", reply_markup=keyboard)
+        return BotState.ConfigLanguage
+
+
+class ConfigLanguageHandler(EventHandler):
+    def handle(self):
+        self.session.config.language = self.update.message.text
+        difficulties = [Difficulty.EASY.value, Difficulty.MEDIUM.value, Difficulty.HARD.value]
+        keyboard = ReplyKeyboardMarkup([difficulties], one_time_keyboard=True)
+        self.send_text("Pick difficulty:", reply_markup=keyboard)
+        return BotState.ConfigDifficulty
+
+
+class ConfigDifficultyHandler(EventHandler):
+    def handle(self):
+        self.session.config.difficulty = Difficulty(self.update.message.text)
+        return self.trigger(StartEventHandler)
+
+
+class ConfigSolverHandler(EventHandler):
+    def handle(self):
+        pass
+
+
+class ContinueHandler(EventHandler):
+    def handle(self):
+        self.send_text("Not implemented yet.")
+
+
+class ContinueGetIdHandler(EventHandler):
+    def handle(self):
+        pass
+
+
+class FallbackHandler(EventHandler):
+    def handle(self):
+        pass
 
 
 class HelpMessageHandler(EventHandler):
@@ -320,14 +323,9 @@ class HelpMessageHandler(EventHandler):
         log.info("Got help message")
         message = f"""Hi {self.user.name}!
 /start - start a new game.
+/custom - start a new game with custom configurations.
+/continue - continue an old game.
 /help - show this message.
-
-Optional arguments:
-/start  language  difficulty  solver
-language = {{english, hebrew}}
-difficulty = {{hard, medium, easy}}
-solver = {{naive, olympic, sna}}
-For example: `/start hebrew easy`
 
 How to play:
 You are the blue guesser. The bot will play all other roles. \
@@ -356,14 +354,53 @@ class TheSpymasterBot:
         updater = Updater(config.telegram_token)
         dispatcher = updater.dispatcher
 
-        dispatcher.add_handler(CommandHandler("start", self.generate_handler(StartEventHandler)))
-        dispatcher.add_handler(CommandHandler("help", self.generate_handler(HelpMessageHandler)))
-        dispatcher.add_handler(
-            MessageHandler(Filters.text & ~Filters.command, self.generate_handler(ProcessMessageHandler))
+        start_handler = CommandHandler("start", self.generate_handler(StartEventHandler))
+        custom_handler = CommandHandler("custom", self.generate_handler(CustomHandler))
+        config_language_handler = MessageHandler(Filters.text, self.generate_handler(ConfigLanguageHandler))
+        config_difficulty_handler = MessageHandler(Filters.text, self.generate_handler(ConfigDifficultyHandler))
+        config_solver_handler = MessageHandler(Filters.text, self.generate_handler(ConfigSolverHandler))
+        continue_game_handler = CommandHandler("continue", self.generate_handler(ContinueHandler))
+        continue_get_id_handler = MessageHandler(Filters.text, self.generate_handler(ContinueGetIdHandler))
+        fallback_handler = CommandHandler("quit", self.generate_handler(FallbackHandler))
+        help_message_handler = CommandHandler("help", self.generate_handler(HelpMessageHandler))
+        process_message_handler = MessageHandler(
+            Filters.text & ~Filters.command, self.generate_handler(ProcessMessageHandler)
         )
+
+        conv_handler = ConversationHandler(
+            entry_points=[start_handler, custom_handler, continue_game_handler, help_message_handler],
+            states={
+                BotState.ConfigLanguage: [config_language_handler],
+                BotState.ConfigDifficulty: [config_difficulty_handler],
+                BotState.ConfigSolver: [config_solver_handler],
+                BotState.ContinueGetId: [continue_get_id_handler],
+                BotState.Playing: [process_message_handler],
+            },
+            fallbacks=[fallback_handler],
+            allow_reentry=True,
+        )
+
+        dispatcher.add_handler(conv_handler)
+        dispatcher.add_handler(process_message_handler)
 
         updater.start_polling()
         updater.idle()
+
+
+def build_board_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
+    reply_keyboard = []
+    for row in table.rows:
+        row_keyboard = []
+        for card in row:
+            card: Card
+            if is_game_over:
+                content = f"{card.color.emoji} {card.word}"
+            else:
+                content = card.color.emoji if card.revealed else card.word
+            row_keyboard.append(content)
+        reply_keyboard.append(row_keyboard)
+    reply_keyboard.append(list(COMMAND_TO_INDEX.keys()))
+    return ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
 
 
 def _is_blue_guesser_turn(session):

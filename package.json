@@ -1,5 +1,5 @@
 {
   "devDependencies": {
-    "json-log-viewer": "github:Townsheriff/json-log-viewer"
+    "json-log-viewer": "github:florian-sattler/json-log-viewer"
   }
 }

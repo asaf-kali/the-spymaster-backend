@@ -58,5 +58,17 @@ migrate:
 save:
 	python manage.py dumpdata print_manager -o $(FIXTURE_FILE)
 
+# Run
+
 run-server:
 	python manage.py runserver
+
+run-bot:
+	export DJANGO_SETTINGS_MODULE="the_spymaster.settings" && \
+	export ENV_FOR_DYNACONF="local" && \
+	python -m telegram_bot.main
+
+run:
+	killall python
+	@make run-server --no-print-directory &
+	@make run-bot --no-print-directory &
