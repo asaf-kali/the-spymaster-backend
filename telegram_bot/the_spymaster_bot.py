@@ -381,9 +381,9 @@ Use '-pass' and '-quit' to pass the turn and quit the game.
 
 
 class TheSpymasterBot:
-    def __init__(self):
+    def __init__(self, base_backend: str = None):
         self.sessions: Dict[int, Session] = {}
-        self.client = TheSpymasterClient()
+        self.client = TheSpymasterClient(base_backend=base_backend)
 
     def set_session(self, user_id: int, session: Optional[Session]):
         if not session:

@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config.django_debug
 SECRET_KEY = config.django_secret_key
 SITE_ID = 1
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.240"]
 
 if DEBUG:
     sentry_sdk.init(

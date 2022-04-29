@@ -20,7 +20,7 @@ from api.models.response import (
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
-DEFAULT_BASE_URL = "http://localhost:8000/api/v1/game"
+DEFAULT_BASE_BACKEND = "http://localhost:8000"
 
 
 def _log_data(url: str, response: Response):
@@ -35,8 +35,11 @@ def _log_data(url: str, response: Response):
 
 
 class TheSpymasterClient:
-    def __init__(self, base_url: str = DEFAULT_BASE_URL):
-        self.base_url = base_url
+    def __init__(self, base_backend: str = None):
+        if not base_backend:
+            base_backend = DEFAULT_BASE_BACKEND
+        self.base_url = f"{base_backend}/api/v1/game"
+        log.debug(f"Client using backend: {self.base_url}.")
 
     def _http_call(self, endpoint: str, method: Callable, **kwargs) -> dict:
         url = f"{self.base_url}/{endpoint}"

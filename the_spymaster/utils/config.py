@@ -59,5 +59,9 @@ class Config:
     def google_oauth_client_secret(self) -> str:
         return self.get("GOOGLE_OAUTH_CLIENT_SECRET")
 
+    @property
+    def base_backend_url(self) -> str:
+        return self.get("BASE_BACKEND_URL")
+
 
 config = Config()
