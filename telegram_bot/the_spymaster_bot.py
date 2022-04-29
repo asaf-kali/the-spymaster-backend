@@ -230,7 +230,7 @@ class EventHandler:
             message = "Game over!" if state.is_game_over else "Pick your guess!"
             if state.bonus_given:
                 message += " (bonus round)"
-        text = self.send_text(message, reply_markup=keyboard)
+        text = self.send_markdown(message, reply_markup=keyboard)
         self.session.last_keyboard_message = text.message_id
 
     def _refresh_game_state(self):
@@ -299,7 +299,7 @@ class ProcessMessageHandler(EventHandler):
             command = COMMAND_TO_INDEX.get(text, text)
             card_index = _get_card_index(board=session.state.board, text=command)
         except:  # noqa
-            self.send_board(f"Card '{text}' not found. Please reply with card index (1-25) or a word on the board.")
+            self.send_board(f"Card '*{text}*' not found. Please reply with card index (1-25) or a word on the board.")
             return None
         request = GuessRequest(game_id=self.game_id, card_index=card_index)
         response = self.client.guess(request)

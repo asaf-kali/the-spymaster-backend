@@ -9,6 +9,7 @@ django_debug = false
 indented_json = 0
 formatter = "simple"
 root_log_level = "INFO"
+bot_log_level = "INFO"
 
 # App
 language_data_folder = "/home/akali/projects/codenames/language_data"
@@ -17,6 +18,7 @@ base_backend_url = "http://127.0.0.1:8000"
 [local]
 env_verbose_name = "Local"
 django_debug = true
+bot_log_level = "DEBUG"
 
 [dev]
 env_verbose_name = "Dev"

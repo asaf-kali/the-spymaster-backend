@@ -226,7 +226,7 @@ LOGGING = {
         },
         "telegram_bot": {
             "handlers": ["console_out", "console_err", "bot_file"],
-            "level": "DEBUG",
+            "level": config.bot_log_level,
             "propagate": False,
         },
         # 3rd parties
