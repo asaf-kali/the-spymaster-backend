@@ -1,7 +1,7 @@
 import django
 
 django.setup()
-from telegram_bot.logic import TheSpymasterBot
+from telegram_bot.the_spymaster_bot import TheSpymasterBot
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)

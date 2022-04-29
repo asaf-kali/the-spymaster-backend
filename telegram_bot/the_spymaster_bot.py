@@ -1,6 +1,6 @@
 from enum import IntEnum, auto
 from random import random
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 from codenames.game import (
     PASS_GUESS,
@@ -247,7 +247,7 @@ class StartEventHandler(EventHandler):
 
 class ProcessMessageHandler(EventHandler):
     def handle(self):
-        text = self.update.message.text
+        text = self.update.message.text.lower()
         log.info(f"Processing message: '{text}'")
         self.remove_keyboard()
         session = self.session
@@ -278,23 +278,26 @@ class CustomHandler(EventHandler):
         game_config = GameConfig()
         session = Session(config=game_config)
         self.bot.set_session(self.user.id, session=session)
-        keyboard = ReplyKeyboardMarkup([DEFAULT_LANGUAGES], one_time_keyboard=True)
+        keyboard = build_language_keyboard()
         self.send_text("🌍 Pick language:", reply_markup=keyboard)
         return BotState.ConfigLanguage
 
 
 class ConfigLanguageHandler(EventHandler):
     def handle(self):
-        self.session.config.language = self.update.message.text
-        difficulties = [Difficulty.EASY.value, Difficulty.MEDIUM.value, Difficulty.HARD.value]
-        keyboard = ReplyKeyboardMarkup([difficulties], one_time_keyboard=True)
+        text = self.update.message.text.lower()
+        log.info(f"Setting language: '{text}'")
+        self.session.config.language = text
+        keyboard = build_difficulty_keyboard()
         self.send_text("🥵 Pick difficulty:", reply_markup=keyboard)
         return BotState.ConfigDifficulty
 
 
 class ConfigDifficultyHandler(EventHandler):
     def handle(self):
-        self.session.config.difficulty = Difficulty(self.update.message.text)
+        text = self.update.message.text.lower()
+        log.info(f"Setting difficulty: '{text}'")
+        self.session.config.difficulty = Difficulty(text)
         return self.trigger(StartEventHandler)
 
 
@@ -401,6 +404,21 @@ def build_board_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
         reply_keyboard.append(row_keyboard)
     reply_keyboard.append(list(COMMAND_TO_INDEX.keys()))
     return ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+
+def build_language_keyboard():
+    languages = _title_list(DEFAULT_LANGUAGES)
+    return ReplyKeyboardMarkup([languages], one_time_keyboard=True)
+
+
+def build_difficulty_keyboard():
+    difficulties = _title_list([Difficulty.EASY.value, Difficulty.MEDIUM.value, Difficulty.HARD.value])
+    keyboard = ReplyKeyboardMarkup([difficulties], one_time_keyboard=True)
+    return keyboard
+
+
+def _title_list(strings: List[str]) -> List[str]:
+    return [s.title() for s in strings]
 
 
 def _is_blue_guesser_turn(session):
