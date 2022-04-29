@@ -1,5 +1,6 @@
 from enum import IntEnum, auto
 from random import random
+from time import sleep
 from typing import Any, Dict, List, Optional, Type
 
 from codenames.game import (
@@ -11,6 +12,7 @@ from codenames.game import (
     GameState,
     PlayerRole,
     TeamColor,
+    WinningReason,
 )
 from pydantic import BaseModel
 from requests import HTTPError
@@ -28,7 +30,12 @@ from telegram.ext import (
 
 from api.logic.language import DEFAULT_LANGUAGES
 from api.models.game import Difficulty, GameConfig
-from api.models.request import GuessRequest, NextMoveRequest, StartGameRequest
+from api.models.request import (
+    GetGameStateRequest,
+    GuessRequest,
+    NextMoveRequest,
+    StartGameRequest,
+)
 from api.models.response import ErrorResponse
 from telegram_bot.client import TheSpymasterClient
 from the_spymaster.utils import config, get_logger
@@ -36,6 +43,11 @@ from the_spymaster.utils import config, get_logger
 log = get_logger(__name__)
 BLUE_EMOJI = CardColor.BLUE.emoji
 RED_EMOJI = CardColor.RED.emoji
+WIN_REASON_TO_EMOJI = {
+    WinningReason.TARGET_SCORE_REACHED: "🤓",
+    WinningReason.OPPONENT_HIT_BLACK: "😵",
+    WinningReason.OPPONENT_QUIT: "🥴",
+}
 COMMAND_TO_INDEX = {"-pass": PASS_GUESS, "-quit": QUIT_GAME}
 
 
@@ -150,6 +162,7 @@ class EventHandler:
     def remove_keyboard(self):
         if not self.session or not self.session.last_keyboard_message:
             return
+        log.debug("Removing keyboard")
         try:
             self.context.bot.edit_message_reply_markup(
                 chat_id=self.chat_id, message_id=self.session.last_keyboard_message
@@ -159,10 +172,26 @@ class EventHandler:
         self.session.last_keyboard_message = None
 
     def send_game_summary(self):
-        hint_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in self.state.raw_hints]
-        intents = "\n".join(hint_strings)
-        self.send_markdown(f"Hinters intents were:\n{intents}")
-        self.send_text(f"Winner: {self.state.winner}", put_log=True)
+        self._send_hinters_intents()
+        self._send_winner_text()
+
+    def _send_winner_text(self):
+        winner = self.state.winner
+        player_won = winner.team_color == TeamColor.BLUE
+        winning_emoji = "🎉" if player_won else "😭"
+        reason_emoji = WIN_REASON_TO_EMOJI[winner.reason]
+        status = "won" if player_won else "lose"
+        text = f"You {status}! {winning_emoji}\n{winner.team_color} team won: {winner.reason.value} {reason_emoji}"
+        self.send_text(text, put_log=True)
+
+    def _send_hinters_intents(self):
+        relevant_hints = [hint for hint in self.state.raw_hints if hint.for_words]
+        if not relevant_hints:
+            return
+        intent_strings = [f"'*{hint.word}*' for {hint.for_words}" for hint in relevant_hints]
+        intent_string = "\n".join(intent_strings)
+        text = f"Hinters intents were:\n{intent_string}\n"
+        self.send_markdown(text)
 
     def _next_move(self):
         team_color = self.state.current_team_color.value.title()
@@ -185,23 +214,29 @@ class EventHandler:
                 text = f"{team_color} guesser says '*{given_guess.guessed_card.word}*', {given_guess.correct}!"
                 self.send_markdown(text)
         self.session.state = response.game_state
+        sleep(0.2 + random() / 2)
 
     def send_score(self):
         score = self.state.remaining_score
-        message = f"{BLUE_EMOJI}  *{score[TeamColor.BLUE]}*  remaining card(s)  *{score[TeamColor.RED]}*  {RED_EMOJI}"
-        self.send_markdown(message)
+        text = f"{BLUE_EMOJI}  *{score[TeamColor.BLUE]}*  remaining card(s)  *{score[TeamColor.RED]}*  {RED_EMOJI}"
+        self.send_markdown(text)
 
-    def send_board(self, text: str = None):
+    def send_board(self, message: str = None):
         state = self.state
         board_to_send = state.board if state.is_game_over else state.board.censured
         table = board_to_send.as_table
         keyboard = build_board_keyboard(table, is_game_over=state.is_game_over)
-        if text is None:
-            text = "Game over!" if state.is_game_over else "Pick your guess!"
+        if message is None:
+            message = "Game over!" if state.is_game_over else "Pick your guess!"
             if state.bonus_given:
-                text += " (bonus round)"
-        message = self.send_text(text, reply_markup=keyboard)
-        self.session.last_keyboard_message = message.message_id
+                message += " (bonus round)"
+        text = self.send_text(message, reply_markup=keyboard)
+        self.session.last_keyboard_message = text.message_id
+
+    def _refresh_game_state(self):
+        request = GetGameStateRequest(game_id=self.game_id)
+        response = self.client.get_game_state(request=request)
+        self.session.state = response.game_state
 
     def _handle_error(self, e: Exception):
         log.debug(f"Handling error: {e}")
@@ -216,6 +251,11 @@ class EventHandler:
             self.send_text(f"💔 Something went wrong: {e}")
         except:  # noqa
             pass
+        # Try refreshing the state
+        try:
+            self._refresh_game_state()
+        except:  # noqa
+            log.exception("Failed to refresh game state")
 
     def _handle_http_error(self, e: HTTPError):
         data = e.response.json()
@@ -241,6 +281,7 @@ class StartEventHandler(EventHandler):
         response = self.client.start_game(request)
         session = Session(game_id=response.game_id, state=response.game_state, config=session_config)
         self.bot.set_session(self.user.id, session=session)
+        self.remove_keyboard()
         self.send_markdown(f"Game *#{response.game_id}* is starting! 🥳")
         return self.fast_forward()
 
@@ -269,7 +310,7 @@ class ProcessMessageHandler(EventHandler):
         else:
             card = given_guess.guessed_card
             result = "Correct! ✅" if given_guess.correct else "Wrong! ❌"
-            self.send_markdown(f"Card '*{card.word}*' is {card.color}, {result}")
+            self.send_markdown(f"Card '*{card.word}*' is {card.color.emoji}, {result}")
         return self.fast_forward()
 
 
@@ -324,7 +365,7 @@ class FallbackHandler(EventHandler):
 class HelpMessageHandler(EventHandler):
     def handle(self):
         log.info("Got help message")
-        message = f"""Hi {self.user.name}!
+        text = f"""Hi {self.user.name}!
 /start - start a new game.
 /custom - start a new game with custom configurations.
 /continue - continue an old game.
@@ -336,7 +377,7 @@ When the blue hinter sends a hint, you can reply with a card index (1-25), \
 or just click the word on the keyboard. \
 Use '-pass' and '-quit' to pass the turn and quit the game.
 """
-        self.send_markdown(message)
+        self.send_markdown(text)
 
 
 class TheSpymasterBot:
