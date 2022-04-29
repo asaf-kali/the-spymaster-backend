@@ -194,10 +194,12 @@ LOGGING = {
             "level": "DEBUG",
         },
         "bot_file": {
-            "class": "logging.handlers.WatchedFileHandler",
+            "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "bot.log"),
             "formatter": "json",
             "level": "DEBUG",
+            "when": "midnight",
+            "backupCount": 28,
         },
         "root_file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
