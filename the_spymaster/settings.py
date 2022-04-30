@@ -108,11 +108,11 @@ WSGI_APPLICATION = "the_spymaster.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": config.get("DB_ENGINE", default="django.db.backends.sqlite3"),
-        "NAME": config.get("DB_NAME", BASE_DIR / "db.sqlite3"),
+        "NAME": config.get("DB_NAME", default=BASE_DIR / "db.sqlite3"),
         "USER": config.get("DB_USER"),
         "PASSWORD": config.get("DB_PASSWORD"),
         "HOST": config.get("DB_HOST"),
-        "PORT": config.get("DB_PORT", default=3306),
+        "PORT": config.get("DB_PORT"),
     }
 }
 

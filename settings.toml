@@ -29,6 +29,9 @@ env_verbose_name = "Staging"
 
 [prod]
 env_verbose_name = "Production"
+db_name = "postgres"
+db_engine = "django.db.backends.postgresql"
+db_port = 5432
 
 [rsbpi]
 env_verbose_name = "Raspberry Pi"
