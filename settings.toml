@@ -12,7 +12,7 @@ root_log_level = "INFO"
 bot_log_level = "INFO"
 
 # App
-language_data_folder = "/home/akali/projects/codenames/language_data"
+language_data_folder = "~/.cache/language_data"
 base_backend_url = "http://127.0.0.1:8000"
 
 [local]
@@ -32,5 +32,4 @@ env_verbose_name = "Production"
 
 [rsbpi]
 env_verbose_name = "Raspberry Pi"
-language_data_folder = "/home/pi/.cache/language_data"
 base_backend_url = "http://192.168.1.240:8000"

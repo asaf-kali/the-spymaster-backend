@@ -1,3 +1,5 @@
+from typing import List
+
 from dynaconf import Dynaconf
 
 
@@ -11,11 +13,11 @@ class Config:
     def get(self, key: str, default=None) -> any:
         return self.settings.get(key, default)
 
-    def load(self):
-        self._settings = Dynaconf(
-            environments=True,
-            settings_files=["settings.toml", ".secrets.toml"],
-        )
+    def load(self, override_files: List[str] = None):
+        if not override_files:
+            override_files = []
+        settings_files = ["settings.toml", "settings.local.toml", ".secrets.toml"] + override_files
+        self._settings = Dynaconf(environments=True, settings_files=settings_files)
 
     @property
     def settings(self) -> Dynaconf:
