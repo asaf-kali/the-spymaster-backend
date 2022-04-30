@@ -7,11 +7,9 @@ django-filter==21.1
 djangorestframework==3.13.1
 dj-rest-auth==2.2.4
 requests
-# django-cors-headers==3.7.0
 
 # Other
-prodict==0.8.18
-# boto3
+django-json-widget==1.1.1
 
 # Monitor
 sentry-sdk==1.5.10

@@ -37,8 +37,8 @@ DIFFICULTY_TO_PASS_PROBABILITY: Dict[Difficulty, float] = {
 
 class Game(models.Model):
     id = models.BigAutoField(primary_key=True)
-    state_json = models.JSONField()
+    state_data = models.JSONField()
 
     @property
     def state(self) -> GameState:
-        return GameState.from_json(self.state_json)
+        return GameState(**self.state_data)

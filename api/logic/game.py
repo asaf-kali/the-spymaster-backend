@@ -70,10 +70,9 @@ class NextMoveHandler:
 
 def get_game(game_id: int) -> Game:
     try:
-        game = Game.objects.get(id=game_id)
+        return Game.objects.get(id=game_id)
     except Game.DoesNotExist as e:
         raise BadRequestError("Game does not exist") from e
-    return game
 
 
 load_default_models_async()
