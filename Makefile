@@ -1,6 +1,8 @@
 PYTHON_TEST_COMMAND=pytest -s
 DEL_COMMAND=gio trash
 LINE_LENGTH=120
+RUN_SERVER_IP=0.0.0.0
+RUN_SERVER_PORT=8080
 export DJANGO_SETTINGS_MODULE = the_spymaster.settings
 export ENV_FOR_DYNACONF = local
 
@@ -63,7 +65,7 @@ save:
 # Run
 
 run-server:
-	python manage.py runserver 0.0.0.0:8000
+	python manage.py runserver $(RUN_SERVER_IP):$(RUN_SERVER_PORT)
 
 run-bot:
 	python -m telegram_bot.main
