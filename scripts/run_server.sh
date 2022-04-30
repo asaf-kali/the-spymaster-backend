@@ -1,4 +1,3 @@
 source ./venv/bin/activate
-export ENV_FOR_DYNACONF=prod
-make run
+make run ENV_FOR_DYNACONF=prod
 tail -n 0 -f console.log

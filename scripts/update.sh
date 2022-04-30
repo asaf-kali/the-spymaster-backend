@@ -1,4 +1,5 @@
-git pull
+git fetch
+git reset --hard origin/main
 
 #echo "Configuring crontab"
 #crontab ./scripts/crontab_config.txt
