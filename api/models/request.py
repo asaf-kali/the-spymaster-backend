@@ -48,3 +48,7 @@ class NextMoveRequest(BaseRequest):
     game_id: int
     model_identifier: Optional[ModelIdentifier] = None
     solver: Solver = Solver.NAIVE
+
+
+class AsyncLoadModelsRequest(BaseRequest):
+    model_identifiers: List[ModelIdentifier] = []

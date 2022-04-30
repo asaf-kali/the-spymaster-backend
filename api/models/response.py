@@ -44,3 +44,7 @@ class NextMoveResponse(BaseResponse):
     given_hint: Optional[GivenHint] = None
     given_guess: Optional[GivenGuess] = None
     game_state: GameState
+
+
+class AsyncLoadModelsResponse(BaseResponse):
+    pass

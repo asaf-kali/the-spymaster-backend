@@ -5,11 +5,7 @@ from codenames.solvers import NaiveGuesser, NaiveHinter
 from codenames.utils.loader.model_loader import ModelIdentifier
 
 from api.logic.errors import BadRequestError
-from api.logic.language import (
-    DEFAULT_MODELS,
-    get_adapter_for_model,
-    load_default_models_async,
-)
+from api.logic.language import DEFAULT_MODELS, get_adapter_for_model
 from api.models.game import Game, Solver
 from api.models.response import NextMoveResponse
 from the_spymaster.utils import get_logger
@@ -73,6 +69,3 @@ def get_game(game_id: int) -> Game:
         return Game.objects.get(id=game_id)
     except Game.DoesNotExist as e:
         raise BadRequestError("Game does not exist") from e
-
-
-load_default_models_async()
