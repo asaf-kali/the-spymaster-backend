@@ -56,16 +56,21 @@ class TheSpymasterClient:
         return self._http_call(endpoint=endpoint, method=requests.post, json=data)
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
-        return StartGameResponse(**self._post("start/", request.dict()))
+        data = self._post("start/", data=request.dict())
+        return StartGameResponse(**data)
 
     def hint(self, request: HintRequest) -> HintResponse:
-        return HintResponse(**self._post("hint/", request.dict()))
+        data = self._post("hint/", data=request.dict())
+        return HintResponse(**data)
 
     def guess(self, request: GuessRequest) -> GuessResponse:
-        return GuessResponse(**self._post("guess/", request.dict()))
+        data = self._post("guess/", data=request.dict())
+        return GuessResponse(**data)
 
     def next_move(self, request: NextMoveRequest) -> NextMoveResponse:
-        return NextMoveResponse(**self._post("next-move/", request.dict()))
+        data = self._post("next-move/", data=request.dict())
+        return NextMoveResponse(**data)
 
     def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
-        return GetGameStateResponse(**self._get("state/", request.dict()))
+        data = self._get("state/", data=request.dict())
+        return GetGameStateResponse(**data)
