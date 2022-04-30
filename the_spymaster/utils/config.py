@@ -16,7 +16,7 @@ class Config:
     def load(self, override_files: List[str] = None):
         if not override_files:
             override_files = []
-        settings_files = ["settings.toml", "settings.local.toml", ".secrets.toml"] + override_files
+        settings_files = ["settings.toml", "local.toml", "secrets.toml"] + override_files
         self._settings = Dynaconf(environments=True, settings_files=settings_files)
 
     @property
