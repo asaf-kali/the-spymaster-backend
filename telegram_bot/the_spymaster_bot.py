@@ -3,6 +3,7 @@ from random import random
 from time import sleep
 from typing import Any, Dict, List, Optional, Type
 
+import sentry_sdk
 from codenames.game import (
     PASS_GUESS,
     QUIT_GAME,
@@ -234,6 +235,8 @@ class EventHandler:
         self.session.last_keyboard_message = text.message_id
 
     def _refresh_game_state(self):
+        if not self.game_id:
+            return
         request = GetGameStateRequest(game_id=self.game_id)
         response = self.client.get_game_state(request=request)
         self.session.state = response.game_state
@@ -241,11 +244,17 @@ class EventHandler:
     def _handle_error(self, e: Exception):
         log.debug(f"Handling error: {e}")
         try:
+            _enrich_sentry_context(user_name=self.user_full_name)
+        except Exception as e:
+            log.error(f"Failed to enrich sentry context: {e}")
+        try:
             if isinstance(e, HTTPError):
                 self._handle_http_error(e)
                 return
-        except:  # noqa
+        except Exception as handling_error:
+            sentry_sdk.capture_exception(handling_error)
             log.exception("Failed to handle error")
+        sentry_sdk.capture_exception(e)
         log.exception(e)
         try:
             self.send_text(f"💔 Something went wrong: {e}")
@@ -415,8 +424,8 @@ class TheSpymasterBot:
             entry_points=[start_handler, custom_handler, continue_game_handler, help_message_handler],
             states={
                 BotState.ConfigLanguage: [config_language_handler],
-                BotState.ConfigDifficulty: [config_difficulty_handler],
-                BotState.ConfigSolver: [config_solver_handler],
+                BotState.ConfigDifficulty: [config_difficulty_handler, fallback_handler],
+                BotState.ConfigSolver: [config_solver_handler, fallback_handler],
                 BotState.ContinueGetId: [continue_get_id_handler],
                 BotState.Playing: [process_message_handler],
             },
@@ -477,3 +486,10 @@ def _get_card_index(board: Board, text: str) -> int:
     except ValueError:
         pass
     return board.find_card_index(text)
+
+
+def _enrich_sentry_context(**kwargs):
+    for k, v in log.context.items():
+        sentry_sdk.set_tag(k, v)
+    for k, v in kwargs.items():
+        sentry_sdk.set_tag(k, v)
