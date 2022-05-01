@@ -241,23 +241,23 @@ class EventHandler:
         response = self.client.get_game_state(request=request)
         self.session.state = response.game_state
 
-    def _handle_error(self, e: Exception):
-        log.debug(f"Handling error: {e}")
+    def _handle_error(self, error: Exception):
+        log.debug(f"Handling error: {error}")
         try:
             _enrich_sentry_context(user_name=self.user_full_name)
         except Exception as e:
             log.error(f"Failed to enrich sentry context: {e}")
         try:
-            if isinstance(e, HTTPError):
-                self._handle_http_error(e)
+            if isinstance(error, HTTPError):
+                self._handle_http_error(error)
                 return
         except Exception as handling_error:
             sentry_sdk.capture_exception(handling_error)
             log.exception("Failed to handle error")
-        sentry_sdk.capture_exception(e)
-        log.exception(e)
+        sentry_sdk.capture_exception(error)
+        log.exception(error)
         try:
-            self.send_text(f"💔 Something went wrong: {e}")
+            self.send_text(f"💔 Something went wrong: {error}")
         except:  # noqa
             pass
         # Try refreshing the state

@@ -6,6 +6,7 @@ package-lock.json
 logs/
 local.toml
 *secrets.*
+language_data
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,linux,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,linux,pycharm
@@ -238,7 +239,7 @@ ipython_config.py
 #   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
 #poetry.lock
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+# PEP 582; used by error.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
 # Celery stuff
