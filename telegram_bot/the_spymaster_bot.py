@@ -15,6 +15,7 @@ from codenames.game import (
     TeamColor,
     WinningReason,
 )
+from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
 from requests import HTTPError
 from telegram import Message, ReplyKeyboardMarkup, Update
@@ -50,12 +51,26 @@ WIN_REASON_TO_EMOJI = {
     WinningReason.OPPONENT_QUIT: "🥴",
 }
 COMMAND_TO_INDEX = {"-pass": PASS_GUESS, "-quit": QUIT_GAME}
+AVAILABLE_MODELS = [
+    ModelIdentifier(language="english", model_name="wiki-50", is_stemmed=False),
+    ModelIdentifier(language="english", model_name="google-300", is_stemmed=False),
+    ModelIdentifier(language="hebrew", model_name="twitter", is_stemmed=False),
+    ModelIdentifier(language="hebrew", model_name="ft-200", is_stemmed=False),
+    ModelIdentifier(language="hebrew", model_name="skv-cbow-30", is_stemmed=True),
+    ModelIdentifier(language="hebrew", model_name="skv-cbow-150", is_stemmed=True),
+    ModelIdentifier(language="hebrew", model_name="skv-ft-150", is_stemmed=True),
+]
+
+
+class BadMessageError(Exception):
+    pass
 
 
 class BotState(IntEnum):
     Entry = auto()
     ConfigLanguage = auto()
     ConfigDifficulty = auto()
+    ConfigModel = auto()
     ConfigSolver = auto()
     ContinueGetId = auto()
     Playing = auto()
@@ -251,6 +266,9 @@ class EventHandler:
             if isinstance(error, HTTPError):
                 self._handle_http_error(error)
                 return
+            if isinstance(error, BadMessageError):
+                self._handle_bad_message(error)
+                return
         except Exception as handling_error:
             sentry_sdk.capture_exception(handling_error)
             log.exception("Failed to handle error")
@@ -270,6 +288,9 @@ class EventHandler:
         data = e.response.json()
         response = ErrorResponse(**data)
         self.send_text(f"{response.message}: {response.details}", put_log=True)
+
+    def _handle_bad_message(self, e: BadMessageError):
+        self.send_markdown(f"🧐 {e}", put_log=True)
 
     def _should_skip_turn(self) -> bool:
         dice = random()
@@ -337,7 +358,7 @@ class ConfigLanguageHandler(EventHandler):
     def handle(self):
         text = self.update.message.text.lower()
         log.info(f"Setting language: '{text}'")
-        self.session.config.language = text
+        self.session.config.language = parse_language(text)
         keyboard = build_difficulty_keyboard()
         self.send_text("🥵 Pick difficulty:", reply_markup=keyboard)
         return BotState.ConfigDifficulty
@@ -347,7 +368,19 @@ class ConfigDifficultyHandler(EventHandler):
     def handle(self):
         text = self.update.message.text.lower()
         log.info(f"Setting difficulty: '{text}'")
-        self.session.config.difficulty = Difficulty(text)
+        self.session.config.difficulty = parse_difficulty(text)
+        keyword = build_models_keyboard(language=self.session.config.language)
+        self.send_text("🧠 Pick language model:", reply_markup=keyword)
+        return BotState.ConfigModel
+
+
+class ConfigModelHandler(EventHandler):
+    def handle(self):
+        text = self.update.message.text.lower()
+        log.info(f"Setting model: '{text}'")
+        self.session.config.model_identifier = parse_model_identifier(
+            language=self.session.config.language, model_name=text
+        )
         return self.trigger(StartEventHandler)
 
 
@@ -411,6 +444,7 @@ class TheSpymasterBot:
         custom_handler = CommandHandler("custom", self.generate_handler(CustomHandler))
         config_language_handler = MessageHandler(Filters.text, self.generate_handler(ConfigLanguageHandler))
         config_difficulty_handler = MessageHandler(Filters.text, self.generate_handler(ConfigDifficultyHandler))
+        config_model_handler = MessageHandler(Filters.text, self.generate_handler(ConfigModelHandler))
         config_solver_handler = MessageHandler(Filters.text, self.generate_handler(ConfigSolverHandler))
         continue_game_handler = CommandHandler("continue", self.generate_handler(ContinueHandler))
         continue_get_id_handler = MessageHandler(Filters.text, self.generate_handler(ContinueGetIdHandler))
@@ -425,6 +459,7 @@ class TheSpymasterBot:
             states={
                 BotState.ConfigLanguage: [config_language_handler],
                 BotState.ConfigDifficulty: [config_difficulty_handler, fallback_handler],
+                BotState.ConfigModel: [config_model_handler, fallback_handler],
                 BotState.ConfigSolver: [config_solver_handler, fallback_handler],
                 BotState.ContinueGetId: [continue_get_id_handler],
                 BotState.Playing: [process_message_handler],
@@ -465,6 +500,33 @@ def build_difficulty_keyboard():
     difficulties = _title_list([Difficulty.EASY.value, Difficulty.MEDIUM.value, Difficulty.HARD.value])
     keyboard = ReplyKeyboardMarkup([difficulties], one_time_keyboard=True)
     return keyboard
+
+
+def build_models_keyboard(language: str):
+    language_models = [model for model in AVAILABLE_MODELS if model.language == language]
+    model_names = [model.model_name for model in language_models]
+    keyboard = ReplyKeyboardMarkup([model_names], one_time_keyboard=True)
+    return keyboard
+
+
+def parse_language(text: str) -> str:
+    if text not in DEFAULT_LANGUAGES:
+        raise BadMessageError(f"Unknown language: '*{text}*'")
+    return text
+
+
+def parse_difficulty(text: str) -> Difficulty:
+    try:
+        return Difficulty(text)
+    except ValueError as e:
+        raise BadMessageError(f"Unknown difficulty: '*{text}*'") from e
+
+
+def parse_model_identifier(language: str, model_name: str) -> ModelIdentifier:
+    for model in AVAILABLE_MODELS:
+        if model.language == language and model.model_name == model_name:
+            return model
+    raise BadMessageError(f"Unknown model '*{model_name}*' for language '*{language}*'")
 
 
 def _title_list(strings: List[str]) -> List[str]:

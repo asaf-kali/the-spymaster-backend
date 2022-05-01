@@ -1,7 +1,8 @@
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 
 from codenames.game import GameState
+from codenames.utils.loader.model_loader import ModelIdentifier
 from django.db import models
 from pydantic import BaseModel
 
@@ -26,6 +27,7 @@ class GameConfig(BaseModel):
     language: str = "hebrew"
     difficulty: Difficulty = Difficulty.EASY
     solver: Solver = Solver.NAIVE
+    model_identifier: Optional[ModelIdentifier] = None
 
 
 DIFFICULTY_TO_PASS_PROBABILITY: Dict[Difficulty, float] = {
