@@ -53,12 +53,14 @@ WIN_REASON_TO_EMOJI = {
 COMMAND_TO_INDEX = {"-pass": PASS_GUESS, "-quit": QUIT_GAME}
 AVAILABLE_MODELS = [
     ModelIdentifier(language="english", model_name="wiki-50", is_stemmed=False),
-    ModelIdentifier(language="english", model_name="google-300", is_stemmed=False),
-    ModelIdentifier(language="hebrew", model_name="twitter", is_stemmed=False),
-    ModelIdentifier(language="hebrew", model_name="ft-200", is_stemmed=False),
-    ModelIdentifier(language="hebrew", model_name="skv-cbow-30", is_stemmed=True),
-    ModelIdentifier(language="hebrew", model_name="skv-cbow-150", is_stemmed=True),
+    # ModelIdentifier(language="english", model_name="google-300", is_stemmed=False),
+    # ModelIdentifier(language="hebrew", model_name="twitter", is_stemmed=False),
+    # ModelIdentifier(language="hebrew", model_name="ft-200", is_stemmed=False),
+    # ModelIdentifier(language="hebrew", model_name="skv-cbow-30", is_stemmed=True),
+    # ModelIdentifier(language="hebrew", model_name="skv-cbow-150", is_stemmed=True),
     ModelIdentifier(language="hebrew", model_name="skv-ft-150", is_stemmed=True),
+    ModelIdentifier(language="hebrew", model_name="ft-30", is_stemmed=False),
+    ModelIdentifier(language="hebrew", model_name="cbow-30", is_stemmed=False),
 ]
 
 
