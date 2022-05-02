@@ -409,7 +409,7 @@ class FallbackHandler(EventHandler):
 class HelpMessageHandler(EventHandler):
     def handle(self):
         log.info("Got help message")
-        text = f"""Hi {self.user.name}!
+        text = """Welcome! I'm *The Spymaster* 🕵🏼‍♂️
 /start - start a new game.
 /custom - start a new game with custom configurations.
 /continue - continue an old game.
