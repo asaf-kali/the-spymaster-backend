@@ -1,3 +1,4 @@
+import json
 from enum import IntEnum, auto
 from random import random
 from time import sleep
@@ -83,6 +84,15 @@ class Session(BaseModel):
     state: Optional[GameState]
     last_keyboard_message: Optional[int]
     config: Optional[GameConfig]
+
+    @property
+    def is_game_active(self) -> bool:
+        return self.state is not None and not self.state.is_game_over
+
+    def clean_dict(self) -> dict:
+        result = self.dict(exclude={"last_keyboard_message", "state"})
+        result["is_game_active"] = self.is_game_active
+        return result
 
 
 class EventHandler:
@@ -172,7 +182,6 @@ class EventHandler:
         self.send_board()
         if session.state.is_game_over:
             self.send_game_summary()
-            self.bot.set_session(self.user.id, None)
             self.trigger(HelpMessageHandler)
             return None
         return BotState.Playing
@@ -324,7 +333,7 @@ class ProcessMessageHandler(EventHandler):
         log.info(f"Processing message: '{text}'")
         self.remove_keyboard()
         session = self.session
-        if not session or not session.state:
+        if not session or not session.is_game_active:
             self.trigger(HelpMessageHandler)
             return
         try:
@@ -384,6 +393,16 @@ class ConfigModelHandler(EventHandler):
             language=self.session.config.language, model_name=text
         )
         return self.trigger(StartEventHandler)
+
+
+class GetSessionsHandler(EventHandler):
+    def handle(self):
+        log.info(f"Getting sessions for user {self.user.full_name}")
+        sessions_dict = {}
+        for user_id, session in self.bot.sessions.items():
+            sessions_dict[user_id] = session.clean_dict()
+        pretty_json = json.dumps(sessions_dict, indent=2, ensure_ascii=False)
+        self.send_text(pretty_json)
 
 
 class ConfigSolverHandler(EventHandler):
@@ -452,12 +471,19 @@ class TheSpymasterBot:
         continue_get_id_handler = MessageHandler(Filters.text, self.generate_handler(ContinueGetIdHandler))
         fallback_handler = CommandHandler("quit", self.generate_handler(FallbackHandler))
         help_message_handler = CommandHandler("help", self.generate_handler(HelpMessageHandler))
+        get_sessions_handler = CommandHandler("sessions", self.generate_handler(GetSessionsHandler))
         process_message_handler = MessageHandler(
             Filters.text & ~Filters.command, self.generate_handler(ProcessMessageHandler)
         )
 
         conv_handler = ConversationHandler(
-            entry_points=[start_handler, custom_handler, continue_game_handler, help_message_handler],
+            entry_points=[
+                start_handler,
+                custom_handler,
+                continue_game_handler,
+                help_message_handler,
+                get_sessions_handler,
+            ],
             states={
                 BotState.ConfigLanguage: [config_language_handler],
                 BotState.ConfigDifficulty: [config_difficulty_handler, fallback_handler],
