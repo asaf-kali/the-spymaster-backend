@@ -34,6 +34,7 @@ from telegram.ext import (
 from api.logic.language import DEFAULT_LANGUAGES
 from api.models.game import Difficulty, GameConfig
 from api.models.request import (
+    AsyncLoadModelsRequest,
     GetGameStateRequest,
     GuessRequest,
     NextMoveRequest,
@@ -405,6 +406,14 @@ class GetSessionsHandler(EventHandler):
         self.send_text(pretty_json)
 
 
+class LoadModelsHandler(EventHandler):
+    def handle(self):
+        log.info("Sending async loading models request")
+        request = AsyncLoadModelsRequest(model_identifiers=AVAILABLE_MODELS)
+        response = self.client.async_load_models(request)
+        self.send_text(f"Got response: {response.dict()}")
+
+
 class ConfigSolverHandler(EventHandler):
     def handle(self):
         pass
@@ -472,6 +481,7 @@ class TheSpymasterBot:
         fallback_handler = CommandHandler("quit", self.generate_handler(FallbackHandler))
         help_message_handler = CommandHandler("help", self.generate_handler(HelpMessageHandler))
         get_sessions_handler = CommandHandler("sessions", self.generate_handler(GetSessionsHandler))
+        load_models_handler = CommandHandler("load_models", self.generate_handler(LoadModelsHandler))
         process_message_handler = MessageHandler(
             Filters.text & ~Filters.command, self.generate_handler(ProcessMessageHandler)
         )
@@ -483,6 +493,7 @@ class TheSpymasterBot:
                 continue_game_handler,
                 help_message_handler,
                 get_sessions_handler,
+                load_models_handler,
             ],
             states={
                 BotState.ConfigLanguage: [config_language_handler],
