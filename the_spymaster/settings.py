@@ -193,9 +193,9 @@ LOGGING = {
             "formatter": config.formatter,
             "stream": sys.stderr,
         },
-        "spymaster_file": {
-            "class": "logging.handlers.WatchedFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "spymaster.log"),
+        "codenames_file": {
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(LOGGING_DIR, "codenames.log"),
             "formatter": "debug",
             "level": "DEBUG",
         },
@@ -226,13 +226,18 @@ LOGGING = {
     "root": {"handlers": ["console_out", "console_err", "root_file"], "level": config.root_log_level},
     "loggers": {
         "api": {
-            "handlers": ["console_out", "console_err", "spymaster_file"],
+            "handlers": ["console_out", "console_err", "debug_file"],
             "level": "DEBUG",
             "propagate": False,
         },
         "telegram_bot": {
             "handlers": ["console_out", "console_err", "bot_file"],
             "level": config.bot_log_level,
+            "propagate": False,
+        },
+        "codenames": {
+            "handlers": ["console_out", "console_err", "codenames_file"],
+            "level": "DEBUG",
             "propagate": False,
         },
         # 3rd parties
