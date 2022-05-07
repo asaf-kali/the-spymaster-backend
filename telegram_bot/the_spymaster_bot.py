@@ -12,6 +12,7 @@ from codenames.game import (
     Card,
     CardColor,
     GameState,
+    GivenGuess,
     PlayerRole,
     TeamColor,
     WinningReason,
@@ -238,8 +239,7 @@ class EventHandler:
                 text = f"{team_color} hinter says '*{given_hint.word}*' with *{given_hint.card_amount}* card(s)."
                 self.send_markdown(text, put_log=True)
             if response.given_guess:
-                given_guess = response.given_guess
-                text = f"{team_color} guesser says '*{given_guess.guessed_card.word}*', {given_guess.correct}!"
+                text = f"{team_color} hinter: " + get_given_guess_result_message_text(given_guess=response.given_guess)
                 self.send_markdown(text)
         self.session.state = response.game_state
         sleep(0.2 + random() / 2)
@@ -350,9 +350,8 @@ class ProcessMessageHandler(EventHandler):
         if given_guess is None:
             pass  # This means we passed the turn
         else:
-            card = given_guess.guessed_card
-            result = "Correct! ✅" if given_guess.correct else "Wrong! ❌"
-            self.send_markdown(f"Card '*{card.word}*' is {card.color.emoji}, {result}")
+            text = get_given_guess_result_message_text(given_guess)
+            self.send_markdown(text)
         return self.fast_forward()
 
 
@@ -512,6 +511,12 @@ class TheSpymasterBot:
 
         updater.start_polling()
         updater.idle()
+
+
+def get_given_guess_result_message_text(given_guess: GivenGuess) -> str:
+    card = given_guess.guessed_card
+    result = "Correct! ✅" if given_guess.correct else "Wrong! ❌"
+    return f"Card '*{card.word}*' is {card.color.emoji}, {result}"
 
 
 def build_board_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
