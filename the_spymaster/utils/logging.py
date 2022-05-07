@@ -37,10 +37,13 @@ class ContextLogger(Logger):
         new_context.update(kwargs)
         self.set_context(new_context)
 
-    def set_context(self, data: dict):
-        if "context_id" not in data:
-            data["context_id"] = ulid.new().str
-        setattr(self._thread_storage, CONTEXT_KEY, data)
+    def set_context(self, context: Optional[dict] = None, **kwargs):
+        context = context or {}
+        if "context_id" not in context:
+            context = {"context_id": ulid.new().str, **context}  # Always keep context_id first.
+        setattr(self._thread_storage, CONTEXT_KEY, context)
+        if kwargs:
+            self.update_context(**kwargs)
 
     def reset_context(self):
         self.set_context({})
@@ -69,7 +72,7 @@ class JsonFormatter(Formatter):
         self.tz = tz or datetime.now().astimezone().tzinfo
 
     def format(self, record: LogRecord) -> str:
-        data = {
+        record_data = {
             # Base
             "date_time": self._format_date_time(record.created),
             "level": record.levelname,
@@ -88,17 +91,12 @@ class JsonFormatter(Formatter):
         }
         exc_info = getattr(record, "exc_info", None) or sys.exc_info()
         if exc_info and exc_info != EMPTY_EXEC_INFO and record.levelno >= logging.ERROR:
-            data["exc_info"] = self.formatException(exc_info)
+            record_data["exc_info"] = self.formatException(exc_info)
         try:
-            return json.dumps(data, indent=self.indent, ensure_ascii=False)
+            return json.dumps(record_data, indent=self.indent, ensure_ascii=False)
         except Exception as e:  # noqa
-            log.debug(f"Log serialization failed, trying without extra: {e}")
-            data.pop("extra")
-            try:
-                return json.dumps(data, indent=self.indent, ensure_ascii=False)
-            except Exception as e:  # noqa
-                log.warning("Log serialization failed")
-                return str(data)
+            log.debug(f"Log serialization failed: {e}")
+            return str(record_data)
 
     def _format_date_time(self, timestamp: float) -> str:
         return datetime.fromtimestamp(timestamp, self.tz).isoformat(sep=" ", timespec="milliseconds")

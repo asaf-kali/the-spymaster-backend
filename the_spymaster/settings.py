@@ -196,7 +196,7 @@ LOGGING = {
         "codenames_file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "codenames.log"),
-            "formatter": "debug",
+            "formatter": "json",
             "level": "DEBUG",
         },
         "bot_file": {
@@ -239,6 +239,9 @@ LOGGING = {
             "handlers": ["console_out", "console_err", "codenames_file"],
             "level": "DEBUG",
             "propagate": False,
+        },
+        "codenames.utils": {
+            "level": "INFO",
         },
         # 3rd parties
         "telegram": {"level": "INFO"},

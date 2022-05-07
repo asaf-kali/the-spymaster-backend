@@ -1,5 +1,4 @@
 import functools
-import json
 from enum import Enum
 from typing import List, Tuple, Type
 
@@ -41,9 +40,7 @@ def endpoint(
 
         @functools.wraps(f)
         def wrapper(view, request: Request, *args, **kwargs):
-            request_context = _extract_context(request)
-            request_context["endpoint_name"] = endpoint_name
-            log.set_context(request_context)
+            log.update_context(endpoint_name=endpoint_name)
             log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
             response = f(view, parsed_request)
@@ -58,14 +55,6 @@ def endpoint(
     if func:
         return decorator(func)
     return decorator
-
-
-def _extract_context(request: Request) -> dict:
-    try:
-        context_json = request.headers.get("x-context") or {}
-        return json.loads(context_json)
-    except:  # noqa: E722
-        return {}
 
 
 def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]]:

@@ -145,9 +145,9 @@ class EventHandler:
     @classmethod
     def handler(cls, bot: "TheSpymasterBot"):
         def dispatch(update: Update, context: CallbackContext) -> Any:
-            instance = cls(bot, update, context)
+            instance = cls(bot=bot, update=update, context=context)
             try:
-                log.update_context(user_id=instance.user.id, game_id=instance.game_id)
+                log.set_context(telegram_user_id=instance.user.id, game_id=instance.game_id)
             except Exception as e:
                 log.warning(f"Failed to update context: {e}")
             try:
@@ -436,7 +436,7 @@ class FallbackHandler(EventHandler):
 
 class HelpMessageHandler(EventHandler):
     def handle(self):
-        log.info("Got help message")
+        log.info("Sending help message")
         text = """Welcome! I'm *The Spymaster* 🕵🏼‍♂️
 /start - start a new game.
 /custom - start a new game with custom configurations.

@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.exceptions import AuthenticationFailed
@@ -15,6 +17,15 @@ class ViewContextMixin(ViewSetMixin):
             user = request.user
         except AuthenticationFailed:
             user = AnonymousUser()
-        log.update_context(user_id=user.id, method=request.method, path=request.path)
+        request_context = _extract_context(request)
+        log.set_context(context=request_context, django_user_id=user.id)
         log.debug(f"{wrap(request.method)} to {wrap(request.path)} by {wrap(user)}")
         return request
+
+
+def _extract_context(request: WSGIRequest) -> dict:
+    try:
+        context_json = request.headers.get("x-context") or {}
+        return json.loads(context_json)
+    except:  # noqa: E722
+        return {}
