@@ -161,9 +161,10 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "simple": {
-            "class": "the_spymaster.utils.logging.ContextFormatter",
+            "()": "the_spymaster.utils.logging.ContextFormatter",
             "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s [%(name)s]",
             "datefmt": "%H:%M:%S",
+            "log_context": False,
         },
         "debug": {
             "class": "the_spymaster.utils.logging.ContextFormatter",

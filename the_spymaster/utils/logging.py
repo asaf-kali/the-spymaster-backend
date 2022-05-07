@@ -50,14 +50,19 @@ class ContextLogger(Logger):
 
 
 class ContextFormatter(Formatter):
+    def __init__(self, *args, log_extra: bool = True, log_context: bool = True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.log_extra = log_extra
+        self.log_context = log_context
+
     def format(self, record: LogRecord) -> str:
         message = original_message = record.msg
         extra = getattr(record, "extra", None)
         context = getattr(record, "context", None)
         message = str(message)
-        if extra:
+        if extra and self.log_extra:
             message += f" | {extra}"
-        if context:
+        if context and self.log_context:
             message += f" | {context}"
         record.msg = message
         result = super().format(record)
@@ -66,8 +71,8 @@ class ContextFormatter(Formatter):
 
 
 class JsonFormatter(Formatter):
-    def __init__(self, indented: bool = False, tz: Optional[timezone] = None):
-        super().__init__()
+    def __init__(self, *args, indented: bool = False, tz: Optional[timezone] = None, **kwargs):
+        super().__init__(*args, **kwargs)
         self.indent = 2 if indented else None
         self.tz = tz or datetime.now().astimezone().tzinfo
 
