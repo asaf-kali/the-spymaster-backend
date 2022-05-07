@@ -23,30 +23,30 @@ class ContextLogger(Logger):
     def context(self) -> dict:
         current_context = getattr(self._thread_storage, CONTEXT_KEY, None)
         if current_context is None:
-            current_context = {}
-            self.set_context(current_context)
+            return self.reset_context()
         return current_context
 
-    def _log(self, *args, **kwargs) -> None:
-        extra = kwargs.get("extra")
-        kwargs["extra"] = {"extra": extra, "context": self.context}
-        super()._log(*args, **kwargs)  # noqa
-
-    def update_context(self, **kwargs):
+    def update_context(self, **kwargs) -> dict:
         new_context = self.context
         new_context.update(kwargs)
-        self.set_context(new_context)
+        return self.set_context(new_context)
 
-    def set_context(self, context: Optional[dict] = None, **kwargs):
+    def set_context(self, context: Optional[dict] = None, **kwargs) -> dict:
         context = context or {}
         if "context_id" not in context:
             context = {"context_id": ulid.new().str, **context}  # Always keep context_id first.
         setattr(self._thread_storage, CONTEXT_KEY, context)
         if kwargs:
-            self.update_context(**kwargs)
+            return self.update_context(**kwargs)
+        return context
 
-    def reset_context(self):
-        self.set_context({})
+    def reset_context(self) -> dict:
+        return self.set_context({})
+
+    def _log(self, *args, **kwargs) -> None:
+        extra = kwargs.get("extra")
+        kwargs["extra"] = {"extra": extra, "context": self.context}
+        super()._log(*args, **kwargs)  # noqa
 
 
 class ContextFormatter(Formatter):
