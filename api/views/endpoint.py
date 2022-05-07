@@ -1,4 +1,5 @@
 import functools
+import json
 from enum import Enum
 from typing import List, Tuple, Type
 
@@ -27,6 +28,46 @@ class HttpMethod(str, Enum):
     PATCH = "PATCH"
 
 
+def endpoint(
+    func=None, *, detail: bool = False, methods: List[HttpMethod] = None, url_path: str = None, url_name: str = None
+):
+    methods = methods or [HttpMethod.POST]
+    str_methods = [m.value for m in methods]
+
+    def decorator(f):
+        endpoint_name = f.__name__
+        request_model, response_model = _get_request_response_models(f)
+        log.debug(f"Registering endpoint {endpoint_name}")
+
+        @functools.wraps(f)
+        def wrapper(view, request: Request, *args, **kwargs):
+            request_context = _extract_context(request)
+            request_context["endpoint_name"] = endpoint_name
+            log.set_context(request_context)
+            log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
+            parsed_request = _parse_request(request_model=request_model, drf_request=request)
+            response = f(view, parsed_request)
+            response_data = _get_response_data(response)
+            status_code = response_data.pop("status_code")
+            response = JsonResponse(response_data, status=status_code)
+            log.reset_context()
+            return response
+
+        return action(detail=detail, methods=str_methods, url_path=url_path, url_name=url_name)(wrapper)
+
+    if func:
+        return decorator(func)
+    return decorator
+
+
+def _extract_context(request: Request) -> dict:
+    try:
+        context_json = request.headers.get("x-context") or {}
+        return json.loads(context_json)
+    except:  # noqa: E722
+        return {}
+
+
 def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]]:
     func_name, annotations = func.__name__, func.__annotations__
     try:
@@ -44,34 +85,6 @@ def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]
     if len(annotations) != 2:
         raise EndpointConfigurationError(f"{func_name} has more than 2 annotations!")
     return request_model, response_model
-
-
-def endpoint(
-    func=None, *, detail: bool = False, methods: List[HttpMethod] = None, url_path: str = None, url_name: str = None
-):
-    methods = methods or [HttpMethod.POST]
-    str_methods = [m.value for m in methods]
-
-    def decorator(f):
-        endpoint_name = f.__name__
-        request_model, response_model = _get_request_response_models(f)
-        log.debug(f"Registering endpoint {endpoint_name}")
-
-        @functools.wraps(f)
-        def wrapper(view, request: Request, *args, **kwargs):
-            log.set_context(dict(endpoint_name=endpoint_name))
-            log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
-            parsed_request = _parse_request(request_model=request_model, drf_request=request)
-            response = f(view, parsed_request)
-            response_data = _get_response_data(response)
-            status_code = response_data.pop("status_code")
-            return JsonResponse(response_data, status=status_code)
-
-        return action(detail=detail, methods=str_methods, url_path=url_path, url_name=url_name)(wrapper)
-
-    if func:
-        return decorator(func)
-    return decorator
 
 
 def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> BaseModel:

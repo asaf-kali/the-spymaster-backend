@@ -1,3 +1,4 @@
+import json
 from typing import Callable
 
 import requests
@@ -45,7 +46,9 @@ class TheSpymasterClient:
 
     def _http_call(self, endpoint: str, method: Callable, **kwargs) -> dict:
         url = f"{self.base_url}/{endpoint}"
-        response = method(url, **kwargs)
+        headers = kwargs.pop("headers", None) or {}
+        headers["x-context"] = json.dumps(log.context)
+        response = method(url, headers=headers, **kwargs)
         _log_data(url=url, response=response)
         response.raise_for_status()
         data = response.json()
