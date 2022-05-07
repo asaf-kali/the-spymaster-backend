@@ -7,6 +7,8 @@ from logging import Filter, Formatter, Logger, LogRecord
 from logging.config import dictConfig
 from typing import Optional
 
+import ulid
+
 CONTEXT_KEY = "_logging_context"
 EMPTY_EXEC_INFO = (None, None, None)
 _thread_storage = threading.local()
@@ -36,6 +38,8 @@ class ContextLogger(Logger):
         self.set_context(new_context)
 
     def set_context(self, data: dict):
+        if "context_id" not in data:
+            data["context_id"] = ulid.new().str
         setattr(self._thread_storage, CONTEXT_KEY, data)
 
     def reset_context(self):
