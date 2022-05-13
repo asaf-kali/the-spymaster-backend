@@ -1,16 +1,16 @@
-from typing import List
+from typing import Any, List
 
 from dynaconf import Dynaconf
 
 
-class Config:
+class LazyConfig:
     def __init__(self, settings: Dynaconf = None):
         self._settings = settings
 
-    def __getattr__(self, item) -> any:
+    def __getattr__(self, item) -> Any:
         return self.get(item)
 
-    def get(self, key: str, default=None) -> any:
+    def get(self, key: str, default=None) -> Any:
         return self.settings.get(key, default)
 
     def load(self, override_files: List[str] = None):
@@ -66,4 +66,5 @@ class Config:
         return self.get("BASE_BACKEND_URL")
 
 
-config = Config()
+def get_config() -> LazyConfig:
+    return LazyConfig()

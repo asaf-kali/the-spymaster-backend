@@ -25,7 +25,7 @@ class ViewContextMixin(ViewSetMixin):
 
 def _extract_context(request: WSGIRequest) -> dict:
     try:
-        context_json = request.headers.get("x-context") or {}
+        context_json = request.headers.get("x-context")
         return json.loads(context_json)
-    except:  # noqa: E722
+    except:  # noqa
         return {}

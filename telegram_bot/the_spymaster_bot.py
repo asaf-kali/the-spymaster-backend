@@ -43,7 +43,7 @@ from api.models.request import (
 )
 from api.models.response import ErrorResponse
 from telegram_bot.client import TheSpymasterClient
-from the_spymaster.utils import config, get_logger
+from the_spymaster.utils import get_config, get_logger
 
 log = get_logger(__name__)
 BLUE_EMOJI = CardColor.BLUE.emoji
@@ -108,8 +108,12 @@ class EventHandler:
         return self.bot.client
 
     @property
-    def user(self) -> TelegramUser:
+    def user(self) -> Optional[TelegramUser]:
         return self.update.effective_user
+
+    @property
+    def user_id(self) -> Optional[int]:
+        return self.user.id if self.user else None
 
     @property
     def username(self) -> Optional[str]:
@@ -124,8 +128,8 @@ class EventHandler:
         return self.user.full_name
 
     @property
-    def chat_id(self) -> int:
-        return self.update.effective_chat.id
+    def chat_id(self) -> Optional[int]:
+        return self.update.effective_chat.id if self.update.effective_chat else None
 
     @property
     def session(self) -> Optional[Session]:
@@ -148,7 +152,7 @@ class EventHandler:
         def dispatch(update: Update, context: CallbackContext) -> Any:
             instance = cls(bot=bot, update=update, context=context)
             try:
-                log.set_context(telegram_user_id=instance.user.id, game_id=instance.game_id)
+                log.set_context(telegram_user_id=instance.user_id, game_id=instance.game_id)
             except Exception as e:
                 log.warning(f"Failed to update context: {e}")
             try:
@@ -250,7 +254,7 @@ class EventHandler:
         self.send_markdown(text)
 
     def send_board(self, message: str = None):
-        state = self.state
+        state: GameState = self.state
         board_to_send = state.board if state.is_game_over else state.board.censured
         table = board_to_send.as_table
         keyboard = build_board_keyboard(table, is_game_over=state.is_game_over)
@@ -259,7 +263,7 @@ class EventHandler:
             if state.bonus_given:
                 message += " (bonus round)"
         text = self.send_markdown(message, reply_markup=keyboard)
-        self.session.last_keyboard_message = text.message_id
+        self.session.last_keyboard_message = text.message_id  # type: ignore
 
     def _refresh_game_state(self):
         if not self.game_id:
@@ -307,8 +311,8 @@ class EventHandler:
     def _should_skip_turn(self) -> bool:
         dice = random()
         return (
-            self.state.current_player_role == PlayerRole.GUESSER
-            and dice < self.session.config.difficulty.pass_probability
+            self.state.current_player_role == PlayerRole.GUESSER  # type: ignore
+            and dice < self.session.config.difficulty.pass_probability  # type: ignore
         )
 
 
@@ -466,6 +470,7 @@ class TheSpymasterBot:
 
     def listen(self) -> None:
         log.info("Starting bot...")
+        config = get_config()
         updater = Updater(config.telegram_token)
         dispatcher = updater.dispatcher
 
@@ -524,7 +529,7 @@ def build_board_keyboard(table, is_game_over: bool) -> ReplyKeyboardMarkup:
     for row in table.rows:
         row_keyboard = []
         for card in row:
-            card: Card
+            card: Card  # type: ignore
             if is_game_over:
                 content = f"{card.color.emoji} {card.word}"
             else:

@@ -32,7 +32,7 @@ class HintRequest(BaseRequest):
     game_id: int
     word: str
     card_amount: int
-    for_words: List[str] = None
+    for_words: Optional[List[str]] = None
 
 
 class GuessRequest(BaseRequest):

@@ -83,7 +83,7 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
         parsed_request = request_model(drf_request=drf_request, **data)
     except Exception as e:
         details = e.errors() if isinstance(e, ValidationError) else str(e)
-        raise BadRequestError("Request parsing failed.", details=details) from e
+        raise BadRequestError("Request parsing failed.", details=details) from e  # type: ignore
     return parsed_request
 
 

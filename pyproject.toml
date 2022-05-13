@@ -14,4 +14,3 @@ profile = "black"
 
 [tool.mypy]
 ignore_missing_imports = true
-ignore_errors = true

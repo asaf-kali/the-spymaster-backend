@@ -18,8 +18,9 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-from the_spymaster.utils import config
+from the_spymaster.utils import get_config
 
+config = get_config()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 ENVIRONMENT = config.env_verbose_name
 BASE_DIR = Path(__file__).resolve().parent.parent
