@@ -46,7 +46,7 @@ def endpoint(
             response = f(view, parsed_request)
             response_data = _get_response_data(response)
             status_code = response_data.pop("status_code")
-            response = JsonResponse(response_data, status=status_code)
+            response = JsonResponse(data=response_data, status=status_code)
             log.reset_context()
             return response
 
