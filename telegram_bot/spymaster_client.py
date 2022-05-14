@@ -4,7 +4,7 @@ from typing import Callable
 import requests
 from requests import Response
 
-from api.models.request import (
+from api.structs.request import (
     AsyncLoadModelsRequest,
     GetGameStateRequest,
     GuessRequest,
@@ -12,7 +12,7 @@ from api.models.request import (
     NextMoveRequest,
     StartGameRequest,
 )
-from api.models.response import (
+from api.structs.response import (
     AsyncLoadModelsResponse,
     GetGameStateResponse,
     GuessResponse,
