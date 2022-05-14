@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 
 from api.logic.errors import BadRequestError, SpymasterError
-from api.models.response import BaseResponse
+from api.structs.response import BaseResponse
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)

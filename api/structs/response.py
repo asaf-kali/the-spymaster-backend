@@ -4,7 +4,7 @@ from codenames.game import GameState, GivenGuess, GivenHint
 from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel, Extra
 
-from api.models.game import Solver
+from api.structs import Solver
 
 
 class BaseResponse(BaseModel):

@@ -7,7 +7,7 @@ from rest_framework.request import Request
 if TYPE_CHECKING:
     from api.models import SpymasterUser
 
-from api.models.game import Solver
+from api.structs import Solver
 
 
 class BaseRequest(BaseModel):

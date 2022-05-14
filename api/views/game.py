@@ -5,7 +5,7 @@ from rest_framework.viewsets import GenericViewSet
 from api.logic.game import NextMoveHandler, get_game
 from api.logic.language import load_default_models_async
 from api.models.game import Game
-from api.models.request import (
+from api.structs.request import (
     AsyncLoadModelsRequest,
     GetGameStateRequest,
     GuessRequest,
@@ -13,7 +13,7 @@ from api.models.request import (
     NextMoveRequest,
     StartGameRequest,
 )
-from api.models.response import (
+from api.structs.response import (
     AsyncLoadModelsResponse,
     GetGameStateResponse,
     GuessResponse,

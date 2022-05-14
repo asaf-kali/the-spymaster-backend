@@ -6,8 +6,9 @@ from codenames.utils.loader.model_loader import ModelIdentifier
 
 from api.logic.errors import BadRequestError
 from api.logic.language import DEFAULT_MODELS, get_adapter_for_model
-from api.models.game import Game, Solver
-from api.models.response import NextMoveResponse
+from api.models.game import Game
+from api.structs import Solver
+from api.structs.response import NextMoveResponse
 from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
