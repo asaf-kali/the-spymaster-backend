@@ -417,7 +417,7 @@ class GetSessionsHandler(EventHandler):
 
 class LoadModelsHandler(EventHandler):
     def handle(self):
-        log.info("Sending async loading models request")
+        log.info("Sending async load models request")
         request = AsyncLoadModelsRequest(model_identifiers=AVAILABLE_MODELS)
         response = self.client.async_load_models(request)
         self.send_text(f"Got response: {response.dict()}")
