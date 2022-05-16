@@ -1,6 +1,8 @@
-from typing import Dict, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type
 
+from telegram import Update
 from telegram.ext import (
+    CallbackContext,
     CommandHandler,
     ConversationHandler,
     Filters,
@@ -44,8 +46,8 @@ class TheSpymasterBot:
     def get_session(self, session_id: SessionId) -> Optional[Session]:
         return self.sessions.get(session_id)
 
-    def generate_handler(self, handler_type: Type[EventHandler]):
-        return handler_type.handler(self)
+    def generate_callback(self, handler_type: Type[EventHandler]) -> Callable[[Update, CallbackContext], Any]:
+        return handler_type.generate_callback(bot=self)
 
     def listen(self) -> None:
         log.info("Starting bot...")
@@ -53,20 +55,28 @@ class TheSpymasterBot:
         updater = Updater(config.telegram_token)
         dispatcher = updater.dispatcher
 
-        start_handler = CommandHandler("start", self.generate_handler(StartEventHandler))
-        custom_handler = CommandHandler("custom", self.generate_handler(CustomHandler))
-        config_language_handler = MessageHandler(Filters.text, self.generate_handler(ConfigLanguageHandler))
-        config_difficulty_handler = MessageHandler(Filters.text, self.generate_handler(ConfigDifficultyHandler))
-        config_model_handler = MessageHandler(Filters.text, self.generate_handler(ConfigModelHandler))
-        config_solver_handler = MessageHandler(Filters.text, self.generate_handler(ConfigSolverHandler))
-        continue_game_handler = CommandHandler("continue", self.generate_handler(ContinueHandler))
-        continue_get_id_handler = MessageHandler(Filters.text, self.generate_handler(ContinueGetIdHandler))
-        fallback_handler = CommandHandler("quit", self.generate_handler(FallbackHandler))
-        help_message_handler = CommandHandler("help", self.generate_handler(HelpMessageHandler))
-        get_sessions_handler = CommandHandler("sessions", self.generate_handler(GetSessionsHandler))
-        load_models_handler = CommandHandler("load_models", self.generate_handler(LoadModelsHandler))
+        start_handler = CommandHandler("start", self.generate_callback(StartEventHandler), run_async=True)
+        custom_handler = CommandHandler("custom", self.generate_callback(CustomHandler), run_async=True)
+        config_language_handler = MessageHandler(
+            Filters.text, self.generate_callback(ConfigLanguageHandler), run_async=True
+        )
+        config_difficulty_handler = MessageHandler(
+            Filters.text, self.generate_callback(ConfigDifficultyHandler), run_async=True
+        )
+        config_model_handler = MessageHandler(Filters.text, self.generate_callback(ConfigModelHandler), run_async=True)
+        config_solver_handler = MessageHandler(
+            Filters.text, self.generate_callback(ConfigSolverHandler), run_async=True
+        )
+        continue_game_handler = CommandHandler("continue", self.generate_callback(ContinueHandler), run_async=True)
+        continue_get_id_handler = MessageHandler(
+            Filters.text, self.generate_callback(ContinueGetIdHandler), run_async=True
+        )
+        fallback_handler = CommandHandler("quit", self.generate_callback(FallbackHandler), run_async=True)
+        help_message_handler = CommandHandler("help", self.generate_callback(HelpMessageHandler), run_async=True)
+        get_sessions_handler = CommandHandler("sessions", self.generate_callback(GetSessionsHandler), run_async=True)
+        load_models_handler = CommandHandler("load_models", self.generate_callback(LoadModelsHandler), run_async=True)
         process_message_handler = MessageHandler(
-            Filters.text & ~Filters.command, self.generate_handler(ProcessMessageHandler)
+            Filters.text & ~Filters.command, self.generate_callback(ProcessMessageHandler), run_async=True
         )
 
         conv_handler = ConversationHandler(

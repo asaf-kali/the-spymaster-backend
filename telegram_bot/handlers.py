@@ -1,7 +1,7 @@
 import json
 from random import random
 from time import sleep
-from typing import TYPE_CHECKING, Any, List, Optional, Type
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Type
 
 import sentry_sdk
 from codenames.game import (
@@ -105,8 +105,8 @@ class EventHandler:
         return self.session.game_id
 
     @classmethod
-    def handler(cls, bot: "TheSpymasterBot"):
-        def dispatch(update: Update, context: CallbackContext) -> Any:
+    def generate_callback(cls, bot: "TheSpymasterBot") -> Callable[[Update, CallbackContext], Any]:
+        def callback(update: Update, context: CallbackContext) -> Any:
             instance = cls(bot=bot, update=update, context=context)
             try:
                 log.set_context(telegram_user_id=instance.user_id, game_id=instance.game_id)
@@ -120,7 +120,7 @@ class EventHandler:
             finally:
                 log.reset_context()
 
-        return dispatch
+        return callback
 
     def handle(self):
         raise NotImplementedError()
