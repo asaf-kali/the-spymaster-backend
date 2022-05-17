@@ -45,6 +45,9 @@ class BotState(IntEnum):
 class SessionId(BaseModel):
     chat_id: int
 
+    def __str__(self) -> str:
+        return f"{self.chat_id}"
+
     def __hash__(self):
         return hash(self.json())
 

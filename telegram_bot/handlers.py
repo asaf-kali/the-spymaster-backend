@@ -1,4 +1,3 @@
-import json
 from random import random
 from time import sleep
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Type
@@ -145,6 +144,7 @@ class EventHandler:
         self.send_board()
         if session.state.is_game_over:
             self.send_game_summary()
+            log.update_context(game_id=None)
             self.trigger(HelpMessageHandler)
             return None
         return BotState.Playing
@@ -285,7 +285,7 @@ class StartEventHandler(EventHandler):
         session = Session(game_id=response.game_id, state=response.game_state, config=session_config)
         self.bot.set_session(session_id=self.session_id, session=session)
         self.remove_keyboard()
-        self.send_markdown(f"Game *#{response.game_id}* is starting! 🥳")
+        self.send_markdown(f"Game *#{response.game_id}* is starting! 🥳", put_log=True)
         return self.fast_forward()
 
 
@@ -408,11 +408,12 @@ def parse_model_identifier(language: str, model_name: str) -> ModelIdentifier:
 class GetSessionsHandler(EventHandler):
     def handle(self):
         log.info(f"Getting sessions for user {self.user.full_name}")
-        sessions_dict = {}
-        for session_id, session in self.bot.sessions.items():
-            sessions_dict[session_id.chat_id] = session.clean_dict()
-        pretty_json = json.dumps(sessions_dict, indent=2, ensure_ascii=False)
-        self.send_text(pretty_json)
+        self.send_text(f"Number of sessions: {len(self.bot.sessions)}")
+        # sessions_dict = {}
+        # for session_id, session in self.bot.sessions.items():
+        #     sessions_dict[session_id.chat_id] = session.clean_dict()
+        # pretty_json = json.dumps(sessions_dict, indent=2, ensure_ascii=False)
+        # self.send_text(pretty_json)
 
 
 class LoadModelsHandler(EventHandler):

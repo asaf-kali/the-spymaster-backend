@@ -41,6 +41,9 @@ class TheSpymasterBot:
     def set_session(self, session_id: SessionId, session: Optional[Session]):
         if not session:
             self.sessions.pop(session_id, None)
+            log.update_context(game_id=None)
+        else:
+            log.update_context(game_id=session.game_id)
         self.sessions[session_id] = session  # type: ignore
 
     def get_session(self, session_id: SessionId) -> Optional[Session]:
