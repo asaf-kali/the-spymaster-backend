@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Any, Dict, Optional, Union
 
-from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
+from solvers.utils.loader import ModelIdentifier
 
 JsonType = Union[str, int, float, bool, list, Dict[str, Any], None]
 

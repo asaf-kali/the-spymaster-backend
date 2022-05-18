@@ -2,8 +2,8 @@ from enum import IntEnum, auto
 from typing import Optional
 
 from codenames.game import PASS_GUESS, QUIT_GAME, CardColor, GameState, WinningReason
-from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
+from solvers.utils.loader import ModelIdentifier
 
 from api.structs import GameConfig
 

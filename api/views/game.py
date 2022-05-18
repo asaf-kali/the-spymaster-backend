@@ -1,6 +1,6 @@
 from codenames.game import Guess, Hint, build_game_state
-from codenames.utils.loader.model_loader import load_model_async
 from rest_framework.viewsets import GenericViewSet
+from solvers.utils.loader import load_model_async
 
 from api.logic.game import NextMoveHandler, get_game
 from api.logic.language import load_default_models_async

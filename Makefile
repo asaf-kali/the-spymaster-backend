@@ -11,7 +11,7 @@ export ENV_FOR_DYNACONF = local
 install-run:
 	pip install --upgrade pip
 	pip install -r requirements.txt
-	pip install codenames.tar.gz
+	pip install codenames-solvers.tar.gz
 
 install-test:
 	@make install-run --no-print-directory

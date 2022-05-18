@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING, List, Optional
 
-from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel
 from rest_framework.request import Request
+from solvers.utils.loader import ModelIdentifier
 
 if TYPE_CHECKING:
     from api.models import SpymasterUser

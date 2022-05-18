@@ -12,8 +12,8 @@ from codenames.game import (
     PlayerRole,
     TeamColor,
 )
-from codenames.utils.loader.model_loader import ModelIdentifier
 from requests import HTTPError
+from solvers.utils.loader import ModelIdentifier
 from telegram import Message, ReplyKeyboardMarkup, Update
 from telegram import User as TelegramUser
 from telegram.error import BadRequest as TelegramBadRequest

@@ -1,8 +1,8 @@
 from typing import Optional
 
 from codenames.game import GameState, PlayerRole
-from codenames.solvers import NaiveGuesser, NaiveHinter
-from codenames.utils.loader.model_loader import ModelIdentifier
+from solvers.naive import NaiveGuesser, NaiveHinter
+from solvers.utils.loader import ModelIdentifier
 
 from api.logic.errors import BadRequestError
 from api.logic.language import DEFAULT_MODELS, get_adapter_for_model

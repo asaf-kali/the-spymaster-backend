@@ -1,13 +1,13 @@
 from typing import Optional
 
 from codenames.game import DEFAULT_MODEL_ADAPTER, ModelFormatAdapter
-from codenames.utils.loader.model_loader import (
+from codenames.utils.model_adapters import HEBREW_SUFFIX_ADAPTER
+from django.conf import settings
+from solvers.utils.loader import (
     ModelIdentifier,
     load_model_async,
     set_language_data_folder,
 )
-from codenames.utils.model_adapters import HEBREW_SUFFIX_ADAPTER
-from django.conf import settings
 
 from the_spymaster.utils import get_logger
 

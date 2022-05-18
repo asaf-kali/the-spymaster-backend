@@ -1,8 +1,8 @@
 from typing import Any, Optional
 
 from codenames.game import GameState, GivenGuess, GivenHint
-from codenames.utils.loader.model_loader import ModelIdentifier
 from pydantic import BaseModel, Extra
+from solvers.utils.loader import ModelIdentifier
 
 from api.structs import Solver
 
