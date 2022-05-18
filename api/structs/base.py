@@ -24,7 +24,7 @@ class Solver(str, Enum):
 
 
 class GameConfig(BaseModel):
-    language: str = "hebrew"
+    language: str = "english"
     difficulty: Difficulty = Difficulty.EASY
     solver: Solver = Solver.NAIVE
     model_identifier: Optional[ModelIdentifier] = None
