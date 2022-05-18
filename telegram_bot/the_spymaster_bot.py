@@ -25,6 +25,7 @@ from telegram_bot.handlers import (
     LoadModelsHandler,
     ProcessMessageHandler,
     StartEventHandler,
+    TestingHandler,
 )
 from telegram_bot.models import BotState, Session, SessionId
 from telegram_bot.spymaster_client import TheSpymasterClient
@@ -78,6 +79,7 @@ class TheSpymasterBot:
         help_message_handler = CommandHandler("help", self.generate_callback(HelpMessageHandler), run_async=True)
         get_sessions_handler = CommandHandler("sessions", self.generate_callback(GetSessionsHandler), run_async=True)
         load_models_handler = CommandHandler("load_models", self.generate_callback(LoadModelsHandler), run_async=True)
+        testing_handler = CommandHandler("test", self.generate_callback(TestingHandler), run_async=True)
         process_message_handler = MessageHandler(
             Filters.text & ~Filters.command, self.generate_callback(ProcessMessageHandler), run_async=True
         )
@@ -90,6 +92,7 @@ class TheSpymasterBot:
                 help_message_handler,
                 get_sessions_handler,
                 load_models_handler,
+                testing_handler,
             ],
             states={
                 BotState.ConfigLanguage: [config_language_handler],

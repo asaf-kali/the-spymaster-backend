@@ -444,6 +444,14 @@ class FallbackHandler(EventHandler):
         pass
 
 
+class TestingHandler(EventHandler):
+    def handle(self):
+        text = self.update.message.text
+        log.info(f"Testing handler with text: {text}")
+        if "error" in text:
+            raise ValueError(f"This is an error: {text}")
+
+
 class HelpMessageHandler(EventHandler):
     def handle(self):
         log.info("Sending help message")
