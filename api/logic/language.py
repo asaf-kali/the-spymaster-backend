@@ -1,9 +1,10 @@
 from typing import Optional
 
-from codenames.game import DEFAULT_MODEL_ADAPTER, ModelFormatAdapter
-from codenames.utils.model_adapters import HEBREW_SUFFIX_ADAPTER
 from django.conf import settings
-from solvers.utils.loader import (
+from solvers.models import (
+    DEFAULT_MODEL_ADAPTER,
+    HEBREW_SUFFIX_ADAPTER,
+    ModelFormatAdapter,
     ModelIdentifier,
     load_model_async,
     set_language_data_folder,

@@ -13,7 +13,7 @@ from codenames.game import (
     TeamColor,
 )
 from requests import HTTPError
-from solvers.utils.loader import ModelIdentifier
+from solvers.models import ModelIdentifier
 from telegram import Message, ReplyKeyboardMarkup, Update
 from telegram import User as TelegramUser
 from telegram.error import BadRequest as TelegramBadRequest

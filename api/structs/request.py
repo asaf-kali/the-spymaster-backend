@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import BaseModel
 from rest_framework.request import Request
-from solvers.utils.loader import ModelIdentifier
+from solvers.models import ModelIdentifier
 
 if TYPE_CHECKING:
     from api.models import SpymasterUser

@@ -3,7 +3,7 @@ from typing import Optional
 
 from codenames.game import PASS_GUESS, QUIT_GAME, CardColor, GameState, WinningReason
 from pydantic import BaseModel
-from solvers.utils.loader import ModelIdentifier
+from solvers.models import ModelIdentifier
 
 from api.structs import GameConfig
 

@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict, Optional, Union
 
 from pydantic import BaseModel
-from solvers.utils.loader import ModelIdentifier
+from solvers.models import ModelIdentifier
 
 JsonType = Union[str, int, float, bool, list, Dict[str, Any], None]
 
