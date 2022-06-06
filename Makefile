@@ -3,8 +3,9 @@ DEL_COMMAND=gio trash
 LINE_LENGTH=120
 RUN_SERVER_IP=0.0.0.0
 RUN_SERVER_PORT=8000
-export DJANGO_SETTINGS_MODULE = the_spymaster.settings
-export ENV_FOR_DYNACONF = local
+FIXTURE_FILE=dump.json
+export DJANGO_SETTINGS_MODULE=the_spymaster.settings
+# export ENV_FOR_DYNACONF=local
 
 # Install
 
@@ -60,7 +61,7 @@ migrate:
 	python manage.py migrate
 
 save:
-	python manage.py dumpdata print_manager -o $(FIXTURE_FILE)
+	python manage.py dumpdata api -o $(FIXTURE_FILE)
 
 # Run
 
