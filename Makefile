@@ -4,6 +4,7 @@ LINE_LENGTH=120
 RUN_SERVER_IP=0.0.0.0
 RUN_SERVER_PORT=8000
 FIXTURE_FILE=dump.json
+ENV=dev
 export DJANGO_SETTINGS_MODULE=the_spymaster.settings
 # export ENV_FOR_DYNACONF=local
 
@@ -78,3 +79,8 @@ run:
 
 kill:
 	killall python || true
+
+# Deploy
+
+deploy:
+	zappa update $(ENV)
