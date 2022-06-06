@@ -1,4 +1,7 @@
-# Base
+# Codenames
+codenames~=1.1
+
+# Service
 Django==4.0.4
 django-allauth==0.50.0
 django-filter==21.1

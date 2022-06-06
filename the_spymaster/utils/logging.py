@@ -100,7 +100,7 @@ class JsonFormatter(Formatter):
         try:
             return json.dumps(record_data, indent=self.indent, ensure_ascii=False)
         except Exception as e:  # noqa
-            log.debug(f"Log serialization failed: {e}")
+            log.debug(f"Record serialization failed: {e}")
             return str(record_data)
 
     def _format_date_time(self, timestamp: float) -> str:
