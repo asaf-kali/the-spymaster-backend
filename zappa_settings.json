@@ -1,0 +1,16 @@
+{
+    "common": {
+        "aws_region": "us-east-1",
+        "profile_name": "default",
+        "django_settings": "the_spymaster.settings",
+        "project_name": "the-spymaster",
+        "runtime": "python3.8",
+        "exclude": ["logs", "node_modules", "language_data", "*.sqlite3", "local.toml", "secrets.toml"],
+        "slim_handler": true,
+        "timeout_seconds": 90
+    },
+    "dev": {
+        "extends": "common",
+        "s3_bucket": "zappa-deployment-bucket-dev"
+    }
+}
