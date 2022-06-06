@@ -7,6 +7,7 @@ from api.logic.language import load_default_models_async
 from api.models.game import Game
 from api.structs.request import (
     AsyncLoadModelsRequest,
+    BaseRequest,
     GetGameStateRequest,
     GuessRequest,
     HintRequest,
@@ -78,3 +79,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
         for model_identifier in request.model_identifiers:
             load_model_async(model_identifier=model_identifier)
         return AsyncLoadModelsResponse()
+
+    @endpoint(methods=[HttpMethod.GET])
+    def test(self, request: BaseRequest) -> dict:
+        return {"test": "test", "status_code": 200}

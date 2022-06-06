@@ -45,7 +45,9 @@ def endpoint(
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
             response = f(view, parsed_request)
             response_data = _get_response_data(response)
-            status_code = response_data.pop("status_code")
+            status_code = response_data.pop("status_code", None)
+            if not status_code:
+                raise ValueError("Response data is missing status_code key!")
             response = JsonResponse(data=response_data, status=status_code)
             log.reset_context()
             return response
@@ -65,14 +67,16 @@ def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]
         raise EndpointConfigurationError(f"{func_name} is missing request type annotation!") from e
     try:
         response_model = annotations["return"]
-    except KeyError as e:
-        raise Exception(f"{func_name} is missing return type annotation!") from e
+    except KeyError:
+        response_model = None
+        log.warning(f"{func_name} is missing return type annotation!")
+        # raise Exception(f"{func_name} is missing return type annotation!") from e
     if not issubclass(request_model, BaseModel):
         raise EndpointConfigurationError(f"{func_name}'s request type annotation is not a subclass of BaseModel!")
-    if not issubclass(response_model, BaseModel):
-        raise EndpointConfigurationError(f"{func_name}'s return type annotation is not a subclass of BaseModel!")
-    if len(annotations) != 2:
-        raise EndpointConfigurationError(f"{func_name} has more than 2 annotations!")
+    # if not issubclass(response_model, BaseModel):
+    #     raise EndpointConfigurationError(f"{func_name}'s return type annotation is not a subclass of BaseModel!")
+    # if len(annotations) > 2:
+    #     raise EndpointConfigurationError(f"{func_name} has more than 2 annotations!")
     return request_model, response_model
 
 
@@ -90,4 +94,6 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
 def _get_response_data(response: BaseResponse) -> dict:
     if response is None:
         return {"status_code": status.HTTP_204_NO_CONTENT, "message": "No content"}
-    return response.dict()
+    if isinstance(response, BaseModel):
+        return response.dict()
+    return response  # type: ignore
