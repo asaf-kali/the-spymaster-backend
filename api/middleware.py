@@ -29,8 +29,9 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
             return JsonResponse(
                 {"message": "Invalid move", "details": str(exception)}, status=status.HTTP_400_BAD_REQUEST
             )
-        log.exception("Uncaught exception")
         sentry_sdk.capture_exception(exception)
+        log.exception("Uncaught exception")
+        sentry_sdk.flush(timeout=5)
         if settings.DEBUG:
             return JsonResponse({"message": str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         raise exception
