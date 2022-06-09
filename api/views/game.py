@@ -1,9 +1,8 @@
 from codenames.game import Guess, Hint, build_game_state
 from rest_framework.viewsets import GenericViewSet
-from solvers.models import load_model_async
 
 from api.logic.game import NextMoveHandler, get_game
-from api.logic.language import load_default_models_async
+from api.logic.language import load_models_async
 from api.models.game import Game
 from api.structs.request import (
     AsyncLoadModelsRequest,
@@ -75,10 +74,8 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
 
     @endpoint(url_path="async-load-models")
     def async_load_models(self, request: AsyncLoadModelsRequest) -> AsyncLoadModelsResponse:
-        load_default_models_async()
-        for model_identifier in request.model_identifiers:
-            load_model_async(model_identifier=model_identifier)
-        return AsyncLoadModelsResponse()
+        loaded_models_count = load_models_async(model_ids=request.model_identifiers)
+        return AsyncLoadModelsResponse(loaded_models_count=loaded_models_count)
 
     @endpoint(methods=[HttpMethod.GET])
     def test(self, request: BaseRequest) -> dict:

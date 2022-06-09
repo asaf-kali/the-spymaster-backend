@@ -1,16 +1,35 @@
 {
-    "common": {
-        "aws_region": "us-east-1",
-        "profile_name": "default",
-        "django_settings": "the_spymaster.settings",
-        "project_name": "the-spymaster",
-        "runtime": "python3.8",
-        "exclude": ["logs", "node_modules", "language_data", "*.sqlite3", "local.toml", "secrets.toml"],
-        "slim_handler": true,
-        "timeout_seconds": 90
-    },
-    "dev": {
-        "extends": "common",
-        "s3_bucket": "zappa-deployment-bucket-dev"
+  "common": {
+    "aws_region": "us-east-1",
+    "profile_name": "default",
+    "django_settings": "the_spymaster.settings",
+    "project_name": "the-spymaster",
+    "runtime": "python3.8",
+    "exclude": [
+      "logs",
+      "node_modules",
+      "language_data",
+      "*.sqlite3",
+      "local.toml",
+      "secrets.toml"
+    ],
+    "slim_handler": true,
+    "timeout_seconds": 120,
+    "memory_size": 3000
+  },
+  "dev": {
+    "extends": "common",
+    "s3_bucket": "zappa-deployment-bucket-dev",
+    "vpc_config": {
+      "SubnetIds": [
+        "subnet-055f905a",
+        "subnet-46dc1e20",
+        "subnet-568d4577",
+        "subnet-6432a029"
+      ],
+      "SecurityGroupIds": [
+        "sg-a3ddf281"
+      ]
     }
+  }
 }

@@ -7,31 +7,48 @@ django_debug = false
 
 # Logging
 indented_json = 0
-formatter = "simple"
+formatter = "json"
 root_log_level = "INFO"
 bot_log_level = "INFO"
 
 # App
-language_data_folder = "~/.cache/language_data"
 base_backend_url = "http://127.0.0.1:8000"
+
+# Language
+language_data_folder = "/tmp/language_data"
+should_load_models_from_s3 = false
+s3_bucket_name = "the-spymaster-bucket-dev"
 
 [local]
 env_verbose_name = "Local"
 django_debug = true
+formatter = "simple"
+should_load_models_from_s3 = true
+#language_data_folder = "~/.cache/language_data"
 bot_log_level = "DEBUG"
 
 [dev]
 env_verbose_name = "Dev"
 django_debug = true
+db_name = "postgres"
+db_engine = "django.db.backends.postgresql"
+db_port = 5432
+should_load_models_from_s3 = true
 
 [stage]
 env_verbose_name = "Staging"
+db_name = "postgres"
+db_engine = "django.db.backends.postgresql"
+db_port = 5432
+should_load_models_from_s3 = true
 
 [prod]
 env_verbose_name = "Production"
 db_name = "postgres"
 db_engine = "django.db.backends.postgresql"
 db_port = 5432
+should_load_models_from_s3 = true
+s3_bucket_name = "the-spymaster-bucket-prod"
 
 [rsbpi]
 env_verbose_name = "Raspberry Pi"

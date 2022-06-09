@@ -47,4 +47,4 @@ class NextMoveResponse(BaseResponse):
 
 
 class AsyncLoadModelsResponse(BaseResponse):
-    pass
+    loaded_models_count: int

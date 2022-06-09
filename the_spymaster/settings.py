@@ -302,3 +302,5 @@ QUERY_INSPECT_LOG_QUERIES = DEBUG
 
 # API
 LANGUAGE_DATA_FOLDER = config.language_data_folder
+SHOULD_LOAD_MODELS_FROM_S3 = config.should_load_models_from_s3
+S3_BUCKET_NAME = config.s3_bucket_name
