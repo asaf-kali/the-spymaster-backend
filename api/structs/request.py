@@ -50,5 +50,5 @@ class NextMoveRequest(BaseRequest):
     solver: Solver = Solver.NAIVE
 
 
-class AsyncLoadModelsRequest(BaseRequest):
+class LoadModelsRequest(BaseRequest):
     model_identifiers: List[ModelIdentifier] = []

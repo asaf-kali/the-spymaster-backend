@@ -22,9 +22,9 @@ from telegram.ext import CallbackContext
 from api.logic.language import DEFAULT_LANGUAGES
 from api.structs import Difficulty, GameConfig
 from api.structs.request import (
-    AsyncLoadModelsRequest,
     GetGameStateRequest,
     GuessRequest,
+    LoadModelsRequest,
     NextMoveRequest,
     StartGameRequest,
 )
@@ -419,8 +419,8 @@ class GetSessionsHandler(EventHandler):
 class LoadModelsHandler(EventHandler):
     def handle(self):
         log.info("Sending async load models request")
-        request = AsyncLoadModelsRequest(model_identifiers=AVAILABLE_MODELS)
-        response = self.client.async_load_models(request)
+        request = LoadModelsRequest(model_identifiers=AVAILABLE_MODELS)
+        response = self.client.load_models(request)
         self.send_text(f"Got response: {response.dict()}")
 
 

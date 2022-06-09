@@ -25,7 +25,7 @@ DEFAULT_MODELS = {
 DEFAULT_LANGUAGES = [language for language in DEFAULT_MODELS.keys()]
 
 
-def load_models_async(model_ids: Iterable[ModelIdentifier]) -> int:
+def load_models(model_ids: Iterable[ModelIdentifier]) -> int:
     log.info(f"Loading default models from {settings.LANGUAGE_DATA_FOLDER}")
     set_language_data_folder(settings.LANGUAGE_DATA_FOLDER)
     task_manager = AsyncTaskManager(collect_results=False)

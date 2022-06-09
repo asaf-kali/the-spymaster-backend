@@ -5,18 +5,18 @@ import requests
 from requests import Response
 
 from api.structs.request import (
-    AsyncLoadModelsRequest,
     GetGameStateRequest,
     GuessRequest,
     HintRequest,
+    LoadModelsRequest,
     NextMoveRequest,
     StartGameRequest,
 )
 from api.structs.response import (
-    AsyncLoadModelsResponse,
     GetGameStateResponse,
     GuessResponse,
     HintResponse,
+    LoadModelsResponse,
     NextMoveResponse,
     StartGameResponse,
 )
@@ -80,6 +80,6 @@ class TheSpymasterClient:
         data = self._get("state/", data=request.dict())
         return GetGameStateResponse(**data)
 
-    def async_load_models(self, request: AsyncLoadModelsRequest) -> AsyncLoadModelsResponse:
+    def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
         data = self._post("async-load-models/", data=request.dict())
-        return AsyncLoadModelsResponse(**data)
+        return LoadModelsResponse(**data)

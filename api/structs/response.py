@@ -46,5 +46,5 @@ class NextMoveResponse(BaseResponse):
     game_state: GameState
 
 
-class AsyncLoadModelsResponse(BaseResponse):
+class LoadModelsResponse(BaseResponse):
     loaded_models_count: int
