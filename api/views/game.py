@@ -80,3 +80,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
     @endpoint(methods=[HttpMethod.GET])
     def test(self, request: BaseRequest) -> dict:
         return {"test": "test", "status_code": 200}
+
+    @endpoint(methods=[HttpMethod.GET], url_path="raise-error")
+    def raise_error(self, request: BaseRequest) -> dict:
+        raise Exception("Test error")
