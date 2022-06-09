@@ -15,6 +15,7 @@ log = get_logger(__name__)
 
 class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
     def process_exception(self, request: WSGIRequest, exception: Exception):
+        log.debug("Processing exception: %s", exception)
         if isinstance(exception, ValidationError):
             return JsonResponse({"message": str(exception)}, status=status.HTTP_400_BAD_REQUEST)
         if isinstance(exception, BadRequestError):
@@ -28,7 +29,7 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
             return JsonResponse(
                 {"message": "Invalid move", "details": str(exception)}, status=status.HTTP_400_BAD_REQUEST
             )
-        log.exception(exception)
+        log.exception("Uncaught exception")
         sentry_sdk.capture_exception(exception)
         if settings.DEBUG:
             return JsonResponse({"message": str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
@@ -31,7 +32,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.240", "zappa", "ps84epd323
 
 sentry_sdk.init(
     dsn=config.sentry_dsn,
-    integrations=[DjangoIntegration(), LoggingIntegration(event_level=None)],
+    integrations=[DjangoIntegration(), LoggingIntegration(event_level=None), AwsLambdaIntegration()],
     environment=ENVIRONMENT,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
