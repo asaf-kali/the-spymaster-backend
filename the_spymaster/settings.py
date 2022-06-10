@@ -9,15 +9,14 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import logging
 import os
-import sys
 from pathlib import Path
 
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
+from the_spymaster_util import get_basic_dict_config
 
-from the_spymaster.utils import get_config
+from the_spymaster.config import get_config
 
 config = get_config()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +27,7 @@ SECRET_KEY = config.django_secret_key
 SITE_ID = 1
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.240", "zappa", "ps84epd323.execute-api.us-east-1.amazonaws.com"]
 
-sentry_sdk.init(
+sentry_sdk.init(  # type: ignore
     dsn=config.sentry_dsn,
     integrations=[LoggingIntegration(event_level=None)],
     environment=ENVIRONMENT,
@@ -106,8 +105,8 @@ WSGI_APPLICATION = "the_spymaster.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": config.get("DB_ENGINE", default="django.db.backends.sqlite3"),
-        "NAME": config.get("DB_NAME", default=BASE_DIR / "db.sqlite3"),
+        "ENGINE": config.get("DB_ENGINE") or "django.db.backends.sqlite3",
+        "NAME": config.get("DB_NAME") or BASE_DIR / "db.sqlite3",
         "USER": config.get("DB_USER"),
         "PASSWORD": config.get("DB_PASSWORD"),
         "HOST": config.get("DB_HOST"),
@@ -155,57 +154,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGS_PARENT = BASE_DIR  # if DEBUG else os.path.join(BASE_DIR, "../")
 LOGGING_DIR = os.path.join(LOGS_PARENT, "logs")
 os.makedirs(LOGGING_DIR, exist_ok=True)
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "simple": {
-            "()": "the_spymaster.utils.logging.ContextFormatter",
-            "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s [%(name)s]",
-            "datefmt": "%H:%M:%S",
-            "log_context": False,
-        },
-        "debug": {
-            "class": "the_spymaster.utils.logging.ContextFormatter",
-            "format": "[%(asctime)s.%(msecs)03d] [%(levelname)-.4s]: %(message)s @@@ "
-            "[%(name)s:%(lineno)s] [%(threadName)s]",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-        "json": {
-            "()": "the_spymaster.utils.logging.JsonFormatter",
-            "indented": config.indented_json,
-        },
-    },
-    "filters": {
-        "std_filter": {"()": "the_spymaster.utils.logging.LevelRangeFilter", "high": logging.WARNING},
-        "err_filter": {"()": "the_spymaster.utils.logging.LevelRangeFilter", "low": logging.WARNING},
-    },
-    "handlers": {
-        "console_out": {
-            "class": "logging.StreamHandler",
-            "filters": ["std_filter"],
-            "formatter": config.formatter,
-            "stream": sys.stdout,
-        },
-        "console_err": {
-            "class": "logging.StreamHandler",
-            "filters": ["err_filter"],
-            "formatter": config.formatter,
-            "stream": sys.stderr,
-        },
+LOGGING = get_basic_dict_config(
+    std_formatter=config.formatter, root_log_level=config.root_log_level, json_indent=config.indented_json
+)
+LOGGING["handlers"].update(
+    **{
         "codenames_file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": os.path.join(LOGGING_DIR, "codenames.log"),
             "formatter": "json",
             "level": "DEBUG",
-        },
-        "bot_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "bot.log"),
-            "formatter": "json",
-            "level": "DEBUG",
-            "when": "midnight",
-            "backupCount": 28,
         },
         "root_file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
@@ -222,35 +180,28 @@ LOGGING = {
             "when": "midnight",
             "backupCount": 7,
         },
+    }
+)
+LOGGING["loggers"] = {
+    "api": {
+        "handlers": ["console_out", "console_err", "debug_file"],
+        "level": "DEBUG",
+        "propagate": False,
     },
-    "root": {"handlers": ["console_out", "console_err", "root_file"], "level": config.root_log_level},
-    "loggers": {
-        "api": {
-            "handlers": ["console_out", "console_err", "debug_file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "telegram_bot": {
-            "handlers": ["console_out", "console_err", "bot_file"],
-            "level": config.bot_log_level,
-            "propagate": False,
-        },
-        "codenames": {
-            "handlers": ["console_out", "console_err", "codenames_file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        "codenames.utils": {
-            "level": "INFO",
-        },
-        # 3rd parties
-        "telegram": {"level": "INFO"},
-        "apscheduler": {"level": "INFO"},
-        "qinspect": {"level": "DEBUG"},
-        # Django
-        "django": {"handlers": ["debug_file", "console_err"], "level": "DEBUG", "propagate": False},
-        "django.utils.autoreload": {"level": "INFO"},
+    "codenames": {
+        "handlers": ["console_out", "console_err", "codenames_file"],
+        "level": "DEBUG",
+        "propagate": False,
     },
+    "codenames.utils": {
+        "level": "INFO",
+    },
+    # 3rd parties
+    "apscheduler": {"level": "INFO"},
+    "qinspect": {"level": "DEBUG"},
+    # Django
+    "django": {"handlers": ["debug_file", "console_err"], "level": "DEBUG", "propagate": False},
+    "django.utils.autoreload": {"level": "INFO"},
 }
 
 # Auth

@@ -1,6 +1,7 @@
 import requests
 from codenames.game import Guess, Hint, build_game_state
 from rest_framework.viewsets import GenericViewSet
+from the_spymaster_util import get_logger
 
 from api.logic.game import NextMoveHandler, get_game
 from api.logic.language import load_models
@@ -24,7 +25,6 @@ from api.structs.response import (
 )
 from api.views import ViewContextMixin
 from api.views.endpoint import HttpMethod, endpoint
-from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
 

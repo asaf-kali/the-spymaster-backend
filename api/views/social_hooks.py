@@ -14,11 +14,11 @@ from django.dispatch import receiver
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from the_spymaster_util import wrap
 
 from api.logic.errors import BadRequestError, UnauthorizedError
 from api.models import SpymasterUser
 from api.views import log
-from the_spymaster.utils import wrap
 
 
 def _create_email_address(existing_user: SpymasterUser):

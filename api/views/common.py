@@ -4,8 +4,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.viewsets import ViewSetMixin
-
-from the_spymaster.utils import get_logger, wrap
+from the_spymaster_util import get_logger, wrap
 
 log = get_logger(__name__)
 

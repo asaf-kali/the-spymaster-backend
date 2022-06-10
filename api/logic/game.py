@@ -3,13 +3,13 @@ from typing import Optional
 from codenames.game import GameState, PlayerRole
 from solvers.models import ModelIdentifier
 from solvers.naive import NaiveGuesser, NaiveHinter
+from the_spymaster_util import get_logger
 
 from api.logic.errors import BadRequestError
 from api.logic.language import DEFAULT_MODELS, get_adapter_for_model
 from api.models.game import Game
 from api.structs import Solver
 from api.structs.response import NextMoveResponse
-from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
 

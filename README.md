@@ -1,5 +1,5 @@
-# The Spymaster
-Backend services for Codenames board game.
+# The Spymaster Backend
+Codenames board game backend service.
 
 [![Unit tests](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/tests.yml/badge.svg)](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/tests.yml)
 [![Lint](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/lint.yml/badge.svg)](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/lint.yml)

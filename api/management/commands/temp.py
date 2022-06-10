@@ -1,9 +1,9 @@
 import json
 
 from django.core.management import BaseCommand
+from the_spymaster_util import get_logger
 
 from api.models.game import Game
-from the_spymaster.utils import get_logger
 
 log = get_logger(__name__)
 

@@ -11,6 +11,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.viewsets import GenericViewSet
+from the_spymaster_util import get_logger, wrap
 
 from api.serializers import UserDetailsSerializer, UserSummarizeSerializer
 from api.views import ViewContextMixin
@@ -19,7 +20,6 @@ from api.views.social_hooks import (
     CustomOAuth2LoginView,
     _generate_key_response,
 )
-from the_spymaster.utils import get_logger, wrap
 
 log = get_logger(__name__)
 
