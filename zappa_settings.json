@@ -14,22 +14,21 @@
       "secrets.toml"
     ],
     "slim_handler": true,
-    "timeout_seconds": 120,
+    "timeout_seconds": 60,
     "memory_size": 3000
   },
   "dev": {
     "extends": "common",
     "s3_bucket": "zappa-deployment-bucket-dev",
-    "vpc_config": {
-      "SubnetIds": [
-        "subnet-055f905a",
-        "subnet-46dc1e20",
-        "subnet-568d4577",
-        "subnet-6432a029"
-      ],
-      "SecurityGroupIds": [
-        "sg-a3ddf281"
-      ]
+    "aws_environment_variables": {
+      "ENV_FOR_DYNACONF": "dev"
+    }
+  },
+  "stage": {
+    "extends": "common",
+    "s3_bucket": "zappa-deployment-bucket-stage",
+    "aws_environment_variables": {
+      "ENV_FOR_DYNACONF": "stage"
     }
   }
 }

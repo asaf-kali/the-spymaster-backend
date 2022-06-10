@@ -80,7 +80,10 @@ run:
 kill:
 	killall python || true
 
-# Deploy
+# Zappa deployment
 
 deploy:
 	zappa update $(ENV)
+
+tale:
+	zappa tale $(ENV)

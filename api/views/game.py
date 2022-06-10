@@ -1,3 +1,4 @@
+import requests
 from codenames.game import Guess, Hint, build_game_state
 from rest_framework.viewsets import GenericViewSet
 
@@ -84,3 +85,8 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
     @endpoint(methods=[HttpMethod.GET], url_path="raise-error")
     def raise_error(self, request: BaseRequest) -> dict:
         raise Exception("Test error")
+
+    @endpoint(methods=[HttpMethod.GET], url_path="ping-google")
+    def ping_google(self, request: BaseRequest) -> dict:
+        r = requests.get("https://www.google.com", timeout=10)
+        return {"status_code": r.status_code, "duration": r.elapsed.total_seconds()}
