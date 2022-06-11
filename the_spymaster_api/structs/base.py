@@ -2,7 +2,6 @@ from enum import Enum
 from typing import Any, Dict, Optional, Union
 
 from pydantic import BaseModel
-from solvers.models import ModelIdentifier
 
 JsonType = Union[str, int, float, bool, list, Dict[str, Any], None]
 
@@ -21,6 +20,15 @@ class Solver(str, Enum):
     NAIVE = "naive"
     OLYMPIC = "olympic"
     SNA = "sna"
+
+
+class ModelIdentifier(BaseModel):
+    language: str
+    model_name: str
+    is_stemmed: bool = False
+
+    def __hash__(self):
+        return hash(f"{self.language}-{self.model_name}-{self.is_stemmed}")
 
 
 class GameConfig(BaseModel):

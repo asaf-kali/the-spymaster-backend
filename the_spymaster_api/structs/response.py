@@ -2,9 +2,8 @@ from typing import Any, Optional
 
 from codenames.game import GameState, GivenGuess, GivenHint
 from pydantic import BaseModel, Extra
-from solvers.models import ModelIdentifier
 
-from api.structs import Solver
+from . import ModelIdentifier, Solver
 
 
 class BaseResponse(BaseModel):
