@@ -6,23 +6,19 @@ django_secret_key = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09"
 django_debug = false
 
 # Logging
-indented_json = 0
-formatter = "json"
+indent_json = false
+std_formatter = "json"
 root_log_level = "INFO"
-bot_log_level = "INFO"
 
 # Language
 language_data_folder = "/tmp/language_data"
 should_load_models_from_s3 = false
 s3_bucket_name = "the-spymaster-bucket-dev"
 
-# DB
-
 [local]
 env_verbose_name = "Local"
 django_debug = true
-formatter = "simple"
-bot_log_level = "DEBUG"
+std_formatter = "simple"
 should_load_models_from_s3 = true
 #language_data_folder = "~/.cache/language_data"
 

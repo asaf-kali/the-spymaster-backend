@@ -14,7 +14,7 @@ from pathlib import Path
 
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
-from the_spymaster_util import get_basic_dict_config
+from the_spymaster_util import get_dict_config
 
 from the_spymaster.config import get_config
 
@@ -154,35 +154,30 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGS_PARENT = BASE_DIR  # if DEBUG else os.path.join(BASE_DIR, "../")
 LOGGING_DIR = os.path.join(LOGS_PARENT, "logs")
 os.makedirs(LOGGING_DIR, exist_ok=True)
-LOGGING = get_basic_dict_config(
-    std_formatter=config.formatter, root_log_level=config.root_log_level, json_indent=config.indented_json
-)
-LOGGING["handlers"].update(
-    **{
-        "codenames_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "codenames.log"),
-            "formatter": "json",
-            "level": "DEBUG",
-        },
-        "root_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "root.log"),
-            "formatter": "json",
-            "level": "INFO",
-            "when": "midnight",
-            "backupCount": 14,
-        },
-        "debug_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(LOGGING_DIR, "debug.log"),
-            "formatter": "json",
-            "when": "midnight",
-            "backupCount": 7,
-        },
-    }
-)
-LOGGING["loggers"] = {
+handlers = {
+    "codenames_file": {
+        "class": "logging.handlers.TimedRotatingFileHandler",
+        "filename": os.path.join(LOGGING_DIR, "codenames.log"),
+        "formatter": "json",
+        "level": "DEBUG",
+    },
+    "root_file": {
+        "class": "logging.handlers.TimedRotatingFileHandler",
+        "filename": os.path.join(LOGGING_DIR, "root.log"),
+        "formatter": "json",
+        "level": "INFO",
+        "when": "midnight",
+        "backupCount": 14,
+    },
+    "debug_file": {
+        "class": "logging.handlers.TimedRotatingFileHandler",
+        "filename": os.path.join(LOGGING_DIR, "debug.log"),
+        "formatter": "json",
+        "when": "midnight",
+        "backupCount": 7,
+    },
+}
+loggers = {
     "api": {
         "handlers": ["console_out", "console_err", "debug_file"],
         "level": "DEBUG",
@@ -203,6 +198,13 @@ LOGGING["loggers"] = {
     "django": {"handlers": ["debug_file", "console_err"], "level": "DEBUG", "propagate": False},
     "django.utils.autoreload": {"level": "INFO"},
 }
+LOGGING = get_dict_config(
+    std_formatter=config.std_formatter,
+    root_log_level=config.root_log_level,
+    indent_json=config.indent_json,
+    extra_handlers=handlers,
+    extra_loggers=loggers,
+)
 
 # Auth
 AUTH_USER_MODEL = "api.SpymasterUser"
