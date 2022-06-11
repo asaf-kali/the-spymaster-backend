@@ -81,3 +81,9 @@ deploy:
 
 tale:
 	zappa tale $(ENV)
+
+# Client
+
+build-client:
+	$(DEL_COMMAND) -f dist/*
+	python -m build

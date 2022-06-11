@@ -13,8 +13,7 @@ from solvers.models import (
 )
 from solvers.models import load_model as _load_model
 from solvers.models import set_language_data_folder
-from solvers.utils.async_task_manager import AsyncTaskManager
-from the_spymaster_util import get_logger
+from the_spymaster_util import AsyncTaskManager, get_logger
 
 log = get_logger(__name__)
 DEFAULT_MODELS = {

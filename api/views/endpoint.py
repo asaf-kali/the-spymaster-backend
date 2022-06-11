@@ -10,7 +10,7 @@ from rest_framework.request import Request
 from the_spymaster_util import get_logger
 
 from api.logic.errors import BadRequestError, SpymasterError
-from api.structs.response import BaseResponse
+from the_spymaster_api.structs import BaseResponse
 
 log = get_logger(__name__)
 

@@ -6,25 +6,23 @@ from the_spymaster_util import get_logger
 from api.logic.game import NextMoveHandler, get_game
 from api.logic.language import load_models
 from api.models.game import Game
-from api.structs.request import (
-    BaseRequest,
-    GetGameStateRequest,
-    GuessRequest,
-    HintRequest,
-    LoadModelsRequest,
-    NextMoveRequest,
-    StartGameRequest,
-)
-from api.structs.response import (
-    GetGameStateResponse,
-    GuessResponse,
-    HintResponse,
-    LoadModelsResponse,
-    NextMoveResponse,
-    StartGameResponse,
-)
 from api.views import ViewContextMixin
 from api.views.endpoint import HttpMethod, endpoint
+from the_spymaster_api.structs import (
+    BaseRequest,
+    GetGameStateRequest,
+    GetGameStateResponse,
+    GuessRequest,
+    GuessResponse,
+    HintRequest,
+    HintResponse,
+    LoadModelsRequest,
+    LoadModelsResponse,
+    NextMoveRequest,
+    NextMoveResponse,
+    StartGameRequest,
+    StartGameResponse,
+)
 
 log = get_logger(__name__)
 

@@ -3,7 +3,7 @@ from typing import Optional
 from rest_framework import status
 from the_spymaster_util import get_logger
 
-from api.structs import JsonType
+from the_spymaster_api.structs import JsonType
 
 log = get_logger(__name__)
 
