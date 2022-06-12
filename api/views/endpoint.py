@@ -9,13 +9,14 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from the_spymaster_util import get_logger
+from the_spymaster_util.measure_time import MeasureTime
 
 from api.logic.errors import BadRequestError, SpymasterError
 from the_spymaster_api.structs import BaseRequest, BaseResponse
 
 log = get_logger(__name__)
 
-ALLOWED_REQUEST_MODELS = (BaseRequest,)
+ALLOWED_REQUEST_TYPES = (BaseRequest,)
 ALLOWED_RESPONSE_TYPES = (dict, BaseResponse, HttpResponse)
 
 
@@ -59,13 +60,17 @@ def endpoint(
             log.update_context(endpoint_name=endpoint_name)
             log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
-            response = f(view, parsed_request)
+            with MeasureTime() as mt:
+                response = f(view, parsed_request)
             response_data = _get_response_data(response)
             status_code = response_data.pop("status_code", None)
             if not status_code:
                 raise ValueError("Response data is missing status_code key!")
             response = JsonResponse(data=response_data, status=status_code)
-            log.info(f"Endpoint returns with status {status_code}")
+            log.info(
+                f"Endpoint completed with status {status_code}",
+                extra={"status_code": status_code, "duration": mt.delta},
+            )
             if getattr(parsed_request, "debug", False):
                 log.debug("Response data", extra={"response": response_data})
             log.reset_context()
@@ -78,7 +83,7 @@ def endpoint(
     return decorator
 
 
-def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type]:
+def _get_request_response_models(func) -> Tuple[Type[BaseRequest], Type]:
     func_name, annotations = func.__name__, func.__annotations__
     try:
         request_model = annotations["request"]
@@ -88,11 +93,11 @@ def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type]:
         response_model = annotations["return"]
     except KeyError as e:
         raise EndpointAnnotationError(f"{func_name} is missing return type annotation!") from e
-    if not issubclass(request_model, ALLOWED_REQUEST_MODELS):
+    if not issubclass(request_model, ALLOWED_REQUEST_TYPES):
         raise EndpointTypingError(
             f"{func_name}'s request type annotation is not supported!",
             actual_type=request_model,
-            supported_types=ALLOWED_REQUEST_MODELS,
+            supported_types=ALLOWED_REQUEST_TYPES,
         )
     if not issubclass(response_model, ALLOWED_RESPONSE_TYPES):
         raise EndpointTypingError(
