@@ -1,8 +1,9 @@
 import functools
+import json
 from enum import Enum
 from typing import List, Tuple, Type
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from pydantic import BaseModel, ValidationError
 from rest_framework import status
 from rest_framework.decorators import action
@@ -10,13 +11,28 @@ from rest_framework.request import Request
 from the_spymaster_util import get_logger
 
 from api.logic.errors import BadRequestError, SpymasterError
-from the_spymaster_api.structs import BaseResponse
+from the_spymaster_api.structs import BaseRequest, BaseResponse
 
 log = get_logger(__name__)
+
+ALLOWED_REQUEST_MODELS = (BaseRequest,)
+ALLOWED_RESPONSE_TYPES = (dict, BaseResponse, HttpResponse)
 
 
 class EndpointConfigurationError(SpymasterError):
     pass
+
+
+class EndpointAnnotationError(EndpointConfigurationError):
+    pass
+
+
+class EndpointTypingError(EndpointConfigurationError):
+    def __init__(self, message: str, actual_type: Type, supported_types: Tuple[Type]):
+        detailed_message = f"{message} (actual type: {actual_type}, supported types: {supported_types})"
+        super().__init__(detailed_message)
+        self.actual_type = actual_type
+        self.supported_types = supported_types
 
 
 class HttpMethod(str, Enum):
@@ -49,6 +65,9 @@ def endpoint(
             if not status_code:
                 raise ValueError("Response data is missing status_code key!")
             response = JsonResponse(data=response_data, status=status_code)
+            log.info(f"Endpoint returns with status {status_code}")
+            if getattr(parsed_request, "debug", False):
+                log.debug("Response data", extra={"response": response_data})
             log.reset_context()
             return response
 
@@ -59,22 +78,28 @@ def endpoint(
     return decorator
 
 
-def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type[BaseModel]]:
+def _get_request_response_models(func) -> Tuple[Type[BaseModel], Type]:
     func_name, annotations = func.__name__, func.__annotations__
     try:
         request_model = annotations["request"]
     except KeyError as e:
-        raise EndpointConfigurationError(f"{func_name} is missing request type annotation!") from e
+        raise EndpointAnnotationError(f"{func_name} is missing request type annotation!") from e
     try:
         response_model = annotations["return"]
-    except KeyError:
-        response_model = None
-        log.warning(f"{func_name} is missing return type annotation!")
-        # raise Exception(f"{func_name} is missing return type annotation!") from e
-    if not issubclass(request_model, BaseModel):
-        raise EndpointConfigurationError(f"{func_name}'s request type annotation is not a subclass of BaseModel!")
-    # if not issubclass(response_model, BaseModel):
-    #     raise EndpointConfigurationError(f"{func_name}'s return type annotation is not a subclass of BaseModel!")
+    except KeyError as e:
+        raise EndpointAnnotationError(f"{func_name} is missing return type annotation!") from e
+    if not issubclass(request_model, ALLOWED_REQUEST_MODELS):
+        raise EndpointTypingError(
+            f"{func_name}'s request type annotation is not supported!",
+            actual_type=request_model,
+            supported_types=ALLOWED_REQUEST_MODELS,
+        )
+    if not issubclass(response_model, ALLOWED_RESPONSE_TYPES):
+        raise EndpointTypingError(
+            f"{func_name}'s return type annotation is not supported!",
+            actual_type=response_model,
+            supported_types=ALLOWED_RESPONSE_TYPES,  # type: ignore
+        )
     # if len(annotations) > 2:
     #     raise EndpointConfigurationError(f"{func_name} has more than 2 annotations!")
     return request_model, response_model
@@ -96,4 +121,14 @@ def _get_response_data(response: BaseResponse) -> dict:
         return {"status_code": status.HTTP_204_NO_CONTENT, "message": "No content"}
     if isinstance(response, BaseModel):
         return response.dict()
-    return response  # type: ignore
+    if isinstance(response, HttpResponse):
+        response_body = response.content.decode("utf-8")
+        response_data = json.loads(response_body)
+        return {**response_data, "status_code": response.status_code}
+    if isinstance(response, dict):
+        return response
+    raise EndpointTypingError(
+        "Response type not implemented",
+        actual_type=type(response),
+        supported_types=ALLOWED_RESPONSE_TYPES,  # type: ignore
+    )
