@@ -69,7 +69,7 @@ class ArchiveCleaner:
         os.makedirs(self.lambda_dir, exist_ok=True)
         os.makedirs(self.layer_dir, exist_ok=True)
         for root, _, files in tqdm(walk_list):
-            zip_relative_root = root[self.prefix_length:].lstrip(os.sep)
+            zip_relative_root = root[self.prefix_length :].lstrip(os.sep)
             should_move_to_layer = any(pattern.match(zip_relative_root) for pattern in self.layer_patterns)
             # manager = self.layer_manager if should_move_to_layer else self.lambda_manager
             component_dir = self.layer_dir if should_move_to_layer else self.lambda_dir
