@@ -15,7 +15,8 @@
     ],
     "slim_handler": true,
     "timeout_seconds": 60,
-    "memory_size": 3000
+    "lambda_concurrency": 3,
+    "memory_size": 2000
   },
   "dev": {
     "extends": "common",
