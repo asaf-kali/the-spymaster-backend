@@ -11,9 +11,28 @@
       "language_data",
       "*.sqlite3",
       "local.toml",
-      "secrets.toml"
+      "secrets.toml",
+      ".mypy_cache"
     ],
-    "slim_handler": true,
+    "exclude_expressions": [
+      "^boto3.*",
+      "^botocore.*",
+      "^scipy.*",
+      "^pydantic.*",
+      "^gensim.*",
+      "^pandas.*",
+      "^numpy.*",
+      "^scipy.*",
+      "^networkx.*",
+      "^cryptography.*",
+      "^mypy.*",
+      "^virtualenv.*",
+      "^selenium.*"
+    ],
+    "callbacks": {
+      "zip": "deployment.zappa_package_cleaner.main"
+    },
+    "slim_handler": false,
     "timeout_seconds": 60,
     "lambda_concurrency": 3,
     "memory_size": 2000
