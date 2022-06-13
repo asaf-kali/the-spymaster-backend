@@ -41,21 +41,23 @@ class ArchiveCleaner:
             self.archive_format, extension = "zip", ".zip"
         else:
             raise Exception(f"Unknown archive format: {archive_path}")
+        self.zip_name = os.path.basename(archive_path)
         self.archive_file_path = absolute_path(archive_path)
         self.wip_dir = absolute_path(archive_path.replace(extension, ""))
         self.temp_unarchive_dir = os.path.join(self.wip_dir, "content")
         self.lambda_dir = os.path.join(self.wip_dir, "lambda")
         self.layer_dir = os.path.join(self.wip_dir, "layer")
-        self.new_archive_path = self.archive_file_path + ".new"
-        self.lambda_manager = _manager_factory(self.new_archive_path, self.archive_format)
-        self.layer_manager = _manager_factory("layer.zip", self.archive_format)
+        self.new_archive_path = self.wip_dir + "-new.zip"
+        self.layer_archive_path = self.wip_dir + "-layer.zip"
+        # self.lambda_manager = _manager_factory(self.new_archive_path, self.archive_format)
+        # self.layer_manager = _manager_factory(self.layer_archive_path, self.archive_format)
         self.prefix_length = len(self.temp_unarchive_dir)
         self.layer_patterns = [re.compile(rf"^{exclude}.*") for exclude in layer_packages]
 
     def clean(self):
         self._unpack_archive()
         self._remake_archive()
-        self._remove_unarchive_dir()
+        self._remove_wip_dir()
         # self._swap_archives()
 
     def _unpack_archive(self):
@@ -69,11 +71,11 @@ class ArchiveCleaner:
         for root, _, files in tqdm(walk_list):
             zip_relative_root = root[self.prefix_length:].lstrip(os.sep)
             should_move_to_layer = any(pattern.match(zip_relative_root) for pattern in self.layer_patterns)
-            manager = self.layer_manager if should_move_to_layer else self.lambda_manager
+            # manager = self.layer_manager if should_move_to_layer else self.lambda_manager
             component_dir = self.layer_dir if should_move_to_layer else self.lambda_dir
             for file_name in files:
-                full_path = os.path.join(root, file_name)
                 zip_relative_path = os.path.join(zip_relative_root, file_name)
+                src_path = os.path.join(root, file_name)
                 dst_path = os.path.join(component_dir, zip_relative_path)
                 dst_dir = os.path.dirname(dst_path)
                 os.makedirs(dst_dir, exist_ok=True)
@@ -82,19 +84,20 @@ class ArchiveCleaner:
                 # Related: https://github.com/Miserlou/Zappa/issues/682
                 # os.chmod(full_path, READ_EXECUTE_WRITE_MODE)
                 # TODO: instead of add the file, move it to the correct location
-                # manager.add(full_path=full_path, zip_relative_path=zip_relative_path)
-                os.rename(full_path, dst_path)
-        self.lambda_manager.close()
-        self.layer_manager.close()
+                os.rename(src=src_path, dst=dst_path)
+                # manager.add(full_path=dst_path, zip_relative_path=zip_relative_path)
+        print(f"Creating {self.new_archive_path}")
+        # self.lambda_manager.close()
+        # self.layer_manager.close()
 
     def _swap_archives(self):
         print(f"Renaming {self.new_archive_path} to {self.archive_file_path}")
         os.remove(self.archive_file_path)
         os.rename(self.new_archive_path, self.archive_file_path)
 
-    def _remove_unarchive_dir(self):
-        print(f"Removing {self.temp_unarchive_dir}")
-        shutil.rmtree(self.temp_unarchive_dir)
+    def _remove_wip_dir(self):
+        print(f"Removing {self.wip_dir}")
+        shutil.rmtree(self.wip_dir)
 
 
 def clean_archive(archive_path: str, layer_packages: List[str]):
