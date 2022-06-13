@@ -3,7 +3,6 @@
 import os
 import re
 import shutil
-from re import Pattern
 from tarfile import TarInfo
 from tarfile import open as open_tar
 from typing import List
@@ -27,12 +26,15 @@ def main(zappa: ZappaCLI):
     common_settings = zappa.zappa_settings.get("common", {})
     stage_settings = zappa.zappa_settings.get(zappa.api_stage, {})
     unified_settings = {**common_settings, **stage_settings}
-    exclude_expressions = unified_settings.get("exclude_expressions", [])
-    clean_archive(archive_path=zappa.zip_path, exclude_expressions=exclude_expressions)
+    layer_packages = unified_settings.get("layer_packages", [])
+    if not layer_packages:
+        print("No layer_packages provided for stage.")
+        return
+    clean_archive(archive_path=zappa.zip_path, layer_packages=layer_packages)
 
 
 class ArchiveCleaner:
-    def __init__(self, archive_path: str):
+    def __init__(self, archive_path: str, layer_packages: List[str]):
         if archive_path.endswith(".tar.gz"):
             self.archive_format, extension = "tarball", ".tar.gz"
         elif archive_path.endswith(".zip"):
@@ -40,40 +42,50 @@ class ArchiveCleaner:
         else:
             raise Exception(f"Unknown archive format: {archive_path}")
         self.archive_file_path = absolute_path(archive_path)
-        self.temp_unarchive_dir = absolute_path(archive_path.replace(extension, ""))
+        self.wip_dir = absolute_path(archive_path.replace(extension, ""))
+        self.temp_unarchive_dir = os.path.join(self.wip_dir, "content")
+        self.lambda_dir = os.path.join(self.wip_dir, "lambda")
+        self.layer_dir = os.path.join(self.wip_dir, "layer")
         self.new_archive_path = self.archive_file_path + ".new"
-        self.manager = _manager_factory(self.new_archive_path, self.archive_format)
+        self.lambda_manager = _manager_factory(self.new_archive_path, self.archive_format)
+        self.layer_manager = _manager_factory("layer.zip", self.archive_format)
         self.prefix_length = len(self.temp_unarchive_dir)
+        self.layer_patterns = [re.compile(rf"^{exclude}.*") for exclude in layer_packages]
 
-    def clean(self, exclude_patterns: List[Pattern]):
+    def clean(self):
         self._unpack_archive()
-        self._remake_archive(exclude_patterns=exclude_patterns)
+        self._remake_archive()
         self._remove_unarchive_dir()
-        self._swap_archives()
+        # self._swap_archives()
 
     def _unpack_archive(self):
         print(f"Unpacking {self.archive_file_path} to {self.temp_unarchive_dir}")
         shutil.unpack_archive(self.archive_file_path, self.temp_unarchive_dir)
 
-    def _remake_archive(self, exclude_patterns: List[Pattern]):
+    def _remake_archive(self):
         walk_list = list(os.walk(self.temp_unarchive_dir))
+        os.makedirs(self.lambda_dir, exist_ok=True)
+        os.makedirs(self.layer_dir, exist_ok=True)
         for root, _, files in tqdm(walk_list):
-            zip_relative_root = root[self.prefix_length :].lstrip(os.sep)
-            should_ignore_directory = any(pattern.match(zip_relative_root) for pattern in exclude_patterns)
-            if should_ignore_directory:
-                continue
+            zip_relative_root = root[self.prefix_length:].lstrip(os.sep)
+            should_move_to_layer = any(pattern.match(zip_relative_root) for pattern in self.layer_patterns)
+            manager = self.layer_manager if should_move_to_layer else self.lambda_manager
+            component_dir = self.layer_dir if should_move_to_layer else self.lambda_dir
             for file_name in files:
                 full_path = os.path.join(root, file_name)
                 zip_relative_path = os.path.join(zip_relative_root, file_name)
-                self._add_file(full_path=full_path, zip_relative_path=zip_relative_path)
-        self.manager.close()
-
-    def _add_file(self, full_path: str, zip_relative_path: str):
-        # Make sure that the files are all correctly chmodded
-        # Related: https://github.com/Miserlou/Zappa/issues/484
-        # Related: https://github.com/Miserlou/Zappa/issues/682
-        os.chmod(full_path, READ_EXECUTE_WRITE_MODE)
-        self.manager.add(full_path=full_path, zip_relative_path=zip_relative_path)
+                dst_path = os.path.join(component_dir, zip_relative_path)
+                dst_dir = os.path.dirname(dst_path)
+                os.makedirs(dst_dir, exist_ok=True)
+                # Make sure that the files are all correctly chmodded
+                # Related: https://github.com/Miserlou/Zappa/issues/484
+                # Related: https://github.com/Miserlou/Zappa/issues/682
+                # os.chmod(full_path, READ_EXECUTE_WRITE_MODE)
+                # TODO: instead of add the file, move it to the correct location
+                # manager.add(full_path=full_path, zip_relative_path=zip_relative_path)
+                os.rename(full_path, dst_path)
+        self.lambda_manager.close()
+        self.layer_manager.close()
 
     def _swap_archives(self):
         print(f"Renaming {self.new_archive_path} to {self.archive_file_path}")
@@ -85,14 +97,10 @@ class ArchiveCleaner:
         shutil.rmtree(self.temp_unarchive_dir)
 
 
-def clean_archive(archive_path: str, exclude_expressions: List[str]):
-    if not exclude_expressions:
-        print("No exclude_expressions provided for stage.")
-        return
-    print(f"Cleaning {archive_path} from excluded files: {exclude_expressions}")
-    exclude_patterns = [re.compile(exclude) for exclude in exclude_expressions]
-    cleaner = ArchiveCleaner(archive_path=archive_path)
-    cleaner.clean(exclude_patterns=exclude_patterns)
+def clean_archive(archive_path: str, layer_packages: List[str]):
+    print(f"Cleaning {archive_path} from excluded files: {layer_packages}")
+    cleaner = ArchiveCleaner(archive_path=archive_path, layer_packages=layer_packages)
+    cleaner.clean()
 
 
 class ArchiveManager:
@@ -164,20 +172,23 @@ def absolute_path(path: str) -> str:
 
 
 def example():
-    archive_path = "the-spymaster-dev-1655152205.zip"
-    exclude_patterns = [
-        re.compile("boto3"),
-        re.compile("botocore"),
-        re.compile("scipy"),
-        re.compile("pydantic"),
-        re.compile("gensim"),
-        re.compile("pandas"),
-        re.compile("numpy"),
-        re.compile("scipy"),
-        re.compile("networkx"),
+    archive_path = "the-spymaster-dev-1655156817.zip"
+    layer_packages = [
+        "boto3",
+        "botocore",
+        "scipy",
+        "pydantic",
+        "gensim",
+        "pandas",
+        "numpy",
+        "scipy",
+        "networkx",
+        "cryptography",
+        "mypy",
+        "virtualenv",
+        "selenium",
     ]
-    cleaner = ArchiveCleaner(archive_path=archive_path)
-    cleaner.clean(exclude_patterns=exclude_patterns)
+    clean_archive(archive_path=archive_path, layer_packages=layer_packages)
 
 
 if __name__ == "__main__":

@@ -14,20 +14,20 @@
       "secrets.toml",
       ".mypy_cache"
     ],
-    "exclude_expressions": [
-      "^boto3.*",
-      "^botocore.*",
-      "^scipy.*",
-      "^pydantic.*",
-      "^gensim.*",
-      "^pandas.*",
-      "^numpy.*",
-      "^scipy.*",
-      "^networkx.*",
-      "^cryptography.*",
-      "^mypy.*",
-      "^virtualenv.*",
-      "^selenium.*"
+    "layer_packages": [
+      "boto3",
+      "botocore",
+      "scipy",
+      "pydantic",
+      "gensim",
+      "pandas",
+      "numpy",
+      "scipy",
+      "networkx",
+      "cryptography",
+      "mypy",
+      "virtualenv",
+      "selenium"
     ],
     "callbacks": {
       "zip": "deployment.zappa_package_cleaner.main"
