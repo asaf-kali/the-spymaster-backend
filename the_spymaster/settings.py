@@ -9,10 +9,10 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import os
 from pathlib import Path
 
 import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 from the_spymaster_util import get_dict_config
 
@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.240", "zappa", "ps84epd323
 
 sentry_sdk.init(  # type: ignore
     dsn=config.sentry_dsn,
-    integrations=[LoggingIntegration(event_level=None)],
+    integrations=[LoggingIntegration(event_level=None), AwsLambdaIntegration()],
     environment=ENVIRONMENT,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
@@ -151,40 +151,14 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
-LOGS_PARENT = BASE_DIR  # if DEBUG else os.path.join(BASE_DIR, "../")
-LOGGING_DIR = os.path.join(LOGS_PARENT, "logs")
-os.makedirs(LOGGING_DIR, exist_ok=True)
-handlers = {
-    "codenames_file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "filename": os.path.join(LOGGING_DIR, "codenames.log"),
-        "formatter": "json",
-        "level": "DEBUG",
-    },
-    "root_file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "filename": os.path.join(LOGGING_DIR, "root.log"),
-        "formatter": "json",
-        "level": "INFO",
-        "when": "midnight",
-        "backupCount": 14,
-    },
-    "debug_file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "filename": os.path.join(LOGGING_DIR, "debug.log"),
-        "formatter": "json",
-        "when": "midnight",
-        "backupCount": 7,
-    },
-}
 loggers = {
     "api": {
-        "handlers": ["console_out", "console_err", "debug_file"],
+        "handlers": ["console_out", "console_err"],
         "level": "DEBUG",
         "propagate": False,
     },
     "codenames": {
-        "handlers": ["console_out", "console_err", "codenames_file"],
+        "handlers": ["console_out", "console_err"],
         "level": "DEBUG",
         "propagate": False,
     },
@@ -195,14 +169,13 @@ loggers = {
     "apscheduler": {"level": "INFO"},
     "qinspect": {"level": "DEBUG"},
     # Django
-    "django": {"handlers": ["debug_file", "console_err"], "level": "DEBUG", "propagate": False},
+    "django": {"handlers": ["console_err"], "level": "DEBUG", "propagate": False},
     "django.utils.autoreload": {"level": "INFO"},
 }
 LOGGING = get_dict_config(
     std_formatter=config.std_formatter,
     root_log_level=config.root_log_level,
     indent_json=config.indent_json,
-    extra_handlers=handlers,
     extra_loggers=loggers,
 )
 
