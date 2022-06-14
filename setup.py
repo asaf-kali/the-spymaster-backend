@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="the-spymaster-api",
-    version="0.1.6",
+    version="1.0.0",
     description="Python client implementation for The Spymaster HTTP backend.",
     author="Asaf Kali",
     author_email="akali93@gmail.com",

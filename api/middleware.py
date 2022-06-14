@@ -9,6 +9,7 @@ from rest_framework import status
 from the_spymaster_util import get_logger, wrap
 
 from api.logic.errors import BadRequestError
+from the_spymaster_api.client import CONTEXT_ID_HEADER_KEY
 
 log = get_logger(__name__)
 
@@ -32,6 +33,7 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
         sentry_sdk.capture_exception(exception)
         log.exception("Uncaught exception")
         sentry_sdk.flush(timeout=5)
-        if settings.DEBUG:
-            return JsonResponse({"message": str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        raise exception
+        message = "Internal server error" if not settings.DEBUG else str(exception)
+        data = {"message": message, "context_id": log.context_id}
+        headers = {CONTEXT_ID_HEADER_KEY: log.context_id}
+        return JsonResponse(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR, headers=headers)

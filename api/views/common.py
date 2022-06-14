@@ -6,6 +6,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.viewsets import ViewSetMixin
 from the_spymaster_util import get_logger, wrap
 
+from the_spymaster_api.client import CONTEXT_HEADER_KEY
+
 log = get_logger(__name__)
 
 
@@ -24,7 +26,7 @@ class ViewContextMixin(ViewSetMixin):
 
 def _extract_context(request: WSGIRequest) -> dict:
     try:
-        context_json = request.headers.get("x-context")
+        context_json = request.headers.get(CONTEXT_HEADER_KEY)
         return json.loads(context_json)
     except:  # noqa
         return {}
