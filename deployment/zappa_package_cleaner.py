@@ -7,7 +7,7 @@ import shutil
 from tarfile import TarInfo
 from tarfile import open as open_tar
 from typing import List
-from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile, ZipInfo
+from zipfile import ZipFile, ZipInfo
 
 from tqdm import tqdm
 from zappa.cli import ZappaCLI
@@ -42,37 +42,36 @@ class ArchiveCleaner:
             self.archive_format, extension = "zip", ".zip"
         else:
             raise Exception(f"Unknown archive format: {archive_path}")
-        self.zip_name = os.path.basename(archive_path)
-        self.archive_file_path = absolute_path(archive_path)
-        self.wip_dir = absolute_path(archive_path.replace(extension, ""))
-        self.temp_unarchive_dir = os.path.join(self.wip_dir, "content")
+        self.original_archive_path = absolute_path(archive_path)
+        self.archive_name = archive_path.replace(extension, "")
+        self.wip_dir = absolute_path(self.archive_name)
+        self.content_dir = os.path.join(self.wip_dir, "content")
         self.lambda_dir = os.path.join(self.wip_dir, "lambda")
         self.layer_dir = os.path.join(self.wip_dir, "layer")
-        self.new_archive_path = self.wip_dir + "-new.zip"
-        self.layer_archive_path = self.wip_dir + "-layer.zip"
-        # self.lambda_manager = _manager_factory(self.new_archive_path, self.archive_format)
-        # self.layer_manager = _manager_factory(self.layer_archive_path, self.archive_format)
-        self.prefix_length = len(self.temp_unarchive_dir)
+        self.lambda_archive_name = self.archive_name + "-new"
+        self.layer_archive_name = self.archive_name + "-layer"
+        self.prefix_length = len(self.content_dir)
         self.layer_patterns = [re.compile(rf"^{exclude}.*") for exclude in layer_packages]
 
     def clean(self):
         self._unpack_archive()
-        self._remake_archive()
+        self._reorder_files()
+        self._zip_archives()
         self._remove_wip_dir()
-        # self._swap_archives()
+        self._replace_old_archive()
 
     def _unpack_archive(self):
-        print(f"Unpacking {self.archive_file_path} to {self.temp_unarchive_dir}")
-        shutil.unpack_archive(self.archive_file_path, self.temp_unarchive_dir)
+        print(f"Unpacking archive to {self.content_dir}...")
+        shutil.unpack_archive(self.original_archive_path, self.content_dir)
 
-    def _remake_archive(self):
-        walk_list = list(os.walk(self.temp_unarchive_dir))
+    def _reorder_files(self):
+        print("Reordering files...")
+        walk_list = list(os.walk(self.content_dir))
         os.makedirs(self.lambda_dir, exist_ok=True)
         os.makedirs(self.layer_dir, exist_ok=True)
         for root, _, files in tqdm(walk_list):
             zip_relative_root = root[self.prefix_length :].lstrip(os.sep)
             should_move_to_layer = any(pattern.match(zip_relative_root) for pattern in self.layer_patterns)
-            # manager = self.layer_manager if should_move_to_layer else self.lambda_manager
             component_dir = self.layer_dir if should_move_to_layer else self.lambda_dir
             for file_name in files:
                 zip_relative_path = os.path.join(zip_relative_root, file_name)
@@ -80,21 +79,19 @@ class ArchiveCleaner:
                 dst_path = os.path.join(component_dir, zip_relative_path)
                 dst_dir = os.path.dirname(dst_path)
                 os.makedirs(dst_dir, exist_ok=True)
-                # Make sure that the files are all correctly chmodded
-                # Related: https://github.com/Miserlou/Zappa/issues/484
-                # Related: https://github.com/Miserlou/Zappa/issues/682
-                # os.chmod(full_path, READ_EXECUTE_WRITE_MODE)
-                # TODO: instead of add the file, move it to the correct location
                 os.rename(src=src_path, dst=dst_path)
-                # manager.add(full_path=dst_path, zip_relative_path=zip_relative_path)
-        print(f"Creating {self.new_archive_path}")
-        # self.lambda_manager.close()
-        # self.layer_manager.close()
 
-    def _swap_archives(self):
-        print(f"Renaming {self.new_archive_path} to {self.archive_file_path}")
-        os.remove(self.archive_file_path)
-        os.rename(self.new_archive_path, self.archive_file_path)
+    def _zip_archives(self):
+        print(f"Zipping lambda to {self.lambda_archive_name}...")
+        shutil.make_archive(self.lambda_archive_name, "zip", self.lambda_dir)
+        print(f"Zipping layer to {self.layer_archive_name}...")
+        shutil.make_archive(self.layer_archive_name, "zip", self.layer_dir)
+
+    def _replace_old_archive(self):
+        print(f"Replacing original archive with {self.lambda_archive_name}")
+        lambda_archive_path = absolute_path(self.lambda_archive_name + ".zip")
+        os.remove(self.original_archive_path)
+        os.rename(lambda_archive_path, self.original_archive_path)
 
     def _remove_wip_dir(self):
         print(f"Removing {self.wip_dir}")
@@ -151,24 +148,25 @@ class TarballArchiveManager(ArchiveManager):
         self.archive.close()
 
 
-def _manager_factory(archive_file_path: str, archive_format: str):
-    if archive_format == "zip":
-        print("Re-packaging project as zip.")
-        manager = _get_zip_manager(archive_file_path)
-    elif archive_format == "tarball":
-        print("Re-packaging project as gzipped tarball.")
-        manager = TarballArchiveManager(archive_path=archive_file_path)
-    else:
-        raise Exception(f"Unknown archive format: {archive_format}")
-    return manager
+#
+# def _manager_factory(archive_path: str, archive_format: str):
+#     if archive_format == "zip":
+#         print("Re-packaging project as zip.")
+#         manager = _get_zip_manager(archive_path)
+#     elif archive_format == "tarball":
+#         print("Re-packaging project as gzipped tarball.")
+#         manager = TarballArchiveManager(archive_path=archive_path)
+#     else:
+#         raise Exception(f"Unknown archive format: {archive_format}")
+#     return manager
 
 
-def _get_zip_manager(archive_path: str):
-    try:
-        compression_method = ZIP_DEFLATED
-    except ImportError:  # pragma: no cover
-        compression_method = ZIP_STORED
-    return ZipArchiveManager(archive_path=archive_path, compression_method=compression_method)
+# def _get_zip_manager(archive_path: str):
+#     try:
+#         compression_method = ZIP_DEFLATED
+#     except ImportError:  # pragma: no cover
+#         compression_method = ZIP_STORED
+#     return ZipArchiveManager(archive_path=archive_path, compression_method=compression_method)
 
 
 def absolute_path(path: str) -> str:
@@ -176,7 +174,7 @@ def absolute_path(path: str) -> str:
 
 
 def example():
-    archive_path = "the-spymaster-dev-1655156817.zip"
+    archive_path = "the-spymaster-dev-1655223648.zip"
     layer_packages = [
         "boto3",
         "botocore",
