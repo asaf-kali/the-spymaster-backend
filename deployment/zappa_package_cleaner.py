@@ -4,10 +4,7 @@
 import os
 import re
 import shutil
-from tarfile import TarInfo
-from tarfile import open as open_tar
 from typing import List
-from zipfile import ZipFile, ZipInfo
 
 from tqdm import tqdm
 from zappa.cli import ZappaCLI
@@ -34,6 +31,12 @@ def main(zappa: ZappaCLI):
     clean_archive(archive_path=zappa.zip_path, layer_packages=layer_packages)
 
 
+def clean_archive(archive_path: str, layer_packages: List[str]):
+    print(f"Cleaning {archive_path} from excluded files: {layer_packages}")
+    cleaner = ArchiveCleaner(archive_path=archive_path, layer_packages=layer_packages)
+    cleaner.clean()
+
+
 class ArchiveCleaner:
     def __init__(self, archive_path: str, layer_packages: List[str]):
         if archive_path.endswith(".tar.gz"):
@@ -56,9 +59,10 @@ class ArchiveCleaner:
     def clean(self):
         self._unpack_archive()
         self._reorder_files()
-        self._zip_archives()
-        self._remove_wip_dir()
-        self._replace_old_archive()
+        self._create_layer_docker_image()
+        # self._zip_lambda_archive()
+        # self._remove_wip_dir()
+        # self._replace_old_archive()
 
     def _unpack_archive(self):
         print(f"Unpacking archive to {self.content_dir}...")
@@ -81,11 +85,13 @@ class ArchiveCleaner:
                 os.makedirs(dst_dir, exist_ok=True)
                 os.rename(src=src_path, dst=dst_path)
 
-    def _zip_archives(self):
+    def _zip_lambda_archive(self):
         print(f"Zipping lambda to {self.lambda_archive_name}...")
         shutil.make_archive(self.lambda_archive_name, "zip", self.lambda_dir)
-        print(f"Zipping layer to {self.layer_archive_name}...")
-        shutil.make_archive(self.layer_archive_name, "zip", self.layer_dir)
+
+    def _create_layer_docker_image(self):
+        print(f"Creating layer docker image {self.layer_archive_name}...")
+        pass
 
     def _replace_old_archive(self):
         print(f"Replacing original archive with {self.lambda_archive_name}")
@@ -96,77 +102,6 @@ class ArchiveCleaner:
     def _remove_wip_dir(self):
         print(f"Removing {self.wip_dir}")
         shutil.rmtree(self.wip_dir)
-
-
-def clean_archive(archive_path: str, layer_packages: List[str]):
-    print(f"Cleaning {archive_path} from excluded files: {layer_packages}")
-    cleaner = ArchiveCleaner(archive_path=archive_path, layer_packages=layer_packages)
-    cleaner.clean()
-
-
-class ArchiveManager:
-    def add(self, full_path: str, zip_relative_path: str):
-        raise NotImplementedError()
-
-    def close(self):
-        raise NotImplementedError()
-
-
-class ZipArchiveManager(ArchiveManager):
-    def __init__(self, archive_path: str, compression_method: int):
-        self.archive = ZipFile(archive_path, "w", compression_method)
-        self.compression_method = compression_method
-
-    def add(self, full_path: str, zip_relative_path: str):
-        # Actually put the file into the proper place in the zip
-        # Related: https://github.com/Miserlou/Zappa/pull/716
-        zip_info = ZipInfo(zip_relative_path)
-        zip_info.create_system = 3
-        zip_info.external_attr = READ_EXECUTE_WRITE_MODE << int(16)  # Is this P2/P3 functional?
-        with open(full_path, "rb") as f:
-            self.archive.writestr(zip_info, f.read(), self.compression_method)
-
-    def close(self):
-        self.archive.close()
-
-
-class TarballArchiveManager(ArchiveManager):
-    def __init__(self, archive_path: str):
-        self.archive = open_tar(archive_path, "w|gz")
-
-    def add(self, full_path: str, zip_relative_path: str):
-        tarinfo = TarInfo(zip_relative_path)
-        tarinfo.mode = READ_EXECUTE_WRITE_MODE
-
-        stat = os.stat(full_path)
-        tarinfo.mtime = int(stat.st_mtime)
-        tarinfo.size = stat.st_size
-        with open(full_path, "rb") as f:
-            self.archive.addfile(tarinfo, f)
-
-    def close(self):
-        self.archive.close()
-
-
-#
-# def _manager_factory(archive_path: str, archive_format: str):
-#     if archive_format == "zip":
-#         print("Re-packaging project as zip.")
-#         manager = _get_zip_manager(archive_path)
-#     elif archive_format == "tarball":
-#         print("Re-packaging project as gzipped tarball.")
-#         manager = TarballArchiveManager(archive_path=archive_path)
-#     else:
-#         raise Exception(f"Unknown archive format: {archive_format}")
-#     return manager
-
-
-# def _get_zip_manager(archive_path: str):
-#     try:
-#         compression_method = ZIP_DEFLATED
-#     except ImportError:  # pragma: no cover
-#         compression_method = ZIP_STORED
-#     return ZipArchiveManager(archive_path=archive_path, compression_method=compression_method)
 
 
 def absolute_path(path: str) -> str:
