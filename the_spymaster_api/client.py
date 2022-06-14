@@ -22,6 +22,8 @@ from .structs import (
 
 log = logging.getLogger(__name__)
 DEFAULT_BASE_BACKEND = "http://localhost:8000"
+CONTEXT_HEADER_KEY = "x-spymaster-context"
+CONTEXT_ID_HEADER_KEY = "x-spymaster-context-id"
 
 
 def _log_data(url: str, response: Response):
@@ -47,7 +49,7 @@ class TheSpymasterClient:
         headers = kwargs.pop("headers", None) or {}
         log_context = getattr(log, "context", None)
         if log_context:
-            headers["x-context"] = json.dumps(log_context)
+            headers[CONTEXT_HEADER_KEY] = json.dumps(log_context)
         response = method(url, headers=headers, **kwargs)
         _log_data(url=url, response=response)
         response.raise_for_status()

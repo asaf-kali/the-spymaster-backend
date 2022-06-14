@@ -1,8 +1,8 @@
 # Codenames
 codenames~=1.1
-the-spymaster-util~=1.4
+the-spymaster-util~=1.5
 
-# Service
+# Server
 Django==4.0.4
 django-allauth==0.50.0
 django-filter==21.1
@@ -17,10 +17,7 @@ pydantic==1.9.0
 # Other
 django-json-widget==1.1.1
 boto3~=1.24
+dynaconf~=3.1
 
 # Monitor
 sentry-sdk==1.5.10
-
-# Telegram bot
-python-telegram-bot~=13.11
-dynaconf~=3.1

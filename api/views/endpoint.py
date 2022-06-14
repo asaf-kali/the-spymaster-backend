@@ -12,6 +12,7 @@ from the_spymaster_util import get_logger
 from the_spymaster_util.measure_time import MeasureTime
 
 from api.logic.errors import BadRequestError, SpymasterError
+from the_spymaster_api.client import CONTEXT_ID_HEADER_KEY
 from the_spymaster_api.structs import BaseRequest, BaseResponse
 
 log = get_logger(__name__)
@@ -66,7 +67,8 @@ def endpoint(
             status_code = response_data.pop("status_code", None)
             if not status_code:
                 raise ValueError("Response data is missing status_code key!")
-            response = JsonResponse(data=response_data, status=status_code)
+            headers = {CONTEXT_ID_HEADER_KEY: log.context_id}
+            response = JsonResponse(data=response_data, status=status_code, headers=headers)
             log.info(
                 f"Endpoint completed with status {status_code}",
                 extra={"status_code": status_code, "duration": mt.delta},
