@@ -1,4 +1,5 @@
 # Based on https://gist.github.com/ian-whitestone/a3452fe38fda9025631045381a18a6df
+# Blog post: https://ianwhitestone.work/zappa-zip-callbacks/
 
 import os
 import re
