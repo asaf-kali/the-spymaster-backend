@@ -14,9 +14,9 @@
       "secrets.toml"
     ],
     "slim_handler": true,
-    "timeout_seconds": 60,
-    "lambda_concurrency": 3,
-    "memory_size": 2000
+    "timeout_seconds": 90,
+    "lambda_concurrency": 5,
+    "memory_size": 3000
   },
   "dev": {
     "extends": "common",

@@ -58,7 +58,7 @@ class S3ModelFetcher:
     def download_model(self, model_id: ModelIdentifier):
         model_local_path = os.path.join(self.local_language_data_dir, model_id.language, model_id.model_name)
         if os.path.exists(model_local_path):
-            log.info(f"Model already exists at {model_local_path}")
+            log.debug(f"Model already exists at {model_local_path}")
             return model_local_path
         zip_path = self._download_zip(model_id=model_id)
         self._extract_zip(zip_path=zip_path, model_id=model_id)
