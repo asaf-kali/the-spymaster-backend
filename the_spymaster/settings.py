@@ -195,7 +195,7 @@ loggers = {
     "apscheduler": {"level": "INFO"},
     "qinspect": {"level": "DEBUG"},
     # Django
-    "django": {"handlers": ["debug_file", "console_err"], "level": "DEBUG", "propagate": False},
+    "django": {"handlers": ["console_err", "debug_file"], "level": "DEBUG", "propagate": False},
     "django.utils.autoreload": {"level": "INFO"},
 }
 LOGGING = get_dict_config(
