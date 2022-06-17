@@ -84,6 +84,11 @@ tale:
 
 # Client
 
-build-client:
+build:
 	$(DEL_COMMAND) -f dist/*
 	python -m build
+
+upload-only:
+	twine upload dist/*
+
+upload: build upload-only
