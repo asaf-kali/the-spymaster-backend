@@ -1,6 +1,6 @@
 # Codenames
 codenames~=1.1
-the-spymaster-util~=1.5
+the-spymaster-util==1.7.4
 
 # Server
 Django==4.0.4
