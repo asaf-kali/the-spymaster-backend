@@ -1,20 +1,25 @@
+import logging
 from typing import List
 
 from the_spymaster_util import LazyConfig
+
+log = logging.getLogger(__name__)
 
 
 class Config(LazyConfig):
     def load(self, override_files: List[str] = None):
         super().load(override_files)
-        secret_name = f"the-spymaster-{self.env_name}-secrets"
-        try:
-            self.load_kms_secrets(secret_name)
-        except Exception:
-            pass
+        parameters = [f"{self.service_prefix}-sentry-dsn"]
+        self.load_ssm_parameters(parameters)
+        log.info("Config loaded")
 
     @property
     def env_verbose_name(self) -> str:
         return self.get("ENV_VERBOSE_NAME")
+
+    @property
+    def service_prefix(self):
+        return f"the-spymaster-backend-{self.env_name}"
 
     @property
     def django_debug(self) -> bool:
@@ -26,7 +31,7 @@ class Config(LazyConfig):
 
     @property
     def sentry_dsn(self) -> str:
-        return self.get("SENTRY_DSN")
+        return self.get(f"{self.service_prefix}-sentry-dsn")
 
     @property
     def recaptcha_site_key(self) -> str:
