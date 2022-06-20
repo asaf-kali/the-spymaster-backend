@@ -1,5 +1,6 @@
 [default]
 env_verbose_name = "Not set"
+load_ssm_secrets = true
 
 # Django
 django_secret_key = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09"
@@ -14,6 +15,11 @@ root_log_level = "INFO"
 language_data_folder = "/tmp/language_data"
 should_load_models_from_s3 = false
 s3_bucket_name = "the-spymaster-bucket-dev"
+
+[test]
+env_verbose_name = "Test"
+django_debug = true
+load_ssm_secrets = false
 
 [local]
 env_verbose_name = "Local"

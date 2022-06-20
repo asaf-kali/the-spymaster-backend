@@ -10,7 +10,8 @@ class Config(LazyConfig):
     def load(self, override_files: List[str] = None):
         super().load(override_files)
         parameters = [f"{self.service_prefix}-sentry-dsn"]
-        self.load_ssm_parameters(parameters)
+        if self.load_ssm_secrets:
+            self.load_ssm_parameters(parameters)
         log.info("Config loaded")
 
     @property
@@ -56,6 +57,10 @@ class Config(LazyConfig):
     @property
     def s3_bucket_name(self) -> str:
         return self.get("S3_BUCKET_NAME")
+
+    @property
+    def load_ssm_secrets(self) -> bool:
+        return self.get("LOAD_SSM_SECRETS")
 
 
 def get_config() -> Config:
