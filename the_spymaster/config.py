@@ -9,10 +9,18 @@ log = logging.getLogger(__name__)
 class Config(LazyConfig):
     def load(self, override_files: List[str] = None):
         super().load(override_files)
-        parameters = [f"{self.service_prefix}-sentry-dsn"]
         if self.load_ssm_secrets:
-            self.load_ssm_parameters(parameters)
+            self._load_parameters()
         log.info("Config loaded")
+
+    def _load_parameters(self):
+        parameters = [f"{self.service_prefix}-sentry-dsn", f"{self.service_prefix}-db-password"]
+        self.load_ssm_parameters(parameters)
+        for parameter_name in parameters:
+            new_parameter_name = parameter_name.replace(f"{self.service_prefix}-", "").replace("-", "_")
+            parameter_value = self.get(parameter_name)
+            if parameter_value:
+                self.set(new_parameter_name, parameter_value)
 
     @property
     def env_verbose_name(self) -> str:
@@ -32,7 +40,7 @@ class Config(LazyConfig):
 
     @property
     def sentry_dsn(self) -> str:
-        return self.get(f"{self.service_prefix}-sentry-dsn")
+        return self.get(f"{self.service_prefix}-sentry-dsn") or self.get("SENTRY_DSN")
 
     @property
     def recaptcha_site_key(self) -> str:
