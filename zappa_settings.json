@@ -16,11 +16,13 @@
     "slim_handler": true,
     "timeout_seconds": 90,
     "lambda_concurrency": 5,
-    "memory_size": 3000
+    "memory_size": 3000,
+    "manage_roles": false
   },
   "dev": {
     "extends": "common",
     "s3_bucket": "zappa-deployment-bucket-dev",
+    "role_arn": "arn:aws:iam::096386908883:role/the-spymaster-backend-dev-exec-role",
     "aws_environment_variables": {
       "ENV_FOR_DYNACONF": "dev"
     }
