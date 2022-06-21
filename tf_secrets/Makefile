@@ -5,3 +5,5 @@ plan:
 
 apply:
 	terraform apply $(TERRAFORM_PLAN_FILE)
+
+make deploy: plan apply
