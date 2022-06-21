@@ -82,6 +82,17 @@ deploy:
 tale:
 	zappa tale $(ENV)
 
+# Terraform deployment
+
+plan:
+	cd tf_service; make plan;
+
+apply:
+	cd tf_service; make apply;
+
+update:
+	cd tf_service; make deploy;
+
 # Client
 
 build:
