@@ -14,7 +14,6 @@ export DJANGO_SETTINGS_MODULE=the_spymaster.settings
 install-run:
 	pip install --upgrade pip
 	pip install -r requirements.txt
-	pip install codenames-solvers.tar.gz
 
 install-test:
 	@make install-run --no-print-directory
