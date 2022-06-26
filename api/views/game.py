@@ -1,13 +1,16 @@
 import requests
 from codenames.game import Guess, Hint, build_game_state
 from rest_framework.viewsets import GenericViewSet
+from the_spymaster_solvers_client.client import TheSpymasterSolversClient
+from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
+from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
 from the_spymaster_util import get_logger
 
 from api.logic.game import NextMoveHandler, get_game
-from api.logic.language import load_models
 from api.models.game import Game
 from api.views import ViewContextMixin
 from api.views.endpoint import HttpMethod, endpoint
+from the_spymaster.config import get_config
 from the_spymaster_api.structs import (
     BaseRequest,
     GetGameStateRequest,
@@ -16,8 +19,6 @@ from the_spymaster_api.structs import (
     GuessResponse,
     HintRequest,
     HintResponse,
-    LoadModelsRequest,
-    LoadModelsResponse,
     NextMoveRequest,
     NextMoveResponse,
     StartGameRequest,
@@ -73,8 +74,10 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
 
     @endpoint(url_path="load-models")
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        loaded_models_count = load_models(model_ids=request.model_identifiers)
-        return LoadModelsResponse(loaded_models_count=loaded_models_count)
+        config = get_config()
+        solvers_client = TheSpymasterSolversClient(base_url=config.solvers_client_backend_url)
+        response = solvers_client.load_models(request)
+        return response
 
     @endpoint(methods=[HttpMethod.GET])
     def test(self, request: BaseRequest) -> dict:

@@ -67,11 +67,7 @@ save:
 # Run
 
 run:
-	@make kill --no-print-directory
 	python manage.py runserver $(RUN_SERVER_IP):$(RUN_SERVER_PORT)
-
-kill:
-	killall python || true
 
 # Zappa deployment
 

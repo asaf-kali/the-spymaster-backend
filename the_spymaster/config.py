@@ -43,6 +43,10 @@ class Config(LazyConfig):
         return self.get(f"{self.service_prefix}-sentry-dsn") or self.get("SENTRY_DSN")
 
     @property
+    def solvers_client_backend_url(self) -> str:
+        return self.get("SOLVERS_CLIENT_BACKEND_URL") or "http://localhost:5000"
+
+    @property
     def recaptcha_site_key(self) -> str:
         return self.get("RECAPTCHA_SITE_KEY")
 
@@ -57,14 +61,6 @@ class Config(LazyConfig):
     @property
     def google_oauth_client_secret(self) -> str:
         return self.get("GOOGLE_OAUTH_CLIENT_SECRET")
-
-    @property
-    def should_load_models_from_s3(self) -> bool:
-        return self.get("SHOULD_LOAD_MODELS_FROM_S3")
-
-    @property
-    def s3_bucket_name(self) -> str:
-        return self.get("S3_BUCKET_NAME")
 
     @property
     def load_ssm_secrets(self) -> bool:

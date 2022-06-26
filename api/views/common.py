@@ -5,8 +5,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.viewsets import ViewSetMixin
 from the_spymaster_util import get_logger, wrap
-
-from the_spymaster_api.client import CONTEXT_HEADER_KEY
+from the_spymaster_util.http_client import CONTEXT_HEADER_KEY
 
 log = get_logger(__name__)
 

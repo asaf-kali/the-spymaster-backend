@@ -7,9 +7,9 @@ from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import status
 from the_spymaster_util import get_logger, wrap
+from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY
 
 from api.logic.errors import BadRequestError
-from the_spymaster_api.client import CONTEXT_ID_HEADER_KEY
 
 log = get_logger(__name__)
 

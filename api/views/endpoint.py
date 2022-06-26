@@ -9,16 +9,16 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from the_spymaster_util import get_logger
+from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY
 from the_spymaster_util.measure_time import MeasureTime
 
 from api.logic.errors import BadRequestError, SpymasterError
-from the_spymaster_api.client import CONTEXT_ID_HEADER_KEY
 from the_spymaster_api.structs import BaseRequest, BaseResponse
 
 log = get_logger(__name__)
 
-ALLOWED_REQUEST_TYPES = (BaseRequest,)
-ALLOWED_RESPONSE_TYPES = (dict, BaseResponse, HttpResponse)
+ALLOWED_REQUEST_TYPES = (BaseModel, BaseRequest)
+ALLOWED_RESPONSE_TYPES = (dict, BaseModel, BaseResponse, HttpResponse)
 
 
 class EndpointConfigurationError(SpymasterError):
@@ -99,7 +99,7 @@ def _get_request_response_models(func) -> Tuple[Type[BaseRequest], Type]:
         raise EndpointTypingError(
             f"{func_name}'s request type annotation is not supported!",
             actual_type=request_model,
-            supported_types=ALLOWED_REQUEST_TYPES,
+            supported_types=ALLOWED_REQUEST_TYPES,  # type: ignore
         )
     if not issubclass(response_model, ALLOWED_RESPONSE_TYPES):
         raise EndpointTypingError(
