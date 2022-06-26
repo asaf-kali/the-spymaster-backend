@@ -1,9 +1,9 @@
 {
   "common": {
-    "aws_region": "us-east-1",
+    "project_name": "the-spymaster-backend",
     "profile_name": "default",
+    "aws_region": "us-east-1",
     "django_settings": "the_spymaster.settings",
-    "project_name": "the-spymaster",
     "runtime": "python3.8",
     "exclude": [
       "logs",
@@ -13,10 +13,9 @@
       "local.toml",
       "secrets.toml"
     ],
-    "slim_handler": true,
-    "timeout_seconds": 90,
+    "timeout_seconds": 60,
     "lambda_concurrency": 5,
-    "memory_size": 3000,
+    "memory_size": 256,
     "manage_roles": false
   },
   "dev": {
@@ -25,13 +24,6 @@
     "role_arn": "arn:aws:iam::096386908883:role/the-spymaster-backend-dev-exec-role",
     "aws_environment_variables": {
       "ENV_FOR_DYNACONF": "dev"
-    }
-  },
-  "stage": {
-    "extends": "common",
-    "s3_bucket": "zappa-deployment-bucket-stage",
-    "aws_environment_variables": {
-      "ENV_FOR_DYNACONF": "stage"
     }
   }
 }

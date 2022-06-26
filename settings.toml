@@ -11,10 +11,8 @@ indent_json = false
 std_formatter = "json"
 root_log_level = "INFO"
 
-# Language
-language_data_folder = "/tmp/language_data"
-should_load_models_from_s3 = false
-s3_bucket_name = "the-spymaster-bucket-dev"
+# Solvers
+solvers_client_backend_url = "http://localhost:5000"
 
 [test]
 env_verbose_name = "Test"
@@ -25,8 +23,6 @@ load_ssm_secrets = false
 env_verbose_name = "Local"
 django_debug = true
 std_formatter = "simple"
-should_load_models_from_s3 = true
-#language_data_folder = "~/.cache/language_data"
 
 [dev]
 env_verbose_name = "Dev"
@@ -34,9 +30,9 @@ django_debug = true
 db_engine = "django.db.backends.postgresql"
 db_name = "postgres"
 db_port = 5432
-should_load_models_from_s3 = true
 db_user = "spymaster_admin"
 db_host = "the-spymaster-dev-db.cb5zziruvvzx.us-east-1.rds.amazonaws.com"
+solvers_client_backend_url = "https://4dajlrqb26c2eegv5chg5ne77u0inide.lambda-url.us-east-1.on.aws"
 
 [stage]
 env_verbose_name = "Staging"
@@ -44,17 +40,14 @@ django_debug = true
 db_engine = "django.db.backends.postgresql"
 db_name = "postgres"
 db_port = 5432
-should_load_models_from_s3 = true
 db_user = "spymaster_admin"
 db_host = "the-spymaster-db..eu-central-1.rds.amazonaws.com"
 
 [prod]
 env_verbose_name = "Production"
-should_load_models_from_s3 = true
 db_engine = "django.db.backends.postgresql"
 db_name = "postgres"
 db_port = 5432
-s3_bucket_name = "the-spymaster-bucket-prod"
 db_user = "spymaster_admin"
 db_host = "the-spymaster-db.cwerl06excux.eu-central-1.rds.amazonaws.com"
 

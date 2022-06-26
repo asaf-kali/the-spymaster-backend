@@ -1,8 +1,7 @@
 from typing import List, Optional
 
 from pydantic import BaseModel, Extra
-
-from . import ModelIdentifier, Solver
+from the_spymaster_solvers_client.structs.base import ModelIdentifier, Solver
 
 
 class BaseRequest(BaseModel):
@@ -41,7 +40,3 @@ class NextMoveRequest(BaseRequest):
     game_id: int
     model_identifier: Optional[ModelIdentifier] = None
     solver: Solver = Solver.NAIVE
-
-
-class LoadModelsRequest(BaseRequest):
-    model_identifiers: List[ModelIdentifier] = []

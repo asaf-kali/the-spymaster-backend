@@ -154,37 +154,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGS_PARENT = BASE_DIR  # if DEBUG else os.path.join(BASE_DIR, "../")
 LOGGING_DIR = os.path.join(LOGS_PARENT, "logs")
 os.makedirs(LOGGING_DIR, exist_ok=True)
-handlers = {
-    "codenames_file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "filename": os.path.join(LOGGING_DIR, "codenames.log"),
-        "formatter": "json",
-        "level": "DEBUG",
-    },
-    "root_file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "filename": os.path.join(LOGGING_DIR, "root.log"),
-        "formatter": "json",
-        "level": "INFO",
-        "when": "midnight",
-        "backupCount": 14,
-    },
-    "debug_file": {
-        "class": "logging.handlers.TimedRotatingFileHandler",
-        "filename": os.path.join(LOGGING_DIR, "debug.log"),
-        "formatter": "json",
-        "when": "midnight",
-        "backupCount": 7,
-    },
-}
 loggers = {
     "api": {
-        "handlers": ["console_out", "console_err", "debug_file"],
+        "handlers": ["console_out", "console_err"],
         "level": "DEBUG",
         "propagate": False,
     },
     "codenames": {
-        "handlers": ["console_out", "console_err", "codenames_file"],
+        "handlers": ["console_out", "console_err"],
         "level": "DEBUG",
         "propagate": False,
     },
@@ -195,14 +172,13 @@ loggers = {
     "apscheduler": {"level": "INFO"},
     "qinspect": {"level": "DEBUG"},
     # Django
-    "django": {"handlers": ["console_err", "debug_file"], "level": "DEBUG", "propagate": False},
+    "django": {"handlers": ["console_err"], "level": "DEBUG", "propagate": False},
     "django.utils.autoreload": {"level": "INFO"},
 }
 LOGGING = get_dict_config(
     std_formatter=config.std_formatter,
     root_log_level=config.root_log_level,
     indent_json=config.indent_json,
-    extra_handlers=handlers,
     extra_loggers=loggers,
 )
 
@@ -251,8 +227,3 @@ REST_FRAMEWORK = {
 # Query inspect
 QUERY_INSPECT_ENABLED = DEBUG
 QUERY_INSPECT_LOG_QUERIES = DEBUG
-
-# API
-LANGUAGE_DATA_FOLDER = config.language_data_folder
-SHOULD_LOAD_MODELS_FROM_S3 = config.should_load_models_from_s3
-S3_BUCKET_NAME = config.s3_bucket_name

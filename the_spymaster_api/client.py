@@ -1,9 +1,9 @@
-import json
 import logging
-from typing import Callable
 
-import requests
-from requests import Response
+from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
+from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
+from the_spymaster_util import wrap
+from the_spymaster_util.http_client import BaseHttpClient
 
 from .structs import (
     GetGameStateRequest,
@@ -12,8 +12,6 @@ from .structs import (
     GuessResponse,
     HintRequest,
     HintResponse,
-    LoadModelsRequest,
-    LoadModelsResponse,
     NextMoveRequest,
     NextMoveResponse,
     StartGameRequest,
@@ -21,46 +19,15 @@ from .structs import (
 )
 
 log = logging.getLogger(__name__)
-DEFAULT_BASE_BACKEND = "http://localhost:8000"
-CONTEXT_HEADER_KEY = "x-spymaster-context"
-CONTEXT_ID_HEADER_KEY = "x-spymaster-context-id"
+DEFAULT_BASE_URL = "http://localhost:8000"
 
 
-def _log_data(url: str, response: Response):
-    try:
-        data = response.json()
-    except Exception:  # noqa
-        data = response.content
-    log.debug(
-        f"Got status code {response.status_code}.",
-        extra={"status_code": response.status_code, "url": url, "data": data},
-    )
-
-
-class TheSpymasterClient:
-    def __init__(self, base_backend: str = None):
-        if not base_backend:
-            base_backend = DEFAULT_BASE_BACKEND
-        self.base_url = f"{base_backend}/api/v1/game"
-        log.debug(f"Client using backend: {self.base_url}.")
-
-    def _http_call(self, endpoint: str, method: Callable, **kwargs) -> dict:
-        url = f"{self.base_url}/{endpoint}"
-        headers = kwargs.pop("headers", None) or {}
-        log_context = getattr(log, "context", None)
-        if log_context:
-            headers[CONTEXT_HEADER_KEY] = json.dumps(log_context)
-        response = method(url, headers=headers, **kwargs)
-        _log_data(url=url, response=response)
-        response.raise_for_status()
-        data = response.json()
-        return data
-
-    def _get(self, endpoint: str, data: dict) -> dict:
-        return self._http_call(endpoint=endpoint, method=requests.get, params=data)
-
-    def _post(self, endpoint: str, data: dict) -> dict:
-        return self._http_call(endpoint=endpoint, method=requests.post, json=data)
+class TheSpymasterClient(BaseHttpClient):
+    def __init__(self, base_url: str = None):
+        if not base_url:
+            base_url = DEFAULT_BASE_URL
+        super().__init__(base_url=f"{base_url}/api/v1/game")
+        log.debug(f"Backend client using base url: {wrap(self.base_url)}")
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
         data = self._post("start/", data=request.dict())
