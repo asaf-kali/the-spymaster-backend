@@ -16,13 +16,14 @@ from the_spymaster_api.structs import NextMoveResponse, Solver
 
 log = get_logger(__name__)
 
+config = get_config()
+
 
 class NextMoveHandler:
     def __init__(self, game_state: GameState, solver: Solver, model_identifier: Optional[ModelIdentifier] = None):
         self.game_state = game_state
         self.solver = solver
         self.model_identifier = model_identifier
-        config = get_config()
         self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_client_backend_url)
         # self.model_adapter = get_adapter_for_model(self.model_identifier)
 
