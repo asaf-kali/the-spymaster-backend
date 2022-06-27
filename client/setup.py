@@ -1,13 +1,13 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name="the-spymaster-api",
-    version="1.1.3",
+    version="1.1.4",
     description="Python client implementation for The Spymaster HTTP backend.",
     author="Asaf Kali",
     author_email="asaf.kali@mail.huji.ac.il",
     url="https://github.com/asaf-kali/the-spymaster-backend",
-    packages=["the_spymaster_api", "the_spymaster_api.structs"],
+    packages=find_packages(),
     install_requires=[
         "codenames~=1.1",
         "the_spymaster_util~=1.10",

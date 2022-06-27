@@ -8,10 +8,7 @@ from the_spymaster_util import get_logger
 
 from api.logic.game import NextMoveHandler, get_game
 from api.models.game import Game
-from api.views import ViewContextMixin
-from api.views.endpoint import HttpMethod, endpoint
-from the_spymaster.config import get_config
-from the_spymaster_api.structs import (
+from api.structs import (
     BaseRequest,
     GetGameStateRequest,
     GetGameStateResponse,
@@ -24,6 +21,9 @@ from the_spymaster_api.structs import (
     StartGameRequest,
     StartGameResponse,
 )
+from api.views import ViewContextMixin
+from api.views.endpoint import HttpMethod, endpoint
+from the_spymaster.config import get_config
 
 log = get_logger(__name__)
 
