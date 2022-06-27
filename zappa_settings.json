@@ -6,16 +6,22 @@
     "django_settings": "the_spymaster.settings",
     "runtime": "python3.8",
     "exclude": [
+      "botocore",
+      "tf_secrets*",
+      "tf_service*",
       "logs",
       "node_modules",
       "language_data",
+      ".mypy_cache",
+      "mypy",
+      "mypyc",
       "*.sqlite3",
       "local.toml",
       "secrets.toml"
     ],
     "timeout_seconds": 60,
     "lambda_concurrency": 5,
-    "memory_size": 256,
+    "memory_size": 1000,
     "manage_roles": false
   },
   "dev": {

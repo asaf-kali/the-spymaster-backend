@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import os
 from pathlib import Path
 
 import sentry_sdk
@@ -25,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config.django_debug
 SECRET_KEY = config.django_secret_key
 SITE_ID = 1
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.240", "zappa", "ps84epd323.execute-api.us-east-1.amazonaws.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.240", "zappa", "f6j2fl9tc6.execute-api.us-east-1.amazonaws.com"]
 
 sentry_sdk.init(  # type: ignore
     dsn=config.sentry_dsn,
@@ -151,9 +150,6 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
-LOGS_PARENT = BASE_DIR  # if DEBUG else os.path.join(BASE_DIR, "../")
-LOGGING_DIR = os.path.join(LOGS_PARENT, "logs")
-os.makedirs(LOGGING_DIR, exist_ok=True)
 loggers = {
     "api": {
         "handlers": ["console_out", "console_err"],
