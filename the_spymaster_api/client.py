@@ -50,5 +50,5 @@ class TheSpymasterClient(BaseHttpClient):
         return GetGameStateResponse(**data)
 
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        data = self._post("async-load-models/", data=request.dict())
+        data = self._post("load-models/", data=request.dict())
         return LoadModelsResponse(**data)
