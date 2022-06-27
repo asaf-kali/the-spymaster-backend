@@ -91,10 +91,10 @@ update:
 # Client
 
 build:
-	$(DEL_COMMAND) -f dist/*
-	python -m build
+	cd client; make build;
 
 upload-only:
-	twine upload dist/*
+	cd client; make upload-only;
 
-upload: build upload-only
+upload:
+	cd client; make upload;

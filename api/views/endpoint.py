@@ -13,7 +13,7 @@ from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY
 from the_spymaster_util.measure_time import MeasureTime
 
 from api.logic.errors import BadRequestError, SpymasterError
-from the_spymaster_api.structs import BaseRequest, BaseResponse
+from api.structs import BaseRequest, BaseResponse
 
 log = get_logger(__name__)
 
