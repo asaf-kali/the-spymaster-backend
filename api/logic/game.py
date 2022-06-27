@@ -41,12 +41,12 @@ class NextMoveHandler:
             model_identifier=self.model_identifier,
             solver=self.solver,
         )
-        hint_response = self.solvers_client.generate_hint(request=generate_hint_request)
-        given_hint = self.game_state.process_hint(hint=hint_response.suggested_hint)
+        generate_hint_response = self.solvers_client.generate_hint(request=generate_hint_request)
+        given_hint = self.game_state.process_hint(hint=generate_hint_response.suggested_hint)
         return NextMoveResponse(
             game_state=self.game_state,
-            used_solver=self.solver,
-            used_model_identifier=self.model_identifier,
+            used_solver=generate_hint_response.used_solver,
+            used_model_identifier=generate_hint_response.used_model_identifier,
             given_hint=given_hint,
         )
 
@@ -56,12 +56,12 @@ class NextMoveHandler:
             model_identifier=self.model_identifier,
             solver=self.solver,
         )
-        guess_response = self.solvers_client.generate_guess(request=generate_guess_request)
-        given_guess = self.game_state.process_guess(guess=guess_response.suggested_guess)
+        generate_guess_response = self.solvers_client.generate_guess(request=generate_guess_request)
+        given_guess = self.game_state.process_guess(guess=generate_guess_response.suggested_guess)
         return NextMoveResponse(
             game_state=self.game_state,
-            used_solver=self.solver,
-            used_model_identifier=self.model_identifier,
+            used_solver=generate_guess_response.used_solver,
+            used_model_identifier=generate_guess_response.used_model_identifier,
             given_guess=given_guess,
         )
 
