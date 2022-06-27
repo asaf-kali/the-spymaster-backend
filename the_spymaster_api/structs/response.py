@@ -37,8 +37,8 @@ class GuessResponse(BaseResponse):
 
 
 class NextMoveResponse(BaseResponse):
-    used_solver: Solver
-    used_model_identifier: ModelIdentifier
     given_hint: Optional[GivenHint] = None
     given_guess: Optional[GivenGuess] = None
+    used_solver: Solver
+    used_model_identifier: ModelIdentifier
     game_state: GameState

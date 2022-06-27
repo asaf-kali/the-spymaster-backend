@@ -1,7 +1,7 @@
 # Codenames
 codenames~=1.1
 the-spymaster-util==1.10.0
-the-spymaster-solvers-client==0.4.0
+the-spymaster-solvers-client==1.0.2
 
 # Server
 Django==4.0.4
