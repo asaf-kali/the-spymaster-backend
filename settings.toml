@@ -23,6 +23,7 @@ load_ssm_secrets = false
 env_verbose_name = "Local"
 django_debug = true
 std_formatter = "simple"
+load_ssm_secrets = false
 
 [dev]
 env_verbose_name = "Dev"
