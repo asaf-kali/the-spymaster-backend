@@ -79,6 +79,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
 
     @endpoint(url_path="load-models")
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
+        request.load_default_models = False
         response = self.solvers_client.load_models(request)
         return response
 
