@@ -73,6 +73,10 @@ run:
 # Zappa deployment
 
 deploy:
+	zappa deploy $(ENV)
+
+update:
+	@make tf-update --no-print-directory
 	zappa update $(ENV)
 
 tale:
@@ -86,7 +90,7 @@ plan:
 apply:
 	cd tf_service; make apply;
 
-update:
+tf-update:
 	cd tf_service; make deploy;
 
 # Client
