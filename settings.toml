@@ -33,7 +33,7 @@ db_name = "postgres"
 db_port = 5432
 db_user = "spymaster_admin"
 db_host = "the-spymaster-dev-db.cb5zziruvvzx.us-east-1.rds.amazonaws.com"
-solvers_client_backend_url = "https://4dajlrqb26c2eegv5chg5ne77u0inide.lambda-url.us-east-1.on.aws"
+solvers_client_backend_url = "https://7pailxgynpwglj7v5ezkbfsv4y0audtf.lambda-url.us-east-1.on.aws/"
 
 [stage]
 env_verbose_name = "Staging"
