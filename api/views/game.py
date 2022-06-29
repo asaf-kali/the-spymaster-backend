@@ -29,6 +29,11 @@ log = get_logger(__name__)
 
 
 class GameManagerView(GenericViewSet, ViewContextMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        config = get_config()
+        self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_client_backend_url)
+
     @endpoint
     def start(self, request: StartGameRequest) -> StartGameResponse:
         game_state = build_game_state(language=request.language)
@@ -74,9 +79,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
 
     @endpoint(url_path="load-models")
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        config = get_config()
-        solvers_client = TheSpymasterSolversClient(base_url=config.solvers_client_backend_url)
-        response = solvers_client.load_models(request)
+        response = self.solvers_client.load_models(request)
         return response
 
     @endpoint(methods=[HttpMethod.GET])
