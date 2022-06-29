@@ -76,8 +76,8 @@ deploy:
 	zappa deploy $(ENV)
 
 update:
-	@make tf-update --no-print-directory
 	zappa update $(ENV)
+	@make tf-update --no-print-directory
 
 tale:
 	zappa tale $(ENV)
