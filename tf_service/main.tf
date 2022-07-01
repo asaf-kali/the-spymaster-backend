@@ -25,12 +25,7 @@ locals {
   kms_env_map           = {
     "dev" : "arn:aws:kms:us-east-1:${local.aws_account_id}:key/59b86867-2b0d-4d48-bdee-87bdbf1e249a",
   }
-  provisioned_concurrency_env_map = {
-    "dev" : 2,
-    "prod" : 5,
-  }
   kms_arn                 = local.kms_env_map[var.env]
-  provisioned_concurrency = local.provisioned_concurrency_env_map[var.env]
 }
 
 variable "aws_region" {
@@ -45,20 +40,6 @@ variable "env" {
     condition     = contains(["dev", "stage", "prod"], var.env)
     error_message = "Valid values for var: `dev`, `stage`, `prod`"
   }
-}
-
-# Provision
-
-resource "aws_lambda_alias" "bot_handler_live_alias" {
-  function_name    = local.handler_function_name
-  function_version = "9"
-  name             = "live"
-}
-
-resource "aws_lambda_provisioned_concurrency_config" "bot_handler_provision" {
-  function_name                     = local.handler_function_name
-  qualifier                         = aws_lambda_alias.bot_handler_live_alias.name
-  provisioned_concurrent_executions = local.provisioned_concurrency
 }
 
 # Role
