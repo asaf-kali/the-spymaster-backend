@@ -32,7 +32,7 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         config = get_config()
-        self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_client_backend_url)
+        self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_backend_url)
 
     @endpoint
     def start(self, request: StartGameRequest) -> StartGameResponse:
