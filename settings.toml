@@ -12,7 +12,7 @@ std_formatter = "json"
 root_log_level = "INFO"
 
 # Solvers
-solvers_client_backend_url = "http://localhost:5000"
+solvers_backend_url = "http://localhost:5000"
 
 [test]
 env_verbose_name = "Test"
@@ -33,7 +33,7 @@ db_name = "postgres"
 db_port = 5432
 db_user = "spymaster_admin"
 db_host = "the-spymaster-dev-db.cb5zziruvvzx.us-east-1.rds.amazonaws.com"
-solvers_client_backend_url = "https://7pailxgynpwglj7v5ezkbfsv4y0audtf.lambda-url.us-east-1.on.aws/"
+solvers_backend_url = "https://solvers.dev.the-spymaster.xyz"
 
 [stage]
 env_verbose_name = "Staging"
@@ -51,6 +51,7 @@ db_name = "postgres"
 db_port = 5432
 db_user = "spymaster_admin"
 db_host = "the-spymaster-db.cwerl06excux.eu-central-1.rds.amazonaws.com"
+solvers_backend_url = "https://solvers.the-spymaster.xyz"
 
 [rsbpi]
 env_verbose_name = "Raspberry Pi"

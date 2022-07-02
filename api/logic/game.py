@@ -24,7 +24,7 @@ class NextMoveHandler:
         self.game_state = game_state
         self.solver = solver
         self.model_identifier = model_identifier
-        self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_client_backend_url)
+        self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_backend_url)
         # self.model_adapter = get_adapter_for_model(self.model_identifier)
 
     def handle(self) -> NextMoveResponse:

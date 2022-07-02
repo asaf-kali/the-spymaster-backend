@@ -43,8 +43,8 @@ class Config(LazyConfig):
         return self.get(f"{self.service_prefix}-sentry-dsn") or self.get("SENTRY_DSN")
 
     @property
-    def solvers_client_backend_url(self) -> str:
-        return self.get("SOLVERS_CLIENT_BACKEND_URL") or "http://localhost:5000"
+    def solvers_backend_url(self) -> str:
+        return self.get("SOLVERS_BACKEND_URL") or "http://localhost:5000"
 
     @property
     def recaptcha_site_key(self) -> str:
