@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="the-spymaster-api",
-    version="1.1.4",
+    version="1.2.0",
     description="Python client implementation for The Spymaster HTTP backend.",
     author="Asaf Kali",
     author_email="asaf.kali@mail.huji.ac.il",
@@ -10,7 +10,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "codenames~=1.1",
-        "the_spymaster_util~=1.10",
+        "the_spymaster_util~=1.11",
         "the_spymaster_solvers_client~=1.0",
         "pydantic~=1.9",
         "requests~=2.28",
