@@ -19,9 +19,9 @@
       "local.toml",
       "secrets.toml"
     ],
-    "timeout_seconds": 60,
-    "lambda_concurrency": 5,
-    "memory_size": 1000,
+    "timeout_seconds": 15,
+    "lambda_concurrency": 10,
+    "memory_size": 256,
     "keep_warm": false,
     "manage_roles": false
   },
