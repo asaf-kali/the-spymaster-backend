@@ -70,19 +70,17 @@ save:
 run:
 	python manage.py runserver $(RUN_SERVER_IP):$(RUN_SERVER_PORT)
 
-# Zappa deployment
-
-deploy:
-	zappa deploy $(ENV)
-
-update:
-	zappa update $(ENV)
-	@make tf-update --no-print-directory
-
-tale:
-	zappa tale $(ENV)
-
 # Terraform deployment
+
+docker-build:
+	docker build -t spymaster-backend .
+
+docker-bash:
+	docker run -it --name=spymaster-server spymaster-backend bash
+
+docker-run:
+	docker rm -f spymaster-server
+	docker run -it --name=spymaster-server -p 8000:8000 spymaster-backend
 
 plan:
 	cd tf_service; make plan;
