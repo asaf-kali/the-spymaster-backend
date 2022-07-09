@@ -21,11 +21,11 @@ resource "aws_route53_record" "api_dns_record" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "api_mapping" {
-  api_id      = local.api_gateway_id
+  api_id      = aws_apigatewayv2_api.api_gateway.id
   domain_name = aws_apigatewayv2_domain_name.api_domain_name.id
-  stage       = var.env
+  stage       = aws_apigatewayv2_stage.api_stage.id
 }
 
-output "api_endpoint_url" {
+output "service_url" {
   value = "https://${local.backend_domain}"
 }
