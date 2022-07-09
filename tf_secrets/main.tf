@@ -39,12 +39,6 @@ variable "sentry_dsn" {
   sensitive = true
 }
 
-
-variable "db_password" {
-  type      = string
-  sensitive = true
-}
-
 # Resources
 
 resource "aws_kms_key" "backend_kms_key" {
@@ -60,13 +54,6 @@ resource "aws_ssm_parameter" "sentry_dsn" {
   name   = "${local.service_name}-sentry-dsn"
   type   = "SecureString"
   value  = var.sentry_dsn
-  key_id = aws_kms_key.backend_kms_key.arn
-}
-
-resource "aws_ssm_parameter" "db_password" {
-  name   = "${local.service_name}-db-password"
-  type   = "SecureString"
-  value  = var.db_password
   key_id = aws_kms_key.backend_kms_key.arn
 }
 
