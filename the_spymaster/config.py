@@ -67,5 +67,8 @@ class Config(LazyConfig):
         return self.get("LOAD_SSM_SECRETS")
 
 
+_config = Config()
+
+
 def get_config() -> Config:
-    return Config()
+    return _config
