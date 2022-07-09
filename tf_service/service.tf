@@ -3,7 +3,7 @@
 data "archive_file" "layer_code_archive" {
   type        = "zip"
   source_dir  = "${local.project_root}/.deployment/layer-dependencies/"
-  output_path = local.layer_zip_name
+  output_path = "layer.zip"
 }
 
 resource "aws_lambda_layer_version" "dependencies_layer" {
@@ -18,7 +18,7 @@ resource "aws_lambda_layer_version" "dependencies_layer" {
 data "archive_file" "service_code_archive" {
   type        = "zip"
   source_dir  = "${local.project_root}/src"
-  output_path = local.lambda_zip_name
+  output_path = "service.zip"
 }
 
 resource "aws_lambda_function" "service_lambda" {
