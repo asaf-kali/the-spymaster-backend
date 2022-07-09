@@ -78,7 +78,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "api.middleware.SpymasterExceptionHandlerMiddleware",
 ]
-if DEBUG:
+if config.env_name == "local":
     MIDDLEWARE += ["qinspect.middleware.QueryInspectMiddleware"]
 
 ROOT_URLCONF = "the_spymaster.urls"

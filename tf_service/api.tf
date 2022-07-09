@@ -5,26 +5,26 @@ resource "aws_apigatewayv2_api" "api_gateway" {
   protocol_type = "HTTP"
 }
 
-#resource "aws_apigatewayv2_integration" "api_gateway_integration" {
-#  api_id             = aws_apigatewayv2_api.api_gateway.id
-#  integration_type   = "AWS_PROXY"
-#  integration_method = "POST"
-#  integration_uri    = aws_lambda_function.solvers_handler_lambda.invoke_arn
-#}
+resource "aws_apigatewayv2_integration" "api_gateway_integration" {
+  api_id             = aws_apigatewayv2_api.api_gateway.id
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+  integration_uri    = aws_lambda_function.handler_lambda.invoke_arn
+}
 
-#resource "aws_apigatewayv2_route" "api_gateway_route" {
-#  api_id    = aws_apigatewayv2_api.api_gateway.id
-#  route_key = "ANY /{proxy+}"
-#  target    = "integrations/${aws_apigatewayv2_integration.api_gateway_integration.id}"
-#}
+resource "aws_apigatewayv2_route" "api_gateway_route" {
+  api_id    = aws_apigatewayv2_api.api_gateway.id
+  route_key = "ANY /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.api_gateway_integration.id}"
+}
 
-#resource "aws_lambda_permission" "handler_api_gateway_permission" {
-#  statement_id  = "AllowExecutionFromAPIGateway"
-#  action        = "lambda:InvokeFunction"
-#  principal     = "apigateway.amazonaws.com"
-#  function_name = aws_lambda_function.solvers_handler_lambda.arn
-#  source_arn    = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*/{proxy+}"
-#}
+resource "aws_lambda_permission" "handler_api_gateway_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  principal     = "apigateway.amazonaws.com"
+  function_name = aws_lambda_function.handler_lambda.arn
+  source_arn    = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*/{proxy+}"
+}
 
 resource "aws_apigatewayv2_stage" "api_stage" {
   api_id      = aws_apigatewayv2_api.api_gateway.id

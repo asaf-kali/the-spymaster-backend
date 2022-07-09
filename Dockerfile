@@ -1,19 +1,13 @@
-FROM python:3.8-slim
+FROM public.ecr.aws/lambda/python:3.8
 
-# Set work directory
-WORKDIR /usr/src/app
-
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Copy project
-COPY src/ .
-COPY Makefile .
-COPY requirements.txt .
+# Copy function code
+COPY src/ ${LAMBDA_TASK_ROOT}
 
 # Install dependencies
-RUN apt-get update && apt-get install -y make
-RUN make install-run
+COPY requirements.txt .
 
-CMD ["make", "run"]
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt --target ${LAMBDA_TASK_ROOT}
+
+# Run
+CMD [ "lambda_handler.handler" ]

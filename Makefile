@@ -88,7 +88,7 @@ plan:
 apply:
 	cd tf_service; make apply;
 
-tf-update:
+update:
 	cd tf_service; make deploy;
 
 # Client
