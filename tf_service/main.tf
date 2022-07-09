@@ -18,13 +18,14 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 locals {
-  project_name   = "the-spymaster-backend"
-  service_name   = "${local.project_name}-${var.env}"
-  aws_account_id = data.aws_caller_identity.current.account_id
-  project_root   = "${path.module}/.."
-  ecr_image_tag  = "latest"
+  project_name    = "the-spymaster-backend"
+  service_name    = "${local.project_name}-${var.env}"
+  aws_account_id  = data.aws_caller_identity.current.account_id
+  project_root    = "${path.module}/.."
+  lambda_zip_name = "service.zip"
+  layer_zip_name  = "layer.zip"
   # Secrets
-  kms_env_map    = {
+  kms_env_map     = {
     "dev" : "arn:aws:kms:us-east-1:096386908883:key/59b86867-2b0d-4d48-bdee-87bdbf1e249a",
   }
   kms_arn           = local.kms_env_map[var.env]

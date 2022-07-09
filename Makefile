@@ -51,7 +51,7 @@ lint-check:
 	black . --check
 	isort . --check
 	mypy .
-	flake8 . --max-line-length=$(LINE_LENGTH) --ignore=E203,W503,E402
+	flake8 . --max-line-length=$(LINE_LENGTH) --ignore=E203,W503,E402 --exclude=local,.deployment
 
 lint: lint-only
 	pre-commit run --all-files
@@ -72,15 +72,8 @@ run:
 
 # Terraform deployment
 
-docker-build:
-	docker build -t spymaster-backend .
-
-docker-bash:
-	docker run -it --name=spymaster-server spymaster-backend bash
-
-docker-run:
-	docker rm -f spymaster-server
-	docker run -it --name=spymaster-server -p 8000:8000 spymaster-backend
+build-layer:
+	sudo ./scripts/build_layer.sh
 
 plan:
 	cd tf_service; make plan;
@@ -90,6 +83,8 @@ apply:
 
 update:
 	cd tf_service; make deploy;
+
+deploy: build-layer update
 
 # Client
 

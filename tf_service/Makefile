@@ -7,4 +7,6 @@ plan:
 apply:
 	terraform apply $(TERRAFORM_PLAN_FILE)
 
-deploy: plan apply
+deploy:
+	@make plan --no-print-directory
+	@make apply --no-print-directory
