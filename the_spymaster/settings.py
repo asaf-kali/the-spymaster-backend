@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+from logging.config import dictConfig
 from pathlib import Path
 
 import sentry_sdk
@@ -17,6 +18,7 @@ from the_spymaster_util import get_dict_config
 
 from the_spymaster.config import get_config
 
+dictConfig(get_dict_config())
 config = get_config()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 ENVIRONMENT = config.env_verbose_name
