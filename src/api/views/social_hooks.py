@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urlencode
 
 from allauth.account.models import EmailAddress
@@ -18,7 +19,8 @@ from the_spymaster_util import wrap
 
 from api.logic.errors import BadRequestError, UnauthorizedError
 from api.models import SpymasterUser
-from api.views import log
+
+log = logging.getLogger(__name__)
 
 
 def _create_email_address(existing_user: SpymasterUser):

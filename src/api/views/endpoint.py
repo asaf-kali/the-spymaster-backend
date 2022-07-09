@@ -10,7 +10,6 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from the_spymaster_util import get_logger
 from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY
-from the_spymaster_util.measure_time import MeasureTime
 
 from api.logic.errors import BadRequestError, SpymasterError
 from api.structs import BaseRequest, BaseResponse
@@ -37,6 +36,10 @@ class EndpointTypingError(EndpointConfigurationError):
         self.supported_types = supported_types
 
 
+class ResponseStructureError(EndpointConfigurationError):
+    pass
+
+
 class HttpMethod(str, Enum):
     GET = "GET"
     POST = "POST"
@@ -59,23 +62,16 @@ def endpoint(
         @functools.wraps(f)
         def wrapper(view, request: Request, *args, **kwargs):
             log.update_context(endpoint_name=endpoint_name)
-            log.info(f"Endpoint called: {endpoint_name}", extra={"request": request.data})
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
-            with MeasureTime() as mt:
-                response = f(view, parsed_request)
+            response = f(view, parsed_request)
             response_data = _get_response_data(response)
             status_code = response_data.pop("status_code", None)
             if not status_code:
-                raise ValueError("Response data is missing status_code key!")
+                raise ResponseStructureError("Response data is missing status_code key!")
             headers = {CONTEXT_ID_HEADER_KEY: log.context_id}
             response = JsonResponse(data=response_data, status=status_code, headers=headers)
-            log.info(
-                f"Endpoint completed with status {status_code}",
-                extra={"status_code": status_code, "duration": mt.delta},
-            )
             if getattr(parsed_request, "debug", False):
-                log.debug("Response data", extra={"response": response_data})
-            log.reset_context()
+                log.info("Response data", extra={"response": response_data})
             return response
 
         return action(detail=detail, methods=str_methods, url_path=url_path, url_name=url_name)(wrapper)

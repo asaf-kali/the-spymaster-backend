@@ -14,7 +14,6 @@ from rest_framework.viewsets import GenericViewSet
 from the_spymaster_util import get_logger, wrap
 
 from api.serializers import UserDetailsSerializer, UserSummarizeSerializer
-from api.views import ViewContextMixin
 from api.views.social_hooks import (
     CustomOAuth2CallbackView,
     CustomOAuth2LoginView,
@@ -24,7 +23,7 @@ from api.views.social_hooks import (
 log = get_logger(__name__)
 
 
-class LoginCallbackView(RetrieveAPIView, ViewContextMixin):
+class LoginCallbackView(RetrieveAPIView):
     def get(self, request: WSGIRequest, **kwargs):
         log.debug(f"Login callback called for user {wrap(request.user)}")
         return _generate_key_response(self.request)
@@ -38,7 +37,7 @@ class LogoutView(RestAuthLogoutView):
         return response
 
 
-class UserDetailsView(GenericViewSet, ViewContextMixin):
+class UserDetailsView(GenericViewSet):
     serializer_class = UserSummarizeSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = None
