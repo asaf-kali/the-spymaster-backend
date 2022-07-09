@@ -9,8 +9,9 @@ source = ["api", "the_spymaster", "telegram_bot"]
 line-length = 120
 
 [tool.isort]
-skip = ["__init__.py"]
 profile = "black"
+skip = ["__init__.py", ".deployment/"]
 
 [tool.mypy]
 ignore_missing_imports = true
+exclude = ["local/", ".deployment/"]

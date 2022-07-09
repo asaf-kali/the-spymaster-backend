@@ -1,22 +1,44 @@
+# Layer
+
+data "archive_file" "layer_code_archive" {
+  type        = "zip"
+  source_dir  = "${local.project_root}/.deployment/layer-dependencies/"
+  output_path = local.layer_zip_name
+}
+
+resource "aws_lambda_layer_version" "dependencies_layer" {
+  filename         = data.archive_file.layer_code_archive.output_path
+  layer_name       = "${local.service_name}-layer"
+  source_code_hash = filebase64sha256(data.archive_file.layer_code_archive.output_path)
+  skip_destroy     = true
+}
+
 # Lambda
 
-resource "aws_lambda_function" "handler_lambda" {
+data "archive_file" "service_code_archive" {
+  type        = "zip"
+  source_dir  = "${local.project_root}/src"
+  output_path = local.lambda_zip_name
+}
+
+resource "aws_lambda_function" "service_lambda" {
   function_name                  = "${local.service_name}-lambda"
-  timeout                        = 15
   role                           = aws_iam_role.lambda_exec_role.arn
-  image_uri                      = "${aws_ecr_repository.ecr_repo.repository_url}@${data.aws_ecr_image.ecr_image.id}"
-  package_type                   = "Image"
+  handler                        = "lambda_handler.handler"
+  runtime                        = "python3.9"
+  filename                       = data.archive_file.service_code_archive.output_path
+  source_code_hash               = filebase64sha256(data.archive_file.service_code_archive.output_path)
+  timeout                        = 15
   memory_size                    = 200
   reserved_concurrent_executions = 5
-
+  layers                         = [
+    aws_lambda_layer_version.dependencies_layer.arn
+  ]
   environment {
     variables = {
       ENV_FOR_DYNACONF = var.env
     }
   }
-  depends_on = [
-    null_resource.image_resource
-  ]
 }
 
 # Role
