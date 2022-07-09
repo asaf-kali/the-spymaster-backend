@@ -33,7 +33,7 @@ dev-init:
 # Test
 
 test:
-	export ENV_FOR_DYNACONF=test; python -m $(PYTHON_TEST_COMMAND)
+	export ENV_FOR_DYNACONF=test; cd src; python -m $(PYTHON_TEST_COMMAND)
 
 cover:
 	coverage run -m $(PYTHON_TEST_COMMAND)

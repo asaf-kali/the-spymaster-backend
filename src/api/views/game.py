@@ -6,6 +6,7 @@ from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
 from the_spymaster_util import get_logger
 
+from api.logic.errors import BadRequestError
 from api.logic.game import NextMoveHandler, get_game
 from api.models.game import Game
 from api.structs import (
@@ -21,7 +22,6 @@ from api.structs import (
     StartGameRequest,
     StartGameResponse,
 )
-from api.views import ViewContextMixin
 from api.views.endpoint import HttpMethod, endpoint
 from the_spymaster.config import get_config
 
@@ -30,7 +30,7 @@ log = get_logger(__name__)
 config = get_config()
 
 
-class GameManagerView(GenericViewSet, ViewContextMixin):
+class GameManagerView(GenericViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_backend_url)
@@ -85,10 +85,12 @@ class GameManagerView(GenericViewSet, ViewContextMixin):
 
     @endpoint(methods=[HttpMethod.GET])
     def test(self, request: BaseRequest) -> dict:
-        return {"test": "test", "status_code": 200}
+        return {"success": "true", "details": "It seems everything is working!", "status_code": 200}
 
     @endpoint(methods=[HttpMethod.GET], url_path="raise-error")
     def raise_error(self, request: BaseRequest) -> dict:
+        if getattr(request, "handled", False):
+            raise BadRequestError("This error was handled!")
         raise Exception("Test error")
 
     @endpoint(methods=[HttpMethod.GET], url_path="ping-google")
