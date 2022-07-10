@@ -10,7 +10,7 @@ resource "aws_ssm_parameter" "admin_password" {
   name   = "${local.service_name}-db-password"
   type   = "SecureString"
   value  = random_password.admin_password.result
-  key_id = local.kms_arn
+  key_id = aws_kms_key.kms_key.arn
 }
 
 # RDS
