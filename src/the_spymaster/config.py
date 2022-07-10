@@ -14,7 +14,11 @@ class Config(LazyConfig):
         log.info("Config loaded")
 
     def _load_parameters(self):
-        parameters = [f"{self.service_prefix}-sentry-dsn", f"{self.service_prefix}-db-password"]
+        parameters = [
+            f"{self.service_prefix}-django-secret-key",
+            f"{self.service_prefix}-sentry-dsn",
+            f"{self.service_prefix}-db-password",
+        ]
         self.load_ssm_parameters(parameters)
         for parameter_name in parameters:
             new_parameter_name = parameter_name.replace(f"{self.service_prefix}-", "").replace("-", "_")
@@ -36,7 +40,7 @@ class Config(LazyConfig):
 
     @property
     def django_secret_key(self) -> str:
-        return self.get("DJANGO_SECRET_KEY")
+        return self.get(f"{self.service_prefix}-django-secret-key") or self.get("DJANGO_SECRET_KEY")
 
     @property
     def sentry_dsn(self) -> str:
