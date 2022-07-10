@@ -169,6 +169,8 @@ loggers = {
     "apscheduler": {"level": "INFO"},
     "qinspect": {"level": "DEBUG"},
     "mangum.http": {"level": "WARNING"},
+    "urllib3": {"level": "WARNING"},
+    "urllib3.util.retry": {"level": "DEBUG"},
     # Django
     "django": {"handlers": ["console_err"], "level": "DEBUG", "propagate": False},
     "django.utils.autoreload": {"level": "INFO"},

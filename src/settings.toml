@@ -9,7 +9,7 @@ django_debug = false
 # Logging
 indent_json = false
 std_formatter = "json"
-root_log_level = "INFO"
+root_log_level = "DEBUG"
 
 # Solvers
 solvers_backend_url = "http://localhost:5000"
