@@ -49,7 +49,7 @@ db_engine = "django.db.backends.postgresql"
 db_name = "postgres"
 db_port = 5432
 db_user = "spymaster_admin"
-db_host = "the-spymaster-db.cwerl06excux.eu-central-1.rds.amazonaws.com"
+db_host = "the-spymaster-backend-prod-db.cb5zziruvvzx.us-east-1.rds.amazonaws.com"
 solvers_backend_url = "https://solvers.the-spymaster.xyz"
 
 [rsbpi]
