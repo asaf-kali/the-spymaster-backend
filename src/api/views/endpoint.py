@@ -61,7 +61,7 @@ def endpoint(
 
         @functools.wraps(f)
         def wrapper(view, request: Request, *args, **kwargs):
-            log.update_context(endpoint_name=endpoint_name)
+            log.update_context(endpoint_name=endpoint_name, django_user_id=request.user.id)
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
             response = f(view, parsed_request)
             response_data = _get_response_data(response)

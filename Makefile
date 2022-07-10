@@ -59,7 +59,8 @@ lint: lint-only
 # Django
 
 migrate:
-	python manage.py makemigrations
+	cd src; \
+	python manage.py makemigrations; \
 	python manage.py migrate
 
 save:
@@ -68,6 +69,7 @@ save:
 # Run
 
 run:
+	cd src; \
 	python manage.py runserver $(RUN_SERVER_IP):$(RUN_SERVER_PORT)
 
 # Terraform deployment
