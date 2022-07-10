@@ -3,7 +3,6 @@ env_verbose_name = "Not set"
 load_ssm_secrets = true
 
 # Django
-django_secret_key = "u04*+#&)cpg282xzxjd6if167%twq_&^8+ty_7xtz#b5)&_d09"
 django_debug = false
 
 # Logging

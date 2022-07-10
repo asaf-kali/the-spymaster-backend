@@ -40,7 +40,10 @@ class Config(LazyConfig):
 
     @property
     def django_secret_key(self) -> str:
-        return self.get(f"{self.service_prefix}-django-secret-key") or self.get("DJANGO_SECRET_KEY")
+        value = self.get(f"{self.service_prefix}-django-secret-key") or self.get("DJANGO_SECRET_KEY")
+        if not value:
+            raise ValueError("DJANGO_SECRET_KEY is not set")
+        return value
 
     @property
     def sentry_dsn(self) -> str:
