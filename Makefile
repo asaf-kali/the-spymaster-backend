@@ -33,7 +33,10 @@ dev-init:
 # Test
 
 test:
-	export ENV_FOR_DYNACONF=test; cd src; python -m $(PYTHON_TEST_COMMAND)
+	export ENV_FOR_DYNACONF="test"; \
+ 	export DJANGO_SECRET_KEY="secret"; \
+ 	cd src; \
+ 	python -m $(PYTHON_TEST_COMMAND)
 
 cover:
 	coverage run -m $(PYTHON_TEST_COMMAND)
