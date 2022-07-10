@@ -13,3 +13,15 @@ resource "aws_ssm_parameter" "sentry_dsn" {
   value  = var.sentry_dsn
   key_id = aws_kms_key.kms_key.arn
 }
+
+resource "random_password" "django_secret_key" {
+  length           = 64
+  special          = true
+  override_special = "_!%^"
+}
+
+resource "aws_ssm_parameter" "django_secret_key" {
+  name  = "${local.service_name}-django-secret-key"
+  type  = "SecureString"
+  value = random_password.django_secret_key.result
+}
