@@ -6,7 +6,7 @@ RUN_SERVER_IP=0.0.0.0
 RUN_SERVER_PORT=8000
 FIXTURE_FILE=dump.json
 
-ENV=dev
+ENV=local
 export DJANGO_SETTINGS_MODULE=the_spymaster.settings
 
 # Install
@@ -73,6 +73,7 @@ save:
 
 run:
 	cd src; \
+	export ENV_FOR_DYNACONF=$(ENV); \
 	python manage.py runserver $(RUN_SERVER_IP):$(RUN_SERVER_PORT)
 
 # Terraform deployment
