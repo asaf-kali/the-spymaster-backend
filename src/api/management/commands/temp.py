@@ -1,11 +1,11 @@
 import json
+import logging
 
 from django.core.management import BaseCommand
-from the_spymaster_util import get_logger
 
 from api.models.game import Game
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def _fix_game_state_json():

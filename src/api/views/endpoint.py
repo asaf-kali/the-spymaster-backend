@@ -8,8 +8,8 @@ from pydantic import BaseModel, ValidationError
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.request import Request
-from the_spymaster_util import get_logger
 from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY
+from the_spymaster_util.logging import get_logger
 
 from api.logic.errors import BadRequestError, SpymasterError
 from api.structs import BaseRequest, BaseResponse

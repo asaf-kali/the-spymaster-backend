@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from the_spymaster_util import LazyConfig
+from the_spymaster_util.config import LazyConfig
 
 log = logging.getLogger(__name__)
 

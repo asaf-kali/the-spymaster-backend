@@ -1,15 +1,17 @@
+import logging
+
 from allauth.socialaccount.models import SocialApp
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import BaseCommand
 from rest_framework.authtoken.models import Token
-from the_spymaster_util import get_logger, wrap
+from the_spymaster_util.logging import wrap
 
 from api.logic.errors import SpymasterError
 from api.models import SpymasterUser
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 DEFAULT_EMAIL = "admin@the-spymaster.xyz"
 DEFAULT_PASSWORD = "qweasd"
 

@@ -9,8 +9,8 @@ from django.http import JsonResponse
 from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework import status
-from the_spymaster_util import get_logger, wrap
 from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY, extract_context
+from the_spymaster_util.logging import get_logger, wrap
 from the_spymaster_util.measure_time import MeasureTime
 
 from api.logic.errors import BadRequestError

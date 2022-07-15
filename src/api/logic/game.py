@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from codenames.game import GameState, PlayerRole
@@ -7,15 +8,13 @@ from the_spymaster_solvers_client.structs.requests import (
     GenerateGuessRequest,
     GenerateHintRequest,
 )
-from the_spymaster_util import get_logger
 
 from api.logic.errors import BadRequestError
 from api.models.game import Game
 from api.structs import NextMoveResponse, Solver
 from the_spymaster.config import get_config
 
-log = get_logger(__name__)
-
+log = logging.getLogger(__name__)
 config = get_config()
 
 

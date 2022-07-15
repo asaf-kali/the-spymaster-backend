@@ -4,7 +4,7 @@ from rest_framework.viewsets import GenericViewSet
 from the_spymaster_solvers_client.client import TheSpymasterSolversClient
 from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
-from the_spymaster_util import get_logger
+from the_spymaster_util.logging import get_logger
 
 from api.logic.errors import BadRequestError
 from api.logic.game import NextMoveHandler, get_game
