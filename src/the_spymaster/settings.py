@@ -13,7 +13,7 @@ from pathlib import Path
 
 import sentry_sdk
 from sentry_sdk.integrations.logging import LoggingIntegration
-from the_spymaster_util import get_dict_config
+from the_spymaster_util.logging import get_dict_config
 
 from the_spymaster.config import get_config
 

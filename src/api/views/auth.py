@@ -1,3 +1,5 @@
+import logging
+
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from dj_rest_auth.views import LogoutView as RestAuthLogoutView
 from django.conf import settings
@@ -11,7 +13,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.viewsets import GenericViewSet
-from the_spymaster_util import get_logger, wrap
+from the_spymaster_util.logging import wrap
 
 from api.serializers import UserDetailsSerializer, UserSummarizeSerializer
 from api.views.social_hooks import (
@@ -20,7 +22,7 @@ from api.views.social_hooks import (
     _generate_key_response,
 )
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class LoginCallbackView(RetrieveAPIView):

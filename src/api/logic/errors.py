@@ -1,9 +1,10 @@
+import logging
 from typing import Optional
 
 from rest_framework import status
-from the_spymaster_util import JsonType, get_logger
+from the_spymaster_util.http_client import JsonType
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class SpymasterError(Exception):

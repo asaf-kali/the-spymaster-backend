@@ -1,8 +1,10 @@
+import logging
+
 from django.apps import AppConfig
 from django.conf import settings
-from the_spymaster_util import get_logger, wrap
+from the_spymaster_util.logging import wrap
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class ApiConfig(AppConfig):
