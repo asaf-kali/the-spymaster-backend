@@ -8,6 +8,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import JsonResponse
 from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
+from requests import HTTPError
 from rest_framework import status
 from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY, extract_context
 from the_spymaster_util.logging import get_logger, wrap
@@ -34,6 +35,14 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
             return JsonResponse(
                 {"message": "Invalid move", "details": str(exception)}, status=status.HTTP_400_BAD_REQUEST
             )
+        if isinstance(exception, HTTPError) and exception.response is not None:
+            response = exception.response
+            try:
+                data = response.json()
+            except:  # noqa
+                data = {"message": "Internal server error", "details": response.text}
+            return JsonResponse(data=data, status=response.status_code)
+
         sentry_sdk.capture_exception(exception)
         log.exception("Uncaught exception")
         sentry_sdk.flush(timeout=5)
