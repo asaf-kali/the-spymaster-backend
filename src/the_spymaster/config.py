@@ -17,7 +17,6 @@ class Config(LazyConfig):
         parameters = [
             f"{self.service_prefix}-django-secret-key",
             f"{self.service_prefix}-sentry-dsn",
-            f"{self.service_prefix}-db-password",
         ]
         self.load_ssm_parameters(parameters)
         for parameter_name in parameters:
@@ -37,6 +36,10 @@ class Config(LazyConfig):
     @property
     def django_debug(self) -> bool:
         return self.get("DJANGO_DEBUG") or False
+
+    @property
+    def game_items_table_name(self) -> str:
+        return self.get("game_items_table_name") or f"{self.service_prefix}-game-items"
 
     @property
     def django_secret_key(self) -> str:

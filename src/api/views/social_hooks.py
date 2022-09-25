@@ -18,7 +18,7 @@ from django.urls import reverse
 from the_spymaster_util.logging import wrap
 
 from api.logic.errors import BadRequestError, UnauthorizedError
-from api.models import SpymasterUser
+from api.models.user import SpymasterUser
 
 log = logging.getLogger(__name__)
 

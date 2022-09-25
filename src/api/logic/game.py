@@ -10,7 +10,6 @@ from the_spymaster_solvers_client.structs.requests import (
 )
 
 from api.logic.errors import BadRequestError
-from api.models.game import Game
 from api.structs import NextMoveResponse, Solver
 from the_spymaster.config import get_config
 
@@ -64,10 +63,3 @@ class NextMoveHandler:
             used_model_identifier=generate_guess_response.used_model_identifier,
             given_guess=given_guess,
         )
-
-
-def get_game(game_id: int) -> Game:
-    try:
-        return Game.objects.get(id=game_id)
-    except Game.DoesNotExist as e:
-        raise BadRequestError("Game does not exist") from e

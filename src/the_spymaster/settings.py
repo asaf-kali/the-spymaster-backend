@@ -103,16 +103,23 @@ WSGI_APPLICATION = "the_spymaster.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": config.get("DB_ENGINE") or "django.db.backends.sqlite3",
-        "NAME": config.get("DB_NAME") or BASE_DIR / "db.sqlite3",
-        "USER": config.get("DB_USER"),
-        "PASSWORD": config.get("DB_PASSWORD"),
-        "HOST": config.get("DB_HOST"),
-        "PORT": config.get("DB_PORT"),
+# DATABASES = {
+#     "default": {
+#         "ENGINE": config.get("DB_ENGINE") or "django.db.backends.sqlite3",
+#         "NAME": config.get("DB_NAME") or BASE_DIR / "db.sqlite3",
+#         "USER": config.get("DB_USER"),
+#         "PASSWORD": config.get("DB_PASSWORD"),
+#         "HOST": config.get("DB_HOST"),
+#         "PORT": config.get("DB_PORT"),
+#     }
+# }
+if config.env_name == "test":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -166,6 +173,8 @@ loggers = {
         "level": "INFO",
     },
     # 3rd parties
+    "botocore": {"level": "WARNING"},
+    "pynamodb": {"level": "WARNING"},
     "apscheduler": {"level": "INFO"},
     "qinspect": {"level": "DEBUG"},
     "mangum.http": {"level": "WARNING"},
