@@ -9,7 +9,7 @@ from rest_framework.authtoken.models import Token
 from the_spymaster_util.logging import wrap
 
 from api.logic.errors import SpymasterError
-from api.models import SpymasterUser
+from api.models.user import SpymasterUser
 
 log = logging.getLogger(__name__)
 DEFAULT_EMAIL = "admin@the-spymaster.xyz"

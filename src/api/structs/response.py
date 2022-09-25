@@ -18,7 +18,7 @@ class ErrorResponse(BaseModel):
 
 
 class StartGameResponse(BaseResponse):
-    game_id: int
+    game_id: str
     game_state: GameState
 
 

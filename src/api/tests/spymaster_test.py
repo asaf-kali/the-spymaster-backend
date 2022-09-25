@@ -1,7 +1,7 @@
 from django.test import TestCase, override_settings
 
 from api.management.commands.dev_init import create_admin
-from api.models import SpymasterUser
+from api.models.user import SpymasterUser
 
 
 class SpymasterTest(TestCase):

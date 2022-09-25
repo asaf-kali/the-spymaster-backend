@@ -21,22 +21,22 @@ class StartGameRequest(BaseRequest):
 
 
 class HintRequest(BaseRequest):
-    game_id: int
+    game_id: str
     word: str
     card_amount: int
     for_words: Optional[List[str]] = None
 
 
 class GuessRequest(BaseRequest):
-    game_id: int
+    game_id: str
     card_index: int
 
 
 class GetGameStateRequest(BaseRequest):
-    game_id: int
+    game_id: str
 
 
 class NextMoveRequest(BaseRequest):
-    game_id: int
+    game_id: str
     solver: Solver = Solver.NAIVE
     model_identifier: Optional[ModelIdentifier] = None

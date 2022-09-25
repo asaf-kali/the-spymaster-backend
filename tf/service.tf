@@ -86,6 +86,15 @@ resource "aws_iam_role" "lambda_exec_role" {
               "kms:Decrypt",
             ],
             "Resource" : aws_kms_key.kms_key.arn
+          },
+          {
+            "Effect" : "Allow",
+            "Action" : [
+              "dynamodb:DescribeTable",
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+            ],
+            "Resource" : aws_dynamodb_table.games_items.arn
           }
         ]
       }

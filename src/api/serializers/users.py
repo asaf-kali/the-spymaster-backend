@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import SpymasterUser
+from api.models.user import SpymasterUser
 
 
 class UserSummarizeSerializer(serializers.ModelSerializer):

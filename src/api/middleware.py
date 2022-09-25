@@ -21,7 +21,7 @@ log = get_logger(__name__)
 
 class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
     def process_exception(self, request: WSGIRequest, exception: Exception):
-        log.debug("Processing exception: %s", exception)
+        log.debug("Processing exception: %s", exception, exc_info=True)
         if isinstance(exception, ValidationError):
             return JsonResponse({"message": str(exception)}, status=status.HTTP_400_BAD_REQUEST)
         if isinstance(exception, BadRequestError):

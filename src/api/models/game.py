@@ -1,10 +1,10 @@
 from codenames.game import GameState
-from django.db import models
+from pydantic import BaseModel
 
 
-class Game(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    state_data = models.JSONField()
+class Game(BaseModel):
+    id: str
+    state_data: dict
 
     @property
     def state(self) -> GameState:
