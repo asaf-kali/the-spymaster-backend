@@ -1,6 +1,3 @@
-# Deployment
-zappa==0.54.1
-
 # Development
 django-queryinspect==1.1.0
 
