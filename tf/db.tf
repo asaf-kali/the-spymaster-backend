@@ -1,15 +1,15 @@
 # Password
 
-resource "random_password" "admin_password" {
+resource "random_password" "db_admin_password" {
   length           = 24
   special          = true
   override_special = "_!%^"
 }
 
-resource "aws_ssm_parameter" "admin_password" {
+resource "aws_ssm_parameter" "db_admin_password_secret" {
   name   = "${local.service_name}-db-password"
   type   = "SecureString"
-  value  = random_password.admin_password.result
+  value  = random_password.db_admin_password.result
   key_id = aws_kms_key.kms_key.arn
 }
 
@@ -22,7 +22,7 @@ resource "aws_db_instance" "service_db" {
   db_name             = "postgres"
   allocated_storage   = 10
   username            = "spymaster_admin"
-  password            = aws_ssm_parameter.admin_password.value
+  password            = aws_ssm_parameter.db_admin_password_secret.value
   publicly_accessible = true
   skip_final_snapshot = true
 }
