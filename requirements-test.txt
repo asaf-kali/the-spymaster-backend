@@ -1,0 +1,6 @@
+# Testing
+pytest==7.1.1
+coverage==6.3.2
+pytest-django==4.5.2
+parameterized==0.8.1
+freezegun==1.2.1
