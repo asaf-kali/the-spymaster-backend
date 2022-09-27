@@ -2,14 +2,14 @@ import requests
 import ulid
 from codenames.game import Guess, Hint, build_game_state
 from rest_framework.viewsets import GenericViewSet
-from the_spymaster_solvers_client.client import TheSpymasterSolversClient
 from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
 from the_spymaster_util.logging import get_logger
 
 from api.logic.db import load_game, save_game
 from api.logic.errors import BadRequestError
-from api.logic.game import NextMoveHandler
+from api.logic.next_move import NextMoveHandler
+from api.logic.solvers import get_solvers_client
 from api.models.game import Game
 from api.structs import (
     BaseRequest,
@@ -25,11 +25,8 @@ from api.structs import (
     StartGameResponse,
 )
 from api.views.endpoint import HttpMethod, endpoint
-from the_spymaster.config import get_config
 
 log = get_logger(__name__)
-
-config = get_config()
 
 
 def ulid_lower():
@@ -39,7 +36,7 @@ def ulid_lower():
 class GameManagerView(GenericViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.solvers_client = TheSpymasterSolversClient(base_url=config.solvers_backend_url)
+        self.solvers_client = get_solvers_client()
 
     @endpoint
     def start(self, request: StartGameRequest) -> StartGameResponse:

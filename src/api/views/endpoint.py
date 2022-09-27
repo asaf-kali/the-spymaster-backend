@@ -29,7 +29,7 @@ class EndpointAnnotationError(EndpointConfigurationError):
 
 
 class EndpointTypingError(EndpointConfigurationError):
-    def __init__(self, message: str, actual_type: Type, supported_types: Tuple[Type]):
+    def __init__(self, message: str, actual_type: Type, supported_types: Tuple[Type, ...]):
         detailed_message = f"{message} (actual type: {actual_type}, supported types: {supported_types})"
         super().__init__(detailed_message)
         self.actual_type = actual_type
@@ -115,7 +115,7 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
         parsed_request = request_model(drf_request=drf_request, **data)
     except Exception as e:
         details = e.errors() if isinstance(e, ValidationError) else str(e)
-        raise BadRequestError("Request parsing failed.", details=details) from e  # type: ignore
+        raise BadRequestError("Request parsing failed.", details=details) from e
     return parsed_request
 
 
@@ -133,5 +133,5 @@ def _get_response_data(response: BaseResponse) -> dict:
     raise EndpointTypingError(
         "Response type not implemented",
         actual_type=type(response),
-        supported_types=ALLOWED_RESPONSE_TYPES,  # type: ignore
+        supported_types=ALLOWED_RESPONSE_TYPES,
     )
