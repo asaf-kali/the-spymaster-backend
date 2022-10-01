@@ -26,18 +26,19 @@ SECRET_KEY = config.django_secret_key
 SITE_ID = 1
 ALLOWED_HOSTS = ["backend.the-spymaster.xyz", "backend.dev.the-spymaster.xyz", "localhost", "127.0.0.1"]
 
-sentry_sdk.init(  # type: ignore
-    dsn=config.sentry_dsn,
-    integrations=[LoggingIntegration(event_level=None)],
-    environment=ENVIRONMENT,
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # We recommend adjusting this value in production.
-    traces_sample_rate=0.2,
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True,
-)
+if config.sentry_setup:
+    sentry_sdk.init(  # type: ignore
+        dsn=config.sentry_dsn,
+        integrations=[LoggingIntegration(event_level=None)],
+        environment=ENVIRONMENT,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=0.2,
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True,
+    )
 
 # Application definition
 
@@ -77,7 +78,7 @@ MIDDLEWARE = [
     "api.middleware.ContextLoggingMiddleware",
     "api.middleware.SpymasterExceptionHandlerMiddleware",
 ]
-if config.env_name == "local":
+if config.setup_sqlite_db and DEBUG:
     MIDDLEWARE += ["qinspect.middleware.QueryInspectMiddleware"]
 
 ROOT_URLCONF = "the_spymaster.urls"
@@ -113,7 +114,7 @@ WSGI_APPLICATION = "the_spymaster.wsgi.application"
 #         "PORT": config.get("DB_PORT"),
 #     }
 # }
-if config.env_name == "test":
+if config.setup_sqlite_db:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
