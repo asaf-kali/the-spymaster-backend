@@ -14,10 +14,7 @@ class Config(LazyConfig):
         log.info("Config loaded")
 
     def _load_parameters(self):
-        parameters = [
-            f"{self.service_prefix}-django-secret-key",
-            f"{self.service_prefix}-sentry-dsn",
-        ]
+        parameters = [f"{self.service_prefix}-django-secret-key", f"{self.service_prefix}-sentry-dsn"]
         self.load_ssm_parameters(parameters)
         for parameter_name in parameters:
             new_parameter_name = parameter_name.replace(f"{self.service_prefix}-", "").replace("-", "_")
@@ -35,7 +32,23 @@ class Config(LazyConfig):
 
     @property
     def django_debug(self) -> bool:
-        return self.get("DJANGO_DEBUG") or False
+        return self.is_test or bool(self.get("DJANGO_DEBUG"))
+
+    @property
+    def is_test(self) -> bool:
+        return self.env_name == "test"
+
+    @property
+    def is_local(self) -> bool:
+        return self.env_name == "local"
+
+    @property
+    def sentry_setup(self) -> bool:
+        return not self.is_test and not self.is_local
+
+    @property
+    def setup_sqlite_db(self) -> bool:
+        return self.is_test
 
     @property
     def game_items_table_name(self) -> str:
@@ -44,9 +57,11 @@ class Config(LazyConfig):
     @property
     def django_secret_key(self) -> str:
         value = self.get(f"{self.service_prefix}-django-secret-key") or self.get("DJANGO_SECRET_KEY")
-        if not value:
-            raise ValueError("DJANGO_SECRET_KEY is not set")
-        return value
+        if value:
+            return value
+        if self.is_test:
+            return "54dc6d2d8ccc4cec8196397af5ff355c"
+        raise ValueError("DJANGO_SECRET_KEY is not set")
 
     @property
     def sentry_dsn(self) -> str:

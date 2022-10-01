@@ -16,6 +16,7 @@ solvers_backend_url = "http://localhost:5000"
 [test]
 env_verbose_name = "Test"
 django_debug = true
+std_formatter = "simple"
 load_ssm_secrets = false
 
 [local]
