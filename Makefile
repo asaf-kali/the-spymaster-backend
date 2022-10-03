@@ -35,7 +35,6 @@ dev-init:
 
 test:
 	export ENV_FOR_DYNACONF="test"; \
- 	export DJANGO_SECRET_KEY="secret"; \
  	cd src; \
  	python -m $(PYTHON_TEST_COMMAND)
 

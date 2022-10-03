@@ -20,7 +20,7 @@ from the_spymaster.config import get_config
 config = get_config()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 ENVIRONMENT = config.env_verbose_name
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config.django_debug
 SECRET_KEY = config.django_secret_key
 SITE_ID = 1
