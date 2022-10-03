@@ -5,7 +5,6 @@ from pynamodb.attributes import JSONAttribute, NumberAttribute, UnicodeAttribute
 from pynamodb.exceptions import DoesNotExist as PynamoDoesNotExist
 from pynamodb.expressions.condition import Condition
 from pynamodb.models import Model
-from pynamodb.settings import OperationSettings
 
 from api.logic.errors import BadRequestError
 from api.models.game import Game
@@ -26,11 +25,9 @@ class GameItem(Model):
     state_data = JSONAttribute(null=True)
     updated_ts = NumberAttribute()
 
-    def save(
-        self, condition: Optional[Condition] = None, settings: OperationSettings = OperationSettings.default
-    ) -> Dict[str, Any]:
+    def save(self, condition: Optional[Condition] = None, *args, **kwargs) -> Dict[str, Any]:
         self.updated_ts = int(time.time())
-        return super().save(condition=condition, settings=settings)
+        return super().save(*args, **kwargs)
 
     @classmethod
     def load(cls, game_id: str, *args, **kwargs) -> "GameItem":

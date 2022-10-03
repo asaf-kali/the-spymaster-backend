@@ -45,7 +45,7 @@ class UserDetailsView(GenericViewSet):
     pagination_class = None
 
     @action(detail=False)
-    def me(self, request: Request, *args, **kwargs):
+    def me(self, request: Request, *args, **kwargs):  # noqa: W0613
         return JsonResponse(data=UserDetailsSerializer(request.user).data, status=status.HTTP_200_OK)
 
 

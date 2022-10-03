@@ -30,7 +30,7 @@ class NextMoveHandler:
             raise BadRequestError("Game is over")
         if self.game_state.current_player_role == PlayerRole.HINTER:
             return self._make_hinter_move()
-        elif self.game_state.current_player_role == PlayerRole.GUESSER:
+        if self.game_state.current_player_role == PlayerRole.GUESSER:
             return self._make_guesser_move()
         raise ValueError(f"Unknown player role: {self.game_state.current_player_role}")
 
