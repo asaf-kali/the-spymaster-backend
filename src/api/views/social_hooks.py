@@ -30,7 +30,7 @@ def _create_email_address(existing_user: SpymasterUser):
 
 
 @receiver(signal=pre_social_login)
-def find_existing_user_hook(request: WSGIRequest, sociallogin: SocialLogin, *args, **kwargs):
+def find_existing_user_hook(request: WSGIRequest, sociallogin: SocialLogin, *args, **kwargs):  # noqa: W0613
     log.debug("find_existing_user_hook called")
     social_user: SpymasterUser = sociallogin.user  # This user might not exist in DB yet
     if social_user.id:

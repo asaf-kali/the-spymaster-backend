@@ -100,5 +100,5 @@ class GameManagerView(GenericViewSet):
 
     @endpoint(methods=[HttpMethod.GET], url_path="ping-google")
     def ping_google(self, request: BaseRequest) -> dict:
-        r = requests.get("https://www.google.com", timeout=10)
-        return {"status_code": r.status_code, "duration": r.elapsed.total_seconds()}
+        response = requests.get("https://www.google.com", timeout=10)
+        return {"status_code": response.status_code, "duration": response.elapsed.total_seconds()}
