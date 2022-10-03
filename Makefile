@@ -63,8 +63,12 @@ check-mypy:
 check-flake8:
 	flake8 . --max-line-length=$(LINE_LENGTH) --ignore=E203,W503,E402 --exclude=local,.deployment
 
+check-pylint:
+	pylint src/ --fail-under=9
+
 lint: format
 	pre-commit run --all-files
+	@make check-pylint --no-print-directory
 
 # Django
 
