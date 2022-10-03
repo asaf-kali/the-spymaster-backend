@@ -1,4 +1,5 @@
 import json
+import traceback
 
 import sentry_sdk
 from codenames.game import GameRuleError
@@ -48,6 +49,8 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
         sentry_sdk.flush(timeout=5)
         message = "Internal server error" if not settings.DEBUG else str(exception)
         data = {"message": message, "context_id": log.context_id}
+        if settings.DEBUG:
+            data["details"] = traceback.format_exc()
         headers = {CONTEXT_ID_HEADER_KEY: log.context_id}
         return JsonResponse(data=data, status=status.HTTP_500_INTERNAL_SERVER_ERROR, headers=headers)
 
