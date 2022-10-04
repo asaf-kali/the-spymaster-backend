@@ -43,3 +43,14 @@ jobs:
       - name: Run flake8
         run: |
           make check-flake8
+
+  check-pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Run pylint
+        run: |
+          pip install pyOpenSSL==22.0.0
+          make install-dev
+          make check-pylint
