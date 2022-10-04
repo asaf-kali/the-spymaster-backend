@@ -19,3 +19,4 @@ exclude = ["local/", ".deployment/"]
 [tool.pylint]
 max-line-length = 120
 disable = ["C0114", "C0115", "C0116", "R0903"]
+extension-pkg-allow-list = ["pydantic"]
