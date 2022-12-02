@@ -3,8 +3,8 @@ addopts = "-s --disable-pytest-warnings"
 DJANGO_SETTINGS_MODULE = "the_spymaster.settings"
 
 [tool.coverage.run]
-source = ["api", "the_spymaster", "telegram_bot"]
-omit = ["*/.tests/*"]
+omit = ["./api/tests/*"]
+source = ["api", "the_spymaster"]
 
 [tool.black]
 line-length = 120
