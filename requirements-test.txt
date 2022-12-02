@@ -1,7 +1,7 @@
 # Testing
 django-queryinspect==1.1.0
 pytest==7.1.1
-coverage==6.3.2
+coverage[toml]==6.5.0
 pytest-django==4.5.2
 parameterized==0.8.1
 freezegun==1.2.1
