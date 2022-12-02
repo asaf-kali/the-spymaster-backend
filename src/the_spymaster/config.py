@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from the_spymaster_util.config import LazyConfig
 
@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 
 
 class Config(LazyConfig):
-    def load(self, override_files: List[str] = None):
+    def load(self, override_files: Optional[List[str]] = None):
         super().load(override_files)
         if self.load_ssm_secrets:
             self._load_parameters()

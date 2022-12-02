@@ -49,7 +49,12 @@ class HttpMethod(str, Enum):
 
 
 def endpoint(
-    func=None, *, detail: bool = False, methods: List[HttpMethod] = None, url_path: str = None, url_name: str = None
+    func=None,
+    *,
+    detail: bool = False,
+    methods: Optional[List[HttpMethod]] = None,
+    url_path: Optional[str] = None,
+    url_name: Optional[str] = None,
 ):
     methods = methods or [HttpMethod.POST]
     str_methods = [m.value for m in methods]
