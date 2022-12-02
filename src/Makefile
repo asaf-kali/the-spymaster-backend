@@ -19,8 +19,8 @@ test:
 
 cover:
 	export ENV_FOR_DYNACONF="test"; \
-    coverage run -m $(PYTHON_TEST_COMMAND)
-	coverage html
+    coverage run --rcfile=../pyproject.toml -m $(PYTHON_TEST_COMMAND)
+	coverage html --rcfile=../pyproject.toml
 	xdg-open htmlcov/index.html &
 	$(DEL_COMMAND) .coverage*
 
