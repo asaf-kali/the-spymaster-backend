@@ -15,19 +15,27 @@ export DJANGO_SETTINGS_MODULE=the_spymaster.settings
 
 test:
 	export ENV_FOR_DYNACONF="test"; \
-    python -m $(PYTHON_TEST_COMMAND)
+	python -m $(PYTHON_TEST_COMMAND)
 
 cover:
 	export ENV_FOR_DYNACONF="test"; \
-    coverage run --rcfile=../pyproject.toml -m $(PYTHON_TEST_COMMAND)
+	coverage run --rcfile=../pyproject.toml -m $(PYTHON_TEST_COMMAND)
 	coverage html --rcfile=../pyproject.toml
 	xdg-open htmlcov/index.html &
 	$(DEL_COMMAND) .coverage*
 
 # Django
 
+dev-init:
+	export ENV_FOR_DYNACONF=$(ENV); \
+	python manage.py migrate; \
+	python manage.py dev_init
+
 migrate:
-	python manage.py makemigrations; python manage.py migrate
+	export ENV_FOR_DYNACONF=$(ENV); \
+	python manage.py makemigrations; \
+	python manage.py migrate
 
 save:
+	export ENV_FOR_DYNACONF=$(ENV); \
 	python manage.py dumpdata api -o $(FIXTURE_FILE)

@@ -19,10 +19,6 @@ install-dev:
 
 install: install-dev cover lint
 
-dev-init:
-	python manage.py migrate
-	python manage.py dev_init
-
 # Proxy
 
 test:
@@ -30,6 +26,9 @@ test:
 
 cover:
 	cd src; make cover
+
+dev-init:
+	cd src; make dev-init
 
 migrate:
 	cd src; make migrate
