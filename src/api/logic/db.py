@@ -20,6 +20,7 @@ def get_game_item_id(game_id: str) -> str:
 class GameItem(Model):
     class Meta:
         table_name = config.game_items_table_name
+        host = config.dynamo_db_host
 
     item_id = UnicodeAttribute(hash_key=True)
     state_data = JSONAttribute(null=True)

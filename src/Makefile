@@ -26,6 +26,10 @@ cover:
 
 # Django
 
+local-env:
+	export ENV_FOR_DYNACONF="local"; \
+	python manage.py create_tables
+
 dev-init:
 	export ENV_FOR_DYNACONF=$(ENV); \
 	python manage.py migrate; \
