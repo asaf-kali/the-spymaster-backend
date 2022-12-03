@@ -48,7 +48,7 @@ class Config(LazyConfig):
 
     @property
     def setup_sqlite_db(self) -> bool:
-        return self.is_test
+        return self.is_test or self.is_local
 
     @property
     def game_items_table_name(self) -> str:
