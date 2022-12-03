@@ -91,6 +91,12 @@ class Config(LazyConfig):
     def load_ssm_secrets(self) -> bool:
         return self.get("LOAD_SSM_SECRETS")
 
+    @property
+    def dynamo_db_host(self) -> Optional[str]:
+        if self.is_local:
+            return "http://localhost:4444"
+        return None
+
 
 _config = Config()
 

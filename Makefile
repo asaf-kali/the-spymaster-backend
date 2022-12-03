@@ -19,6 +19,10 @@ install-dev:
 
 install: install-dev cover lint
 
+local-env:
+	docker-compose -f ./docker/dynamo.yml up -d
+	cd src; make local-env
+
 # Proxy
 
 test:
