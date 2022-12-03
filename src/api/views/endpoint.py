@@ -1,9 +1,10 @@
 import functools
 import json
 from enum import Enum
-from typing import List, Tuple, Type
+from typing import List, Optional, Tuple, Type, Union
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse as DjangoHttpResponse
+from django.http import JsonResponse
 from pydantic import BaseModel, ValidationError
 from rest_framework import status
 from rest_framework.decorators import action
@@ -12,12 +13,14 @@ from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY
 from the_spymaster_util.logging import get_logger
 
 from api.logic.errors import BadRequestError, SpymasterError
-from api.structs import BaseRequest, BaseResponse
+from api.structs import BaseRequest, HttpResponse
 
 log = get_logger(__name__)
 
-ALLOWED_REQUEST_TYPES = (BaseModel, BaseRequest)
-ALLOWED_RESPONSE_TYPES = (dict, BaseModel, BaseResponse, HttpResponse)
+RequestType = Union[BaseModel, BaseRequest]
+ResponseType = Union[dict, BaseModel, HttpResponse, DjangoHttpResponse]
+ALLOWED_REQUEST_TYPES = RequestType.__args__  # type: ignore
+ALLOWED_RESPONSE_TYPES = ResponseType.__args__  # type: ignore
 
 
 class EndpointConfigurationError(SpymasterError):
@@ -69,15 +72,10 @@ def endpoint(
             log.update_context(endpoint_name=endpoint_name, django_user_id=request.user.id)
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
             response = f(view, parsed_request)
-            response_data = _get_response_data(response)
-            status_code = response_data.pop("status_code", None)
-            if not status_code:
-                raise ResponseStructureError("Response data is missing status_code key!")
-            headers = {CONTEXT_ID_HEADER_KEY: log.context_id}
-            response = JsonResponse(data=response_data, status=status_code, headers=headers)
+            json_response = _get_json_response(response=response)
             if getattr(parsed_request, "debug", False):
-                log.info("Response data", extra={"response": response_data})
-            return response
+                log.info("Response data", extra={"content": json_response.content})
+            return json_response
 
         return action(detail=detail, methods=str_methods, url_path=url_path, url_name=url_name)(wrapper)
 
@@ -114,7 +112,7 @@ def _get_request_response_models(func) -> Tuple[Type[BaseRequest], Type]:
 
 
 def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> BaseModel:
-    query_params = {k: v for k, v in drf_request.query_params.items()}
+    query_params = dict(drf_request.query_params.items())
     data = {**query_params, **drf_request.data}
     try:
         parsed_request = request_model(drf_request=drf_request, **data)
@@ -124,19 +122,29 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
     return parsed_request
 
 
-def _get_response_data(response: BaseResponse) -> dict:
+def _get_json_response(response: ResponseType) -> JsonResponse:
+    headers = {CONTEXT_ID_HEADER_KEY: log.context_id}
+    status_code = status.HTTP_200_OK
     if response is None:
-        return {"status_code": status.HTTP_204_NO_CONTENT, "message": "No content"}
-    if isinstance(response, BaseModel):
-        return response.dict()
-    if isinstance(response, HttpResponse):
+        data = {"message": "No content"}
+    elif isinstance(response, dict):
+        data = response
+    elif isinstance(response, HttpResponse):
+        status_code = response.status_code
+        data = response.data
+        if response.headers:
+            headers.update(response.headers)
+    elif isinstance(response, BaseModel):
+        data = response.dict()
+    elif isinstance(response, DjangoHttpResponse):
+        status_code = response.status_code
         response_body = response.content.decode("utf-8")
-        response_data = json.loads(response_body)
-        return {**response_data, "status_code": response.status_code}
-    if isinstance(response, dict):
-        return response
-    raise EndpointTypingError(
-        "Response type not implemented",
-        actual_type=type(response),
-        supported_types=ALLOWED_RESPONSE_TYPES,
-    )
+        data = json.loads(response_body)
+        headers.update(response.headers)
+    else:
+        raise EndpointTypingError(
+            "Response type not implemented",
+            actual_type=type(response),
+            supported_types=ALLOWED_RESPONSE_TYPES,
+        )
+    return JsonResponse(data=data, status=status_code, headers=headers)
