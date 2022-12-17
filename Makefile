@@ -25,6 +25,9 @@ local-env:
 
 # Proxy
 
+run:
+	cd src; make run
+
 test:
 	cd src; make test
 
