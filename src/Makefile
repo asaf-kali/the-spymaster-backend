@@ -11,6 +11,12 @@ FIXTURE_FILE=dump.json
 # Config
 export DJANGO_SETTINGS_MODULE=the_spymaster.settings
 
+# Run
+
+run:
+	export ENV_FOR_DYNACONF=$(ENV); \
+	python manage.py runserver $(RUN_SERVER_IP):$(RUN_SERVER_PORT)
+
 # Test
 
 test:
