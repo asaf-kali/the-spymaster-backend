@@ -12,10 +12,10 @@ from django.utils.deprecation import MiddlewareMixin
 from requests import HTTPError
 from rest_framework import status
 from the_spymaster_util.http_client import CONTEXT_ID_HEADER_KEY, extract_context
-from the_spymaster_util.logging import get_logger, wrap
+from the_spymaster_util.logger import get_logger, wrap
 from the_spymaster_util.measure_time import MeasureTime
 
-from api.logic.errors import BadRequestError
+from api.structs.errors import BadRequestError
 
 log = get_logger(__name__)
 

@@ -13,7 +13,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.viewsets import GenericViewSet
-from the_spymaster_util.logging import wrap
+from the_spymaster_util.logger import wrap
 
 from api.serializers import UserDetailsSerializer, UserSummarizeSerializer
 from api.views.social_hooks import (

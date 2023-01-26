@@ -6,10 +6,10 @@ from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import BaseCommand
 from rest_framework.authtoken.models import Token
-from the_spymaster_util.logging import wrap
+from the_spymaster_util.logger import wrap
 
-from api.logic.errors import SpymasterError
 from api.models.user import SpymasterUser
+from api.structs.errors import SpymasterError
 
 log = logging.getLogger(__name__)
 DEFAULT_EMAIL = "admin@the-spymaster.xyz"

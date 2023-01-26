@@ -4,10 +4,9 @@ from codenames.game import Guess, Hint, build_game_state
 from rest_framework.viewsets import GenericViewSet
 from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
-from the_spymaster_util.logging import get_logger
+from the_spymaster_util.logger import get_logger
 
 from api.logic.db import load_game, save_game
-from api.logic.errors import BadRequestError
 from api.logic.next_move import NextMoveHandler
 from api.logic.solvers import get_solvers_client
 from api.models.game import Game
@@ -25,6 +24,7 @@ from api.structs import (
     StartGameRequest,
     StartGameResponse,
 )
+from api.structs.errors import BadRequestError
 from api.views.endpoint import HttpMethod, endpoint
 
 log = get_logger(__name__)
