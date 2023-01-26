@@ -2,7 +2,7 @@ import logging
 
 from django.apps import AppConfig
 from django.conf import settings
-from the_spymaster_util.logging import wrap
+from the_spymaster_util.logger import wrap
 
 log = logging.getLogger(__name__)
 

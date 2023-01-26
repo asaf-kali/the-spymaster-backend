@@ -4,8 +4,8 @@ from django.contrib.auth.models import AnonymousUser
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.request import Request
 
-from api.logic.errors import BadRequestError
 from api.logic.recaptcha.validator import verify_recaptcha
+from api.structs.errors import BadRequestError
 
 
 class RecaptchaAuthentication(BaseAuthentication):

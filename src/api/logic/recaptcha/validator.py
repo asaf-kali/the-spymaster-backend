@@ -5,7 +5,7 @@ import requests
 from django.conf import settings
 from pydantic import BaseModel
 
-from api.logic.errors import ForbiddenError
+from api.structs.errors import ForbiddenError
 
 log = logging.getLogger(__name__)
 
