@@ -6,17 +6,18 @@ DJANGO_SETTINGS_MODULE = "the_spymaster.settings"
 omit = ["./api/tests/*"]
 source = ["api", "the_spymaster"]
 
+[tool.ruff]
+line-length = 120
+select = ["B", "C", "E", "F", "W"]
+ignore = []
+exclude = ["local", ".deployment"]
+
 [tool.black]
 line-length = 120
 
 [tool.isort]
 profile = "black"
 skip = ["__init__.py", ".deployment/"]
-
-[tool.flake8]
-max-line-length = 120
-ignore = ["E203", "W503", "E402"]
-exclude = ["local", ".deployment"]
 
 [tool.mypy]
 ignore_missing_imports = true
