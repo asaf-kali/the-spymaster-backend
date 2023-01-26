@@ -33,7 +33,7 @@ class GameItem(Model):
     @classmethod
     def load(cls, game_id: str, *args, **kwargs) -> "GameItem":
         hash_key = get_game_item_id(game_id=game_id)
-        return super().get(hash_key=hash_key, *args, **kwargs)  # type: ignore
+        return super().get(*args, hash_key=hash_key, **kwargs)  # type: ignore
 
 
 def load_game(game_id: str) -> Game:
