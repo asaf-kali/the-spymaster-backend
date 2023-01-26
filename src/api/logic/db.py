@@ -5,9 +5,9 @@ from pynamodb.attributes import JSONAttribute, NumberAttribute, UnicodeAttribute
 from pynamodb.exceptions import DoesNotExist as PynamoDoesNotExist
 from pynamodb.expressions.condition import Condition
 from pynamodb.models import Model
+from the_spymaster_util.http.errors import BadRequestError
 
 from api.models.game import Game
-from api.structs.errors import BadRequestError
 from the_spymaster.config import get_config
 
 config = get_config()

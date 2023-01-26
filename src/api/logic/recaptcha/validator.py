@@ -4,8 +4,7 @@ from typing import Optional
 import requests
 from django.conf import settings
 from pydantic import BaseModel
-
-from api.structs.errors import ForbiddenError
+from the_spymaster_util.http.errors import ForbiddenError
 
 log = logging.getLogger(__name__)
 
