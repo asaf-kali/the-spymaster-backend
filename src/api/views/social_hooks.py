@@ -15,10 +15,10 @@ from django.dispatch import receiver
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from the_spymaster_util.http.errors import BadRequestError, UnauthorizedError
 from the_spymaster_util.logger import wrap
 
 from api.models.user import SpymasterUser
-from api.structs.errors import BadRequestError, UnauthorizedError
 
 log = logging.getLogger(__name__)
 

@@ -89,8 +89,8 @@ deploy: build-layer update
 build:
 	cd client; make build;
 
-upload-only:
-	cd client; make upload-only;
-
 upload:
 	cd client; make upload;
+
+build-and-upload:
+	cd client; make build-and-upload;

@@ -4,7 +4,7 @@ build:
 	$(DEL_COMMAND) -f dist/*
 	python -m build
 
-upload-only:
+upload:
 	twine upload dist/*
 
-upload: build upload-only
+build-and-upload: build upload

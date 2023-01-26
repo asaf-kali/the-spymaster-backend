@@ -3,7 +3,7 @@ from typing import Optional
 
 from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
-from the_spymaster_util.http_client import DEFAULT_RETRY_STRATEGY, BaseHttpClient
+from the_spymaster_util.http.base_client import DEFAULT_RETRY_STRATEGY, BaseHttpClient
 from the_spymaster_util.logger import wrap
 from urllib3 import Retry
 
@@ -54,3 +54,6 @@ class TheSpymasterClient(BaseHttpClient):
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
         data = self._post("load-models/", data=request.dict())
         return LoadModelsResponse(**data)
+
+    def raise_error(self, request: dict):
+        return self._get("raise-error/", data=request)

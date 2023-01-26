@@ -8,9 +8,9 @@ from the_spymaster_solvers_client.structs.requests import (
     GenerateGuessRequest,
     GenerateHintRequest,
 )
+from the_spymaster_util.http.errors import BadRequestError
 
 from api.structs import NextMoveResponse, Solver
-from api.structs.errors import BadRequestError
 from the_spymaster.config import get_config
 
 log = logging.getLogger(__name__)

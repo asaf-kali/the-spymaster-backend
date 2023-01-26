@@ -11,15 +11,11 @@ from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
 from requests import HTTPError
 from rest_framework import status
-from the_spymaster_util.http_client import (
-    CONTEXT_ID_HEADER_KEY,
-    extract_context,
-    get_error_code,
-)
+from the_spymaster_util.http.base_client import extract_context, get_error_code
+from the_spymaster_util.http.defs import CONTEXT_ID_HEADER_KEY
+from the_spymaster_util.http.errors import BadRequestError
 from the_spymaster_util.logger import get_logger, wrap
 from the_spymaster_util.measure_time import MeasureTime
-
-from api.structs.errors import BadRequestError
 
 log = get_logger(__name__)
 
