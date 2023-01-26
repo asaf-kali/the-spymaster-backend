@@ -46,17 +46,18 @@ save:
 # Lint
 
 format:
+	ruff . --fix
 	black .
 	isort .
+
+check-ruff:
+	ruff .
 
 check-black:
 	black --check .
 
 check-isort:
 	isort --check .
-
-check-flake8:
-	flake8 .
 
 check-mypy:
 	mypy .

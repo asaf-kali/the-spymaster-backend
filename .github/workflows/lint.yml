@@ -4,6 +4,16 @@ on:
   push:
 
 jobs:
+  check-ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/lint-install
+      - name: Run ruff
+        run: |
+          make check-ruff
+
   check-black:
     runs-on: ubuntu-latest
     steps:
@@ -33,16 +43,6 @@ jobs:
       - name: Run mypy
         run: |
           make check-mypy
-
-  check-flake8:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - uses: ./.github/actions/lint-install
-      - name: Run flake8
-        run: |
-          make check-flake8
 
   check-pylint:
     runs-on: ubuntu-latest
