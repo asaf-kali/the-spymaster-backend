@@ -1,6 +1,6 @@
 # Codenames
 codenames~=1.1
-the-spymaster-util==2.1.2
+the-spymaster-util==2.2.0
 the-spymaster-solvers-client==1.4.4
 
 # Server

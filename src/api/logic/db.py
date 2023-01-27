@@ -5,9 +5,9 @@ from pynamodb.attributes import JSONAttribute, NumberAttribute, UnicodeAttribute
 from pynamodb.exceptions import DoesNotExist as PynamoDoesNotExist
 from pynamodb.expressions.condition import Condition
 from pynamodb.models import Model
-from the_spymaster_util.http.errors import BadRequestError
 
 from api.models.game import Game
+from api.structs.errors import GameDoesNotExistError
 from the_spymaster.config import get_config
 
 config = get_config()
@@ -40,7 +40,7 @@ def load_game(game_id: str) -> Game:
     try:
         game_item = GameItem.load(game_id=game_id)
     except PynamoDoesNotExist as e:
-        raise BadRequestError("Game does not exist.", status_code=404, details={"game_id": game_id}) from e
+        raise GameDoesNotExistError(game_id=game_id) from e
     return Game(id=game_id, state_data=game_item.state_data)
 
 
