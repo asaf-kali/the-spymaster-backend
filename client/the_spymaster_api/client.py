@@ -4,7 +4,6 @@ from typing import Optional
 from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
 from the_spymaster_util.http.base_client import DEFAULT_RETRY_STRATEGY, BaseHttpClient
-from the_spymaster_util.logger import wrap
 from urllib3 import Retry
 
 from .structs import (
@@ -29,7 +28,6 @@ class TheSpymasterClient(BaseHttpClient):
         if not base_url:
             base_url = DEFAULT_BASE_URL
         super().__init__(base_url=f"{base_url}/api/v1/game", retry_strategy=retry_strategy)
-        log.debug(f"Backend client using base url: {wrap(self.base_url)}")
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
         data = self._post("start/", data=request.dict())

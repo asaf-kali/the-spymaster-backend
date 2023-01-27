@@ -1,7 +1,9 @@
 # Install
 
-install-run:
+upgrade-pip:
 	pip install --upgrade pip
+
+install-run:
 	pip install -r requirements.txt
 
 install-test:
@@ -11,7 +13,7 @@ install-test:
 install-lint:
 	pip install -r requirements-lint.txt
 
-install-dev:
+install-dev: upgrade-pip
 	pip install -r requirements-dev.txt
 	@make install-lint --no-print-directory
 	@make install-test --no-print-directory
