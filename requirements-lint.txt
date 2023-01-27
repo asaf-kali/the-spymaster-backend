@@ -1,5 +1,5 @@
 # Linting
-ruff==0.0.235
+ruff==0.0.236
 black==22.12.0
 isort==5.11.4
 mypy==0.991
