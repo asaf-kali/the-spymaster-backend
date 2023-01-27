@@ -18,6 +18,7 @@ from .structs import (
     StartGameRequest,
     StartGameResponse,
 )
+from .structs.errors import SERVICE_ERRORS
 
 log = logging.getLogger(__name__)
 DEFAULT_BASE_URL = "http://localhost:8000"
@@ -27,31 +28,33 @@ class TheSpymasterClient(BaseHttpClient):
     def __init__(self, base_url: Optional[str] = None, retry_strategy: Optional[Retry] = DEFAULT_RETRY_STRATEGY):
         if not base_url:
             base_url = DEFAULT_BASE_URL
-        super().__init__(base_url=f"{base_url}/api/v1/game", retry_strategy=retry_strategy)
+        super().__init__(
+            base_url=f"{base_url}/api/v1/game", retry_strategy=retry_strategy, common_errors=SERVICE_ERRORS
+        )
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
-        data = self._post("start/", data=request.dict())
+        data = self.post(endpoint="start/", data=request.dict(), error_types={})
         return StartGameResponse(**data)
 
     def hint(self, request: HintRequest) -> HintResponse:
-        data = self._post("hint/", data=request.dict())
+        data = self.post(endpoint="hint/", data=request.dict())
         return HintResponse(**data)
 
     def guess(self, request: GuessRequest) -> GuessResponse:
-        data = self._post("guess/", data=request.dict())
+        data = self.post(endpoint="guess/", data=request.dict())
         return GuessResponse(**data)
 
     def next_move(self, request: NextMoveRequest) -> NextMoveResponse:
-        data = self._post("next-move/", data=request.dict())
+        data = self.post(endpoint="next-move/", data=request.dict())
         return NextMoveResponse(**data)
 
     def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
-        data = self._get("state/", data=request.dict())
+        data = self.get(endpoint="state/", data=request.dict())
         return GetGameStateResponse(**data)
 
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        data = self._post("load-models/", data=request.dict())
+        data = self.post(endpoint="load-models/", data=request.dict())
         return LoadModelsResponse(**data)
 
     def raise_error(self, request: dict):
-        return self._get("raise-error/", data=request)
+        return self.get(endpoint="raise-error/", data=request)
