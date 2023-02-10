@@ -14,7 +14,6 @@ from the_spymaster_util.http.errors import BadRequestError
 from the_spymaster_util.logger import get_logger
 
 from api.structs import BaseRequest, HttpResponse
-from api.structs.errors import SpymasterError
 
 log = get_logger(__name__)
 
@@ -24,7 +23,7 @@ ALLOWED_REQUEST_TYPES = RequestType.__args__  # type: ignore
 ALLOWED_RESPONSE_TYPES = ResponseType.__args__  # type: ignore
 
 
-class EndpointConfigurationError(SpymasterError):
+class EndpointConfigurationError(Exception):
     pass
 
 
@@ -63,13 +62,13 @@ def endpoint(
     methods = methods or [HttpMethod.POST]
     str_methods = [m.value for m in methods]
 
-    def decorator(f):
+    def decorator(f):  # pylint: disable=invalid-name
         endpoint_name = f.__name__
-        request_model, response_model = _get_request_response_models(f)
+        request_model, response_model = _get_request_response_models(f)  # pylint: disable=unused-variable
         log.debug(f"Registering endpoint {endpoint_name}")
 
         @functools.wraps(f)
-        def wrapper(view, request: Request, *args, **kwargs):
+        def wrapper(view, request: Request, *args, **kwargs):  # pylint: disable=unused-argument
             log.update_context(endpoint_name=endpoint_name, django_user_id=request.user.id)
             parsed_request = _parse_request(request_model=request_model, drf_request=request)
             response = f(view, parsed_request)
@@ -89,11 +88,11 @@ def _get_request_response_models(func) -> Tuple[Type[BaseRequest], Type]:
     func_name, annotations = func.__name__, func.__annotations__
     try:
         request_model = annotations["request"]
-    except KeyError as e:
+    except KeyError as e:  # pylint: disable=invalid-name
         raise EndpointAnnotationError(f"{func_name} is missing request type annotation!") from e
     try:
         response_model = annotations["return"]
-    except KeyError as e:
+    except KeyError as e:  # pylint: disable=invalid-name
         raise EndpointAnnotationError(f"{func_name} is missing return type annotation!") from e
     if not issubclass(request_model, ALLOWED_REQUEST_TYPES):
         raise EndpointTypingError(
@@ -117,9 +116,9 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
     data = {**query_params, **drf_request.data}
     try:
         parsed_request = request_model(drf_request=drf_request, **data)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=invalid-name
         details = e.errors() if isinstance(e, ValidationError) else str(e)
-        raise BadRequestError("Request parsing failed.", details=details) from e
+        raise BadRequestError(message="Request parsing failed.", data={"details": details}) from e
     return parsed_request
 
 

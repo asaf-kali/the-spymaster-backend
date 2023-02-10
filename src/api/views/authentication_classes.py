@@ -12,7 +12,7 @@ class RecaptchaAuthentication(BaseAuthentication):
     def authenticate(self, request: Request) -> Tuple[AnonymousUser, str]:
         try:
             token = request.GET["recaptcha_token"]
-        except KeyError as e:
-            raise BadRequestError(f"Missing key {e}") from e
+        except KeyError as e:  # pylint: disable=invalid-name
+            raise BadRequestError(message=f"Missing key {e}") from e
         verify_recaptcha(token=token)
         return AnonymousUser(), token

@@ -15,7 +15,7 @@ from django.dispatch import receiver
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from the_spymaster_util.http.errors import BadRequestError, UnauthorizedError
+from the_spymaster_util.http.errors import BadRequestError, UnauthenticatedError
 from the_spymaster_util.logger import wrap
 
 from api.models.user import SpymasterUser
@@ -24,13 +24,15 @@ log = logging.getLogger(__name__)
 
 
 def _create_email_address(existing_user: SpymasterUser):
-    email_address, created = EmailAddress.objects.get_or_create(user=existing_user, email=existing_user.email)
+    email_address, _ = EmailAddress.objects.get_or_create(user=existing_user, email=existing_user.email)
     email_address.primary = email_address.verified = True
     email_address.save()
 
 
 @receiver(signal=pre_social_login)
-def find_existing_user_hook(request: WSGIRequest, sociallogin: SocialLogin, *args, **kwargs):  # noqa: W0613
+def find_existing_user_hook(
+    request: WSGIRequest, sociallogin: SocialLogin, *args, **kwargs  # pylint: disable=unused-argument
+):
     log.debug("find_existing_user_hook called")
     social_user: SpymasterUser = sociallogin.user  # This user might not exist in DB yet
     if social_user.id:
@@ -47,7 +49,7 @@ def find_existing_user_hook(request: WSGIRequest, sociallogin: SocialLogin, *arg
         sociallogin.state["next"] = reverse("login_complete")
         _create_email_address(existing_user)
         perform_login(request, existing_user, "none")
-    except SpymasterUser.DoesNotExist:
+    except SpymasterUser.DoesNotExist:  # pylint: disable=no-member
         log.debug("User didn't exist")
         social_user.username = social_user.email.split("@")[0]
 
@@ -55,7 +57,7 @@ def find_existing_user_hook(request: WSGIRequest, sociallogin: SocialLogin, *arg
 def _generate_key_response(request: WSGIRequest) -> HttpResponse:
     user: SpymasterUser = request.user  # noqa
     if not user.is_authenticated:
-        raise UnauthorizedError("User is not authenticated")
+        raise UnauthenticatedError(message="User is not authenticated")
     # params = {}
     # nonce = request.GET.get("nonce", None)
     callback_url = request.GET.get("callback_url", None)
@@ -87,9 +89,9 @@ class CustomOAuth2LoginView(OAuth2LoginView):
             request.session["nonce"] = nonce
         if callback_url:
             if not nonce:
-                raise BadRequestError("Can't have callback_url with no nonce")
+                raise BadRequestError(message="Can't have callback_url with no nonce")
             if not _is_authorized_callback(callback_url):
-                raise BadRequestError(f"Unauthorized callback URL {callback_url}")
+                raise BadRequestError(message=f"Unauthorized callback URL {callback_url}")
             request.session["callback_url"] = callback_url
         return result
 

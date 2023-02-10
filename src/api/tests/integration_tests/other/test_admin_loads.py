@@ -27,7 +27,10 @@ class TestAdminLoads(SpymasterTest):
         response = cls.client.post(login_url, data={"username": "admin", "password": DEFAULT_PASSWORD})
         cls.cookies = response.cookies
 
-    @parameterized.expand([(reg,) for reg in admin.site._registry.values()], name_func=get_model_page_load_test_name)
+    @parameterized.expand(
+        [(reg,) for reg in admin.site._registry.values()],  # pylint: disable=protected-access
+        name_func=get_model_page_load_test_name,
+    )
     def test_all_model_page_load(self, admin_page):
         pattern: URLPattern = admin_page.urls[0]
         url = reverse(f"admin:{pattern.name}")

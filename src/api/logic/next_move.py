@@ -27,7 +27,7 @@ class NextMoveHandler:
 
     def handle(self) -> NextMoveResponse:
         if self.game_state.is_game_over:
-            raise BadRequestError("Game is over")
+            raise BadRequestError(message="Game is over")
         if self.game_state.current_player_role == PlayerRole.HINTER:
             return self._make_hinter_move()
         if self.game_state.current_player_role == PlayerRole.GUESSER:

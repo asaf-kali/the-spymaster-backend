@@ -15,8 +15,12 @@ class SpymasterTest(TestCase):
         cls.mock_dynamo.start()
         GameItem.create_table()
 
-        from api.management.commands.dev_init import create_admin
-        from api.models.user import SpymasterUser
+        from api.management.commands.dev_init import (  # pylint: disable=import-outside-toplevel
+            create_admin,
+        )
+        from api.models.user import (  # pylint: disable=import-outside-toplevel
+            SpymasterUser,
+        )
 
         create_admin()
         cls.admin = SpymasterUser.objects.get(username="admin")

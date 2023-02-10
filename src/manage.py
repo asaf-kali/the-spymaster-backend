@@ -8,7 +8,9 @@ def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "the_spymaster.settings")
     try:
-        from django.core.management import execute_from_command_line  # noqa: C0415
+        from django.core.management import (  # noqa: C0415  # pylint: disable=import-outside-toplevel
+            execute_from_command_line,
+        )
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "

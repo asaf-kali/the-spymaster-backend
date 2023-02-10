@@ -1,9 +1,8 @@
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from pynamodb.attributes import JSONAttribute, NumberAttribute, UnicodeAttribute
 from pynamodb.exceptions import DoesNotExist as PynamoDoesNotExist
-from pynamodb.expressions.condition import Condition
 from pynamodb.models import Model
 
 from api.models.game import Game
@@ -26,7 +25,7 @@ class GameItem(Model):
     state_data = JSONAttribute(null=True)
     updated_ts = NumberAttribute()
 
-    def save(self, condition: Optional[Condition] = None, *args, **kwargs) -> Dict[str, Any]:
+    def save(self, *args, **kwargs) -> Dict[str, Any]:
         self.updated_ts = int(time.time())
         return super().save(*args, **kwargs)
 
@@ -39,8 +38,8 @@ class GameItem(Model):
 def load_game(game_id: str) -> Game:
     try:
         game_item = GameItem.load(game_id=game_id)
-    except PynamoDoesNotExist as e:
-        raise GameDoesNotExistError(game_id=game_id) from e
+    except PynamoDoesNotExist as e:  # pylint: disable=invalid-name
+        raise GameDoesNotExistError.create(game_id=game_id) from e
     return Game(id=game_id, state_data=game_item.state_data)
 
 
