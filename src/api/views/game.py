@@ -90,20 +90,20 @@ class GameManagerView(GenericViewSet):
         return response
 
     @endpoint(methods=[HttpMethod.GET])
-    def test(self, request: BaseRequest) -> HttpResponse:
+    def test(self, request: BaseRequest) -> HttpResponse:  # pylint: disable=unused-argument
         body = {"details": "It seems everything is working!"}
         return HttpResponse(body=body)
 
     @endpoint(methods=[HttpMethod.GET], url_path="raise-error")
     def raise_error(self, request: BaseRequest) -> HttpResponse:
         if getattr(request, "handled", False):
-            raise BadRequestError("This error should be handled!")
+            raise BadRequestError(message="This error should be handled!")
         if getattr(request, "good", False):
             return HttpResponse(body={"success": "true"})
         raise Exception("Test error")
 
     @endpoint(methods=[HttpMethod.GET], url_path="ping-google")
-    def ping_google(self, request: BaseRequest) -> HttpResponse:
+    def ping_google(self, request: BaseRequest) -> HttpResponse:  # pylint: disable=unused-argument
         response = requests.get("https://www.google.com", timeout=10)
         body = {"status_code": response.status_code, "duration": response.elapsed.total_seconds()}
         return HttpResponse(body=body)

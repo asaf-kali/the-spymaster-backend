@@ -7,8 +7,8 @@ log = logging.getLogger(__name__)
 
 
 class Config(LazyConfig):
-    def load(self, override_files: Optional[List[str]] = None):
-        super().load(override_files)
+    def load(self, extra_files: Optional[List[str]] = None):
+        super().load(extra_files)
         if self.load_ssm_secrets:
             self._load_parameters()
         log.info("Config loaded")

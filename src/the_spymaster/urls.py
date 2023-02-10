@@ -21,7 +21,7 @@ from django.urls import include, path, re_path
 from api.views import icon_view
 
 
-def echo_stage(request: WSGIRequest, stage: str):  # noqa: W0613
+def echo_stage(request: WSGIRequest, stage: str):  # pylint: disable=unused-argument
     return JsonResponse({"stage": stage})
 
 

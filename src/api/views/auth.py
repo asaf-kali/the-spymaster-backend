@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 class LoginCallbackView(RetrieveAPIView):
-    def get(self, request: WSGIRequest, **kwargs):
+    def get(self, request: WSGIRequest, *args, **kwargs):
         log.debug(f"Login callback called for user {wrap(request.user)}")
         return _generate_key_response(self.request)
 
@@ -45,7 +45,7 @@ class UserDetailsView(GenericViewSet):
     pagination_class = None
 
     @action(detail=False)
-    def me(self, request: Request, *args, **kwargs):  # noqa: W0613
+    def me(self, request: Request, *args, **kwargs):  # pylint: disable=unused-argument,invalid-name
         return JsonResponse(data=UserDetailsSerializer(request.user).data, status=status.HTTP_200_OK)
 
 

@@ -6,27 +6,29 @@ from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import BaseCommand
 from rest_framework.authtoken.models import Token
-from the_spymaster_util.logger import wrap
+from the_spymaster_util.http.errors import BadRequestError
 
 from api.models.user import SpymasterUser
-from api.structs.errors import SpymasterError
 
 log = logging.getLogger(__name__)
 DEFAULT_EMAIL = "admin@the-spymaster.xyz"
 DEFAULT_PASSWORD = "qweasd"
 
 
-class EnvironmentSafetyError(SpymasterError):
+class EnvironmentSafetyError(BadRequestError):
     operation_name: str
     environment: str
 
     def __init__(self, operation_name: str, environment: str):
         self.operation_name = operation_name
         self.environment = environment
-        super().__init__(f"Can't perform {wrap(self.operation_name)} on {wrap(self.environment)} environment")
+        super().__init__(
+            message="Can't perform operation on current environment.",
+            data={"operation_name": self.operation_name, "environment": self.environment},
+        )
 
 
-def _create_user(
+def _create_user(  # pylint: disable=too-many-arguments
     username: str,
     email: str,
     first_name: str,
@@ -35,9 +37,7 @@ def _create_user(
     is_staff: bool = False,
     is_superuser: bool = False,
 ) -> SpymasterUser:
-    user, created = SpymasterUser.objects.get_or_create(
-        username=username,
-    )
+    user, created = SpymasterUser.objects.get_or_create(username=username)  # pylint: disable=unused-variable
     user.email, user.first_name, user.last_name = email, first_name, last_name
     user.is_staff, user.is_superuser = is_staff, is_superuser
     user.set_password(password)
@@ -91,7 +91,7 @@ def configure_site():
 
 def create_tokens():
     for user in SpymasterUser.objects.all():
-        Token.objects.get_or_create(user=user)
+        Token.objects.get_or_create(user=user)  # pylint: disable=no-member
 
 
 def create_all():
@@ -110,7 +110,7 @@ class Command(BaseCommand):
         log.info("Calling load data...")
         try:
             management.call_command("loaddata", "dev.json")
-        except Exception as e:
+        except Exception as e:  # pylint: disable=invalid-name, broad-except
             log.error(e)
         create_all()
         log.info("Dev init done")

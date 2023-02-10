@@ -16,13 +16,13 @@ class RecaptchaVerification(BaseModel):
     error_codes: Optional[list] = None
 
 
-RECAPTCHA_FAILED_ERROR = ForbiddenError("reCAPTCHA Validation failed")
+RECAPTCHA_FAILED_ERROR = ForbiddenError(message="reCAPTCHA Validation failed")
 
 
 def verify_recaptcha(token: str, should_raise: bool = True) -> RecaptchaVerification:
     log.debug(f"Validating token: {token}")
     params = {"secret": settings.RECAPTCHA_PRIVATE_KEY, "response": token}
-    response = requests.post("https://www.google.com/recaptcha/api/siteverify", params=params)
+    response = requests.post("https://www.google.com/recaptcha/api/siteverify", params=params, timeout=10)
     data = response.json()
     log.debug(f"Validate response: {data}")
     verification = RecaptchaVerification(**data)

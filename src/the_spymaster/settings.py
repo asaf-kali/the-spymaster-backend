@@ -27,7 +27,7 @@ SITE_ID = 1
 ALLOWED_HOSTS = ["backend.the-spymaster.xyz", "backend.dev.the-spymaster.xyz", "localhost", "127.0.0.1"]
 
 if config.sentry_setup:
-    sentry_sdk.init(  # type: ignore
+    sentry_sdk.init(  # type: ignore  # pylint: disable=abstract-class-instantiated
         dsn=config.sentry_dsn,
         integrations=[LoggingIntegration(event_level=None)],
         environment=ENVIRONMENT,

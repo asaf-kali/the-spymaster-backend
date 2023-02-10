@@ -65,10 +65,11 @@ check-mypy:
 	mypy .
 
 check-pylint:
-	pylint src/ --fail-under=9
+	pylint src/ --fail-under=10
 
 lint: format
 	pre-commit run --all-files
+	@make check-pylint --no-print-directory
 
 # Terraform deployment
 
