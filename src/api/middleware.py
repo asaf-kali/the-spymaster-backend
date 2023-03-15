@@ -1,6 +1,6 @@
 import json
 import traceback
-from typing import Optional
+from typing import Any, Mapping, Optional
 
 import sentry_sdk
 from codenames.game import GameRuleError
@@ -91,6 +91,7 @@ def _log_request(request: WSGIRequest):
         data = json.loads(request.body.decode())
     except:  # noqa  # pylint: disable=invalid-name, bare-except
         data = {}
+    data["request_meta"] = _get_string_values(request.META)  # Meta also contains headers
     log.debug(f"Handling: {wrap(request.method)} to {wrap(request.path)}", extra={"data": data})
     return request
 
@@ -100,3 +101,7 @@ def _log_response(response: HttpResponseBase, duration: float):
     log.info(f"Responding: {wrap(status_code)}", extra={"duration": duration})
     log.reset_context()
     return response
+
+
+def _get_string_values(m: Mapping[str, Any]) -> Mapping[str, str]:
+    return {k.lower(): v for k, v in m.items() if isinstance(v, str)}
