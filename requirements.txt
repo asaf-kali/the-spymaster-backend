@@ -1,5 +1,5 @@
 # Codenames
-codenames~=1.1
+codenames==1.2.0
 the-spymaster-util==3.0.6
 the-spymaster-solvers-client==1.5.1
 

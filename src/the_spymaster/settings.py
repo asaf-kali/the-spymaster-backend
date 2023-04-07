@@ -86,7 +86,7 @@ ROOT_URLCONF = "the_spymaster.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["templates"],
+        "DIRS": ["src/templates", "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
