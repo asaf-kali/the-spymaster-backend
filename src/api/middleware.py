@@ -103,5 +103,5 @@ def _log_response(response: HttpResponseBase, duration: float):
     return response
 
 
-def _get_string_values(m: Mapping[str, Any]) -> Mapping[str, str]:
+def _get_string_values(m: Mapping[str, Any]) -> Mapping[str, str]:  # pylint: disable=invalid-name
     return {k.lower(): v for k, v in m.items() if isinstance(v, str)}
