@@ -31,6 +31,5 @@ disable = [
     "C0116",
     "R0903",
     "W1203",
-
 ]
 extension-pkg-allow-list = ["pydantic"]
