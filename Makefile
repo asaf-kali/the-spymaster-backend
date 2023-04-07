@@ -19,7 +19,7 @@ install-dev: upgrade-pip
 	@make install-test --no-print-directory
 	pre-commit install
 
-install: install-dev cover lint
+install: install-dev lint cover
 
 local-env:
 	docker-compose -f ./docker/dynamo.yml up -d
