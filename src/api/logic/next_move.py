@@ -1,7 +1,8 @@
 import logging
 from typing import Optional
 
-from codenames.game import GameState, PlayerRole
+from codenames.game.player import PlayerRole
+from codenames.game.state import GameState
 from the_spymaster_solvers_client.client import TheSpymasterSolversClient
 from the_spymaster_solvers_client.structs.base import ModelIdentifier
 from the_spymaster_solvers_client.structs.requests import (

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from http import HTTPStatus
 
-from codenames.game import GameRuleError
+from codenames.game.exceptions import GameRuleError
 from the_spymaster_util.http.errors import BadRequestError, NotFoundError
 
 

@@ -3,7 +3,7 @@ import traceback
 from typing import Any, Mapping, Optional
 
 import sentry_sdk
-from codenames.game import GameRuleError
+from codenames.game.exceptions import GameRuleError
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.handlers.wsgi import WSGIRequest

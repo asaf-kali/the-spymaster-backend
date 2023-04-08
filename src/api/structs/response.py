@@ -1,6 +1,7 @@
 from typing import Any, Optional, Union
 
-from codenames.game import GameState, GivenGuess, GivenHint
+from codenames.game.move import GivenGuess, GivenHint
+from codenames.game.state import GameState
 from pydantic import BaseModel, Extra
 from the_spymaster_solvers_client.structs.base import ModelIdentifier, Solver
 
