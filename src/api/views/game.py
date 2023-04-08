@@ -1,6 +1,7 @@
 import requests
 import ulid
-from codenames.game import Guess, Hint, build_game_state
+from codenames.game.move import Guess, Hint
+from codenames.game.state import build_game_state
 from rest_framework.viewsets import GenericViewSet
 from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_client.structs.responses import LoadModelsResponse

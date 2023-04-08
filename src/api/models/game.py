@@ -1,4 +1,4 @@
-from codenames.game import GameState
+from codenames.game.state import GameState
 from pydantic import BaseModel
 
 
