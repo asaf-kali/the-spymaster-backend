@@ -1,3 +1,60 @@
+[tool.poetry]
+name = "the-spymaster-backend"
+version = "0.1.0"
+description = ""
+authors = ["Asaf Kali <asaf.kali@mail.huji.ac.il>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+# Codenames
+codenames = "2.1.1"
+the-spymaster-util = "3.0.6"
+the-spymaster-solvers-client = "1.7.1"
+# Server
+Django = "4.1.7"
+django-allauth = "0.50.0"
+django-filter = "21.1"
+# psycopg2-binary = "2.9.3"
+mangum = "0.15.0"
+pynamodb = "5.4.1"
+# REST
+djangorestframework = "3.13.1"
+dj-rest-auth = "2.2.4"
+requests = "2.28.2"
+pydantic = "1.9.0"
+# Other
+django-json-widget = "1.1.1"
+boto3 = "1.24.96"
+dynaconf = "3.1.12"
+# Monitor
+sentry-sdk = "1.19.1"
+
+[tool.poetry.group.test.dependencies]
+django-queryinspect = "1.1.0"
+pytest = "7.1.1"
+coverage = { version = "^6.5.0", extras = ["toml"] }
+pytest-django = "4.5.2"
+parameterized = "0.8.1"
+freezegun = "1.2.1"
+moto = "4.0.5"
+
+[tool.poetry.group.lint.dependencies]
+ruff = "0.0.236"
+black = "22.12.0"
+isort = "5.11.4"
+mypy = "0.991"
+pylint = "2.15.10"
+types-requests = "2.28.11.8"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.17"
+twine = "4.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.pytest.ini_options]
 addopts = "-s --disable-pytest-warnings"
 DJANGO_SETTINGS_MODULE = "the_spymaster.settings"

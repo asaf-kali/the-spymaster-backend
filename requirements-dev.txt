@@ -1,6 +1,0 @@
-# Package
-build==0.8.0
-twine==4.0.1
-
-# Other
-pre-commit~=2.17
