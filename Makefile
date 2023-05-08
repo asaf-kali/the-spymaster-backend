@@ -3,20 +3,21 @@
 upgrade-pip:
 	pip install --upgrade pip
 
+install-ci: upgrade-pip
+	pip install poetry==1.4.2
+	poetry config virtualenvs.create false
+
 install-run:
-	pip install -r requirements.txt
+	poetry install --only main
 
 install-test:
-	pip install -r requirements-test.txt
-	@make install-run --no-print-directory
+	poetry install --only main --only test
 
 install-lint:
-	pip install -r requirements-lint.txt
+	poetry install --only lint
 
 install-dev: upgrade-pip
-	pip install -r requirements-dev.txt
-	@make install-lint --no-print-directory
-	@make install-test --no-print-directory
+	poetry install
 	pre-commit install
 
 install: install-dev lint cover
@@ -24,6 +25,14 @@ install: install-dev lint cover
 local-env:
 	docker-compose -f ./docker/dynamo.yml up -d
 	cd src; make local-env
+
+# Poetry
+
+lock:
+	poetry lock
+
+lock-check:
+	poetry lock --check
 
 # Proxy
 
@@ -74,7 +83,7 @@ lint: format
 # Terraform deployment
 
 build-layer:
-	sudo ./scripts/build_layer.sh
+	./scripts/build_layer.sh
 
 plan:
 	cd tf; make plan;
