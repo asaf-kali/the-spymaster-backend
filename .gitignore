@@ -1,3 +1,4 @@
+requirements.lock
 .idea/
 *.env
 *.sqlite3
