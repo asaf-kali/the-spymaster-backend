@@ -9,3 +9,6 @@ apply:
 	terraform apply $(TERRAFORM_PLAN_FILE)
 
 deploy: plan apply
+
+update:
+	terraform get -update
