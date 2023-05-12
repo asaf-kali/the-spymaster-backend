@@ -1,9 +1,15 @@
 # Layer
 
+module "layer_excludes" {
+  source = "./python_excludes"
+  path   = local.layer_src_root
+}
+
 data "archive_file" "layer_code_archive" {
   type        = "zip"
-  source_dir  = "${local.project_root}/.deployment/layer-dependencies/"
+  source_dir  = local.layer_src_root
   output_path = "layer.zip"
+  excludes    = module.layer_excludes.file_names
 }
 
 resource "aws_lambda_layer_version" "dependencies_layer" {
@@ -15,10 +21,16 @@ resource "aws_lambda_layer_version" "dependencies_layer" {
 
 # Lambda
 
+module "lambda_excludes" {
+  source = "./python_excludes"
+  path   = local.lambda_src_root
+}
+
 data "archive_file" "service_code_archive" {
   type        = "zip"
-  source_dir  = "${local.project_root}/src"
+  source_dir  = local.lambda_src_root
   output_path = "service.zip"
+  excludes    = module.lambda_excludes.file_names
 }
 
 resource "aws_lambda_function" "service_lambda" {

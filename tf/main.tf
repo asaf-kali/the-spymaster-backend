@@ -49,6 +49,9 @@ locals {
   backend_domain  = "backend.${local.domain_suffix}${local.base_app_domain}"
   # Encryption
   default_key_arn = "arn:aws:kms:us-east-1:${local.aws_account_id}:key/0b9c713c-1c4b-43ad-84df-1f62117838f0"
+  # Root folder
+  layer_src_root  = "${local.project_root}/.deployment/layer-dependencies/"
+  lambda_src_root = "${local.project_root}/src/"
 }
 
 data "aws_caller_identity" "current" {}
