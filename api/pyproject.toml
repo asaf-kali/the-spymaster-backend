@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "the-spymaster-api"
+version = "1.9.1"
+description = "Python client implementation for The Spymaster HTTP backend."
+authors = ["Asaf Kali <asaf.kali@mail.huji.ac.il>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+codenames = "^2.0"
+the_spymaster_util = "^3.0"
+the_spymaster_solvers_client = "^1.7"
+pydantic = "^1.9"
+requests = "^2.28"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

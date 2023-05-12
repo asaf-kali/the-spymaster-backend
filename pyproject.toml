@@ -1,3 +1,5 @@
+# Poetry
+
 [tool.poetry]
 name = "the-spymaster-backend"
 version = "0.1.0"
@@ -9,6 +11,7 @@ readme = "README.md"
 python = "^3.8"
 # Codenames
 codenames = "2.1.1"
+the-spymaster-api = { path = "./api", develop = true }
 the-spymaster-util = "3.0.6"
 the-spymaster-solvers-client = "1.7.1"
 # Server
@@ -55,13 +58,18 @@ twine = "4.0.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+# Test
+
 [tool.pytest.ini_options]
+pythonpath = "src"
 addopts = "-s --disable-pytest-warnings"
 DJANGO_SETTINGS_MODULE = "the_spymaster.settings"
 
 [tool.coverage.run]
-omit = ["./api/tests/*"]
-source = ["api", "the_spymaster"]
+omit = ["src/server/tests/*"]
+source = ["src", "api"]
+
+# Lint
 
 [tool.ruff]
 line-length = 120

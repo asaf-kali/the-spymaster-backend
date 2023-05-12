@@ -6,5 +6,5 @@ install_dependencies_cmd="pip install -r requirements.lock -t ${export_folder}"
 docker_cmd="${update_pip_cmd}; ${install_dependencies_cmd}; exit"
 
 sudo rm -rf "$export_folder"
-poetry export --without-hashes -f requirements.txt --output requirements.lock --only main
+make export
 docker run -v "$PWD":/var/task "$image_name" /bin/sh -c "$docker_cmd"

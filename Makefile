@@ -1,3 +1,7 @@
+# Commands
+PYTHON_TEST_COMMAND=pytest -s
+DEL_COMMAND=gio trash
+
 # Install
 
 upgrade-pip:
@@ -20,7 +24,7 @@ install-dev: upgrade-pip
 	poetry install
 	pre-commit install
 
-install: install-dev lint cover
+install: lock-check install-dev lint cover
 
 local-env:
 	docker-compose -f ./docker/dynamo.yml up -d
@@ -29,21 +33,33 @@ local-env:
 # Poetry
 
 lock:
-	poetry lock
+	poetry lock --no-update
 
 lock-check:
 	poetry lock --check
+
+export: lock-check
+	poetry export -f requirements.txt --output requirements.lock --only main --without-hashes
+	sed -i '/the-spymaster-api/d' requirements.lock
+	echo "api/" >> requirements.lock
+
+# Test
+
+test:
+	export ENV_FOR_DYNACONF="test"; \
+	python -m $(PYTHON_TEST_COMMAND)
+
+cover:
+	export ENV_FOR_DYNACONF="test"; \
+	coverage run --rcfile=pyproject.toml -m $(PYTHON_TEST_COMMAND)
+	coverage html --rcfile=pyproject.toml
+	xdg-open htmlcov/index.html &
+	$(DEL_COMMAND) .coverage*
 
 # Proxy
 
 run:
 	cd src; make run
-
-test:
-	cd src; make test
-
-cover:
-	cd src; make cover
 
 dev-init:
 	cd src; make dev-init
@@ -99,10 +115,10 @@ deploy: build-layer update
 # Client
 
 build:
-	cd client; make build;
+	cd api; make build;
 
 upload:
-	cd client; make upload;
+	cd api; make upload;
 
 build-and-upload:
-	cd client; make build-and-upload;
+	cd api; make build-and-upload;

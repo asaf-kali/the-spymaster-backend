@@ -18,7 +18,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import JsonResponse
 from django.urls import include, path, re_path
 
-from api.views import icon_view
+from server.views import icon_view
 
 
 def echo_stage(request: WSGIRequest, stage: str):  # pylint: disable=unused-argument
@@ -26,7 +26,7 @@ def echo_stage(request: WSGIRequest, stage: str):  # pylint: disable=unused-argu
 
 
 urlpatterns = [
-    path("", include("api.urls")),
+    path("", include("server.urls")),
     path("admin/", admin.site.urls),
     path("rest-auth/", include("dj_rest_auth.urls")),
     # path("accounts/", include("allauth.urls")),
