@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     # Utils
     "django_json_widget",
     # App
-    "api",
+    "server",
 ]
 
 MIDDLEWARE = [
@@ -75,8 +75,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "api.middleware.ContextLoggingMiddleware",
-    "api.middleware.SpymasterExceptionHandlerMiddleware",
+    "server.middleware.ContextLoggingMiddleware",
+    "server.middleware.SpymasterExceptionHandlerMiddleware",
 ]
 if config.setup_sqlite_db and DEBUG:
     MIDDLEWARE += ["qinspect.middleware.QueryInspectMiddleware"]
@@ -160,7 +160,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
 loggers = {
-    "api": {
+    "server": {
         "handlers": ["console_out", "console_err"],
         "level": "DEBUG",
         "propagate": False,
@@ -193,7 +193,7 @@ LOGGING = get_dict_config(
 )
 
 # Auth
-AUTH_USER_MODEL = "api.SpymasterUser"
+AUTH_USER_MODEL = "server.SpymasterUser"
 LOGIN_REDIRECT_URL = "login_complete"
 LOGOUT_REDIRECT_URL = "index"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http" if DEBUG else "https"
@@ -214,7 +214,7 @@ SOCIALACCOUNT_PROVIDERS = {
         ]
     }
 }
-SOCIALACCOUNT_ADAPTER = "api.views.social_hooks.CustomSocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "server.views.social_hooks.CustomSocialAccountAdapter"
 
 # REST
 REST_FRAMEWORK = {

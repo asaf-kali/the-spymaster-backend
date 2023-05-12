@@ -25,7 +25,7 @@ resource "aws_lambda_function" "service_lambda" {
   function_name                  = "${local.service_name}-lambda"
   role                           = aws_iam_role.lambda_exec_role.arn
   handler                        = "lambda_handler.handler"
-  runtime                        = "python3.9"
+  runtime                        = "python3.10"
   filename                       = data.archive_file.service_code_archive.output_path
   source_code_hash               = filebase64sha256(data.archive_file.service_code_archive.output_path)
   timeout                        = 15
