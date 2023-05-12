@@ -35,7 +35,13 @@ locals {
   project_name      = "the-spymaster-backend"
   service_name      = "${local.project_name}-${local.env}"
   aws_account_id    = data.aws_caller_identity.current.account_id
-  project_root      = "${path.module}/.."
+  # Paths
+  tf_root           = abspath(path.module)
+  project_root      = abspath("${path.module}/../")
+  layer_relative    = ".deployment/layer-dependencies/${local.requirements_hash}"
+  layer_src_root    = "${local.project_root}/${local.layer_relative}"
+  lambda_src_root   = "${local.project_root}/src/"
+  lock_file         = "${local.project_root}/poetry.lock"
   # Domain
   base_app_domain   = "the-spymaster.xyz"
   hosted_zone_id    = "Z0770508EK6R7V32364I"
@@ -45,13 +51,12 @@ locals {
     "staging" = ""
     "prod"    = ""
   }
-  domain_suffix   = local.domain_suffix_map[local.env]
-  backend_domain  = "backend.${local.domain_suffix}${local.base_app_domain}"
+  domain_suffix     = local.domain_suffix_map[local.env]
+  backend_domain    = "backend.${local.domain_suffix}${local.base_app_domain}"
   # Encryption
-  default_key_arn = "arn:aws:kms:us-east-1:${local.aws_account_id}:key/0b9c713c-1c4b-43ad-84df-1f62117838f0"
-  # Root folder
-  layer_src_root  = "${local.project_root}/.deployment/layer-dependencies/"
-  lambda_src_root = "${local.project_root}/src/"
+  default_key_arn   = "arn:aws:kms:us-east-1:${local.aws_account_id}:key/0b9c713c-1c4b-43ad-84df-1f62117838f0"
+  # Helper
+  requirements_hash = filemd5(local.lock_file)
 }
 
 data "aws_caller_identity" "current" {}

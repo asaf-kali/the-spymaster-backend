@@ -8,14 +8,14 @@ Codenames board game backend service.
 
 ### Environment Setup
 
-1. Install `Python 3.9`.
-1. Create virtual environment (and set source).
-1. Run `make setup-local-env`.
+1. Install `Python 3.10`.
+2. Create virtual environment (and set source).
+3. Run `make setup-local-env`.
 
 ### Workflow
 
 1. Lint using `make lint`.
-1. Run tests using `make test`.
+2. Run tests using `make test`.
 
 ## Deployment
 
