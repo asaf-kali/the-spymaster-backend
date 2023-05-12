@@ -1,36 +1,27 @@
 # Layer
 
-module "layer_excludes" {
-  source = "./python_excludes"
-  path   = local.layer_src_root
-}
-
-data "archive_file" "layer_code_archive" {
-  type        = "zip"
-  source_dir  = local.layer_src_root
-  output_path = "layer.zip"
-  excludes    = module.layer_excludes.file_names
+module "layer_archive" {
+  source     = "git@github.com:asaf-kali/resources//tf/filtered_archive"
+  source_dir = local.layer_src_root
+  name       = "layer"
 }
 
 resource "aws_lambda_layer_version" "dependencies_layer" {
-  filename         = data.archive_file.layer_code_archive.output_path
   layer_name       = "${local.service_name}-layer"
-  source_code_hash = filebase64sha256(data.archive_file.layer_code_archive.output_path)
+  filename         = module.layer_archive.output_path
+  source_code_hash = filebase64sha256(module.layer_archive.output_path)
   skip_destroy     = true
+  depends_on       = [
+    module.layer_archive,
+  ]
 }
 
 # Lambda
 
-module "lambda_excludes" {
-  source = "./python_excludes"
-  path   = local.lambda_src_root
-}
-
-data "archive_file" "service_code_archive" {
-  type        = "zip"
-  source_dir  = local.lambda_src_root
-  output_path = "service.zip"
-  excludes    = module.lambda_excludes.file_names
+module "lambda_archive" {
+  source     = "git@github.com:asaf-kali/resources//tf/filtered_archive"
+  source_dir = local.lambda_src_root
+  name       = "service"
 }
 
 resource "aws_lambda_function" "service_lambda" {
@@ -38,8 +29,8 @@ resource "aws_lambda_function" "service_lambda" {
   role                           = aws_iam_role.lambda_exec_role.arn
   handler                        = "lambda_handler.handler"
   runtime                        = "python3.10"
-  filename                       = data.archive_file.service_code_archive.output_path
-  source_code_hash               = filebase64sha256(data.archive_file.service_code_archive.output_path)
+  filename                       = module.lambda_archive.output_path
+  source_code_hash               = filebase64sha256(module.lambda_archive.output_path)
   timeout                        = 15
   memory_size                    = 200
   reserved_concurrent_executions = 2
@@ -51,6 +42,9 @@ resource "aws_lambda_function" "service_lambda" {
       ENV_FOR_DYNACONF = local.env
     }
   }
+  depends_on = [
+    module.lambda_archive,
+  ]
 }
 
 # Role
