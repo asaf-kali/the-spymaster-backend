@@ -39,7 +39,7 @@ locals {
   tf_root           = abspath(path.module)
   project_root      = abspath("${path.module}/../")
   layer_src_root    = "${local.project_root}/.deployment/layer-dependencies"
-  lambda_src_root   = "${local.project_root}/src/"
+  lambda_src_root   = "${local.project_root}/service/"
   # Domain
   base_app_domain   = "the-spymaster.xyz"
   hosted_zone_id    = "Z0770508EK6R7V32364I"

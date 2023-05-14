@@ -28,7 +28,7 @@ install: lock-check install-dev lint cover
 
 local-env:
 	docker-compose -f ./docker/dynamo.yml up -d
-	cd src; make local-env
+	cd service; make local-env
 
 # Poetry
 
@@ -59,16 +59,16 @@ cover:
 # Proxy
 
 run:
-	cd src; make run
+	cd service; make run
 
 dev-init:
-	cd src; make dev-init
+	cd service; make dev-init
 
 migrate:
-	cd src; make migrate
+	cd service; make migrate
 
 save:
-	cd src; make save
+	cd service; make save
 
 # Lint
 
@@ -90,7 +90,7 @@ check-mypy:
 	mypy .
 
 check-pylint:
-	pylint src/ --fail-under=10
+	pylint service/ --fail-under=10
 
 lint: format
 	pre-commit run --all-files
