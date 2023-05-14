@@ -1,28 +1,13 @@
 # Layer
 
-resource "null_resource" "layer_code" {
-  triggers = {
-    requirements_hash = local.requirements_hash
-  }
-  provisioner "local-exec" {
-    command = <<EOF
-image_name="public.ecr.aws/sam/build-python3.10"
-export_folder="${local.layer_relative}/python"
-update_pip_cmd="pip install --upgrade pip"
-install_dependencies_cmd="pip install -r requirements.lock -t $export_folder"
-docker_cmd="$update_pip_cmd; $install_dependencies_cmd; exit"
-
-cd ../; make export
-docker run -v "${local.project_root}":/var/task "$image_name" /bin/sh -c "$docker_cmd"
-EOF
-  }
-}
-
 module "layer_archive" {
   source     = "git@github.com:asaf-kali/resources//tf/filtered_archive"
   source_dir = local.layer_src_root
   name       = "layer"
-  depends_on = [null_resource.layer_code]
+}
+
+output "layer_archive_hash" {
+  value = filebase64sha256(module.layer_archive.output_path)
 }
 
 resource "aws_lambda_layer_version" "dependencies_layer" {
@@ -30,9 +15,6 @@ resource "aws_lambda_layer_version" "dependencies_layer" {
   filename         = module.layer_archive.output_path
   source_code_hash = filebase64sha256(module.layer_archive.output_path)
   skip_destroy     = true
-  depends_on       = [
-    module.layer_archive,
-  ]
 }
 
 # Lambda
@@ -41,6 +23,10 @@ module "lambda_archive" {
   source     = "git@github.com:asaf-kali/resources//tf/filtered_archive"
   source_dir = local.lambda_src_root
   name       = "service"
+}
+
+output "lambda_archive_hash" {
+  value = filebase64sha256(module.lambda_archive.output_path)
 }
 
 resource "aws_lambda_function" "service_lambda" {

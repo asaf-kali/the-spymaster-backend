@@ -98,6 +98,9 @@ lint: format
 
 # Terraform deployment
 
+build-layer:
+	./scripts/build_layer.sh
+
 plan:
 	cd tf; make plan;
 
