@@ -102,6 +102,9 @@ lint: format
 build-layer:
 	./scripts/build_layer.sh
 
+update:
+	cd tf; make update;
+
 plan:
 	cd tf; make plan;
 
@@ -110,8 +113,6 @@ apply:
 
 deploy:
 	cd tf; make deploy;
-
-update: deploy
 
 # Client
 
