@@ -21,7 +21,7 @@ install-lint:
 	poetry install --only lint
 
 install-dev: upgrade-pip
-	poetry install
+	poetry install --sync
 	pre-commit install
 
 install: lock-check install-dev lint cover

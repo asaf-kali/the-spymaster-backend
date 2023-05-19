@@ -411,14 +411,14 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "codenames"
-version = "2.1.1"
+version = "2.2.1"
 description = "Codenames board game logic implementation in python."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "codenames-2.1.1-py3-none-any.whl", hash = "sha256:e3e649c4f57dd2b2791072c7a8016c2c19d20e2ab01c8a98ea6469ccb65dde45"},
-    {file = "codenames-2.1.1.tar.gz", hash = "sha256:1c430b17bf2d4e48893567a6bd63755100ca3c077bcf9c5590d83749b8ac1233"},
+    {file = "codenames-2.2.1-py3-none-any.whl", hash = "sha256:cca43b82d3534b2c0d54aef20e02691577fbe182d720f80142e44830db3eb950"},
+    {file = "codenames-2.2.1.tar.gz", hash = "sha256:6248ccbb490ecd4853de664dd773808b65a4a6f41328b8a925d21d2c12c2f578"},
 ]
 
 [package.dependencies]
@@ -426,7 +426,6 @@ beautifultable = ">=1.0,<2.0"
 pydantic = ">=1.9,<2.0"
 
 [package.extras]
-all = ["beautifultable (>=1.0,<2.0)", "pydantic (>=1.9,<2.0)", "selenium (>=4.1,<5.0)"]
 web = ["selenium (>=4.1,<5.0)"]
 
 [[package]]
@@ -2417,4 +2416,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "2140664d91b143492b76c0ca714f7e27830b1916a6b931dfe55f6241b34c840c"
+content-hash = "5d11416b0b9bfc898deadb6643039c14e211783029156296c7601d41bf348c21"
