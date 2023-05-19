@@ -112,6 +112,12 @@ def _get_request_response_models(func) -> Tuple[Type[BaseRequest], Type]:
 
 def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> BaseModel:
     query_params = dict(drf_request.query_params.items())
+    shared_keys = set(query_params.keys()) & set(drf_request.data.keys())
+    if shared_keys:
+        raise BadRequestError(
+            message="Request parsing failed.",
+            data={"details": f"Query params and body cannot share keys: {shared_keys}"},
+        )
     data = {**query_params, **drf_request.data}
     try:
         parsed_request = request_model(drf_request=drf_request, **data)
