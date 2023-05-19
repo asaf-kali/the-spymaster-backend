@@ -16,4 +16,4 @@ jobs:
       - name: Init local development environment
         run: |
           make install-ci
-          make install
+          make install SYNC=""

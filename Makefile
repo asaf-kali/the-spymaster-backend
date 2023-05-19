@@ -1,6 +1,7 @@
 # Commands
 PYTHON_TEST_COMMAND=pytest -s
 DEL_COMMAND=gio trash
+SYNC=--sync
 
 # Install
 
@@ -21,7 +22,7 @@ install-lint:
 	poetry install --only lint
 
 install-dev: upgrade-pip
-	poetry install --sync
+	poetry install $(SYNC)
 	pre-commit install
 
 install: lock-check install-dev lint cover
