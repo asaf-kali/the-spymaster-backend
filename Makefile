@@ -1,7 +1,14 @@
 # Commands
 PYTHON_TEST_COMMAND=pytest -s
-DEL_COMMAND=gio trash
+ifeq ($(OS),Windows_NT)
+	OPEN_FILE_COMMAND=start
+	DEL_COMMAND=del
+else
+	OPEN_FILE_COMMAND=xdg-open
+	DEL_COMMAND=gio trash
+endif
 SYNC=--sync
+.PHONY: build
 
 # Install
 
