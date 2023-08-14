@@ -8,7 +8,7 @@ Codenames board game backend service.
 
 ### Environment Setup
 
-1. Install `Python 3.10`.
+1. Install `Python 3.11`.
 2. Create virtual environment (and set source).
 3. Run `make setup-local-env`.
 
