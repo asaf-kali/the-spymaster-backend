@@ -101,7 +101,7 @@ class GameManagerView(GenericViewSet):
             raise BadRequestError(message="This error should be handled!")
         if getattr(request, "good", False):
             return HttpResponse(body={"success": "true"})
-        raise Exception("Test error")
+        raise Exception("Test error")  # pylint: disable=broad-exception-raised
 
     @endpoint(methods=[HttpMethod.GET], url_path="ping-google")
     def ping_google(self, request: BaseRequest) -> HttpResponse:  # pylint: disable=unused-argument
