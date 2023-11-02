@@ -15,7 +15,7 @@ the-spymaster-api = { path = "./api", develop = true }
 the-spymaster-util = "^3.0.9"
 the-spymaster-solvers-client = "^1.7.1"
 # Server
-Django = "^4.1.10"
+Django = "^4.2.7"
 django-allauth = "^0.50.0"
 django-filter = "^21.1"
 # psycopg2-binary = "2.9.3"
