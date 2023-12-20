@@ -1,8 +1,13 @@
 [tool.poetry]
 name = "the-spymaster-api"
-version = "1.9.2"
+version = "1.9.3"
 description = "Python client implementation for The Spymaster HTTP backend."
 authors = ["Asaf Kali <asaf.kali@mail.huji.ac.il>"]
+
+[tool.poetry.urls]
+Homepage = "https://github.com/asaf-kali/the-spymaster-backend"
+Repository = "https://github.com/asaf-kali/the-spymaster-backend"
+Issues = "https://github.com/asaf-kali/the-spymaster-backend/issues"
 
 [tool.poetry.dependencies]
 python = "^3.8"
