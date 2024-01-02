@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from codenames.game.color import TeamColor
 from pydantic import BaseModel, Extra
 from the_spymaster_solvers_client.structs.base import ModelIdentifier, Solver
 
@@ -18,6 +19,7 @@ class BaseRequest(BaseModel):
 
 class StartGameRequest(BaseRequest):
     language: str = "english"
+    first_team: Optional[TeamColor] = None
 
 
 class HintRequest(BaseRequest):

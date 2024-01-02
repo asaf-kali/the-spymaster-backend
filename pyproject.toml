@@ -10,10 +10,10 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 # Codenames
-codenames = "^2.2.1"
+codenames = "^4.0.3"
 the-spymaster-api = { path = "./api", develop = true }
 the-spymaster-util = "^3.0.9"
-the-spymaster-solvers-client = "^1.7.1"
+the-spymaster-solvers-client = "^2.0.0"
 # Server
 Django = "^4.2.7"
 django-allauth = "^0.50.0"

@@ -1,5 +1,6 @@
 import requests
 import ulid
+from codenames.boards.builder import generate_board
 from codenames.game.move import Guess, Hint
 from codenames.game.state import build_game_state
 from rest_framework.viewsets import GenericViewSet
@@ -42,7 +43,8 @@ class GameManagerView(GenericViewSet):
 
     @endpoint
     def start(self, request: StartGameRequest) -> StartGameResponse:
-        game_state = build_game_state(language=request.language)
+        board = generate_board(language=request.language, first_team=request.first_team)
+        game_state = build_game_state(board=board)
         game = Game(id=ulid_lower(), state_data=game_state.dict())
         save_game(game)
         log.info(f"Starting game: {game.id}")
