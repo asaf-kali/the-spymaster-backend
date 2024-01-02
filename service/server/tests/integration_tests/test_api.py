@@ -23,13 +23,12 @@ class TestApi(SpymasterTest):
         expected_data = {
             "game_id": ANY,
             "game_state": {
-                "language": "english",
-                "board": {"cards": ANY},
+                "board": {"language": "english", "cards": ANY},
                 "score": {
-                    "blue": {"total": 9, "revealed": 0},
-                    "red": {"total": 8, "revealed": 0},
+                    "blue": {"total": lambda x: x >= 8, "revealed": 0},
+                    "red": {"total": lambda x: x >= 8, "revealed": 0},
                 },
-                "current_team_color": "BLUE",
+                "current_team_color": lambda x: x in {"BLUE", "RED"},
                 "current_player_role": "HINTER",
                 "left_guesses": 0,
                 "winner": None,
@@ -55,7 +54,6 @@ class TestApi(SpymasterTest):
         expected_data = {
             "given_hint": {"word": "test", "card_amount": 2, "team_color": "BLUE"},
             "game_state": {
-                "language": "english",
                 "board": ANY,
                 "score": {"blue": {"total": 9, "revealed": 0}, "red": {"total": 8, "revealed": 0}},
                 "current_team_color": "BLUE",
@@ -80,7 +78,7 @@ class TestApi(SpymasterTest):
         return self.api_client.post(path=url, data=_data, content_type="application/json")
 
     def _start_game(self) -> StartGameResponse:
-        response = self._post(path=START_GAME_PATH, data={})
+        response = self._post(path=START_GAME_PATH, data={"first_team": "BLUE"})
         return StartGameResponse.parse_obj(response.json())
 
     # def test_guess(self):

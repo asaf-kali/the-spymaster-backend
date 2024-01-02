@@ -1,5 +1,5 @@
 import json
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 
 def deep_diff(left: Any, right: Any) -> Any:
@@ -7,6 +7,10 @@ def deep_diff(left: Any, right: Any) -> Any:
         return dict_diff(left, right)
     if isinstance(left, list) and isinstance(right, list):
         return list_diff(left, right)
+    if isinstance(left, Callable):  # type: ignore
+        return None if left(right) else left
+    if isinstance(right, Callable):  # type: ignore
+        return None if right(left) else right
     if left != right:
         return f"{left} != {right}"
     return None
