@@ -1,8 +1,7 @@
 # The Spymaster Backend
 Codenames board game backend service.
 
-[![Unit tests](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/tests.yml/badge.svg)](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/tests.yml)
-[![Lint](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/lint.yml/badge.svg)](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/lint.yml)
+[![Pipeline](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/pipeline.yml/badge.svg)](https://github.com/asaf-kali/the-spymaster-backend/actions/workflows/pipeline.yml)
 [![PyPI version](https://badge.fury.io/py/the-spymaster-api.svg)](https://badge.fury.io/py/the-spymaster-api)
 
 ## Local development
