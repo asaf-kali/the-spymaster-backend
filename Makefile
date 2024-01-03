@@ -131,3 +131,13 @@ upload:
 
 build-and-upload:
 	cd api; make build-and-upload;
+
+# Quick and dirty
+
+wip:
+	git add .
+	git commit -m "Auto commit." --no-verify
+
+amend:
+	git add .
+	git commit --amend --no-edit --no-verify
