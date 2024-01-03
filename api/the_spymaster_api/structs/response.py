@@ -3,7 +3,7 @@ from typing import Any, Optional, Union
 from codenames.game.move import GivenGuess, GivenHint
 from codenames.game.state import GameState
 from pydantic import BaseModel, Extra
-from the_spymaster_solvers_client.structs.base import ModelIdentifier, Solver
+from the_spymaster_solvers_api.structs.base import ModelIdentifier, Solver
 
 
 class HttpResponse(BaseModel):

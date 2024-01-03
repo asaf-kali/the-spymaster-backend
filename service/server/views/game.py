@@ -18,8 +18,8 @@ from the_spymaster_api.structs import (
     StartGameRequest,
     StartGameResponse,
 )
-from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
-from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
+from the_spymaster_solvers_api.structs.requests import LoadModelsRequest
+from the_spymaster_solvers_api.structs.responses import LoadModelsResponse
 from the_spymaster_util.http.errors import BadRequestError
 from the_spymaster_util.logger import get_logger
 

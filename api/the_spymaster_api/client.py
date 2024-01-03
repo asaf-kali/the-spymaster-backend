@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
 
-from the_spymaster_solvers_client.structs.requests import LoadModelsRequest
-from the_spymaster_solvers_client.structs.responses import LoadModelsResponse
+from the_spymaster_solvers_api.structs.requests import LoadModelsRequest
+from the_spymaster_solvers_api.structs.responses import LoadModelsResponse
 from the_spymaster_util.http.base_client import DEFAULT_RETRY_STRATEGY, BaseHttpClient
 from urllib3 import Retry
 

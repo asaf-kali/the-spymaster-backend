@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from the_spymaster_solvers_client import TheSpymasterSolversClient
+from the_spymaster_solvers_api import TheSpymasterSolversClient
 
 from the_spymaster.config import get_config
 
