@@ -7,6 +7,13 @@ terraform {
       version = "5.12.0"
     }
   }
+  backend "s3" {
+    bucket               = "the-spymaster-infra-tf-state"
+    key                  = "backend/terraform.tfstate"
+    region               = "us-east-1"
+    dynamodb_table       = "the-spymaster-infra-tf-state-lock"
+    workspace_key_prefix = "env"
+  }
 }
 
 provider "aws" {
