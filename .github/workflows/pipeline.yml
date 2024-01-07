@@ -137,7 +137,6 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
           sentry_dsn: ${{ secrets.SENTRY_DSN }}
-          telegram_token: ${{ secrets.DEV_TELEGRAM_TOKEN }}
 
   automation:
     runs-on: ubuntu-latest
