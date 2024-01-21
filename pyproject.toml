@@ -8,12 +8,12 @@ authors = ["Asaf Kali <asaf.kali@mail.huji.ac.il>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 # Codenames
-codenames = "^4.0.3"
+codenames = "^4.1.6"
 the-spymaster-api = { path = "./api", develop = true }
-the-spymaster-util = "^3.0.9"
-the-spymaster-solvers-api = "^2.0.1"
+the-spymaster-util = { version = "^3.2", extras = ["all"] }
+the-spymaster-solvers-api = "^2.0.2"
 # Server
 Django = "^4.2.7"
 django-allauth = "^0.50.0"
