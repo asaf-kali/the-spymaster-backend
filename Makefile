@@ -48,8 +48,8 @@ lock-check:
 
 lock-export: lock-check
 	poetry export -f requirements.txt --output requirements.lock --only main --without-hashes
-	sed -i '/the-spymaster-api/d' requirements.lock
-	echo "api/" >> requirements.lock
+	sed -i '/the-spymaster-backend\/api/d' requirements.lock
+	echo "-e api/" >> requirements.lock
 
 # Test
 
@@ -136,7 +136,8 @@ build-and-upload:
 
 wip:
 	git add .
-	git commit -m "Auto commit." --no-verify
+	git commit -m "Auto commit [skip ci]" --no-verify
+	git push
 
 amend:
 	git add .
