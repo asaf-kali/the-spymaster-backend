@@ -2,7 +2,7 @@
 
 [tool.poetry]
 name = "the-spymaster-backend"
-version = "0.1.0"
+package-mode = false
 description = ""
 authors = ["Asaf Kali <asaf.kali@mail.huji.ac.il>"]
 readme = "README.md"
@@ -15,7 +15,7 @@ the-spymaster-api = { path = "./api", develop = true }
 the-spymaster-util = { version = "^3.2", extras = ["all"] }
 the-spymaster-solvers-api = "^2.0.2"
 # Server
-Django = "^4.2.10"
+Django = "^4.2"
 django-allauth = "^0.50.0"
 django-filter = "^21.1"
 # psycopg2-binary = "2.9.3"
@@ -45,7 +45,7 @@ moto = "^4.0.5"
 
 [tool.poetry.group.lint.dependencies]
 ruff = "^0.0.236"
-black = "^22.12.0"
+black = "^24.3"
 isort = "^5.11.4"
 mypy = "^0.991"
 pylint = "^2.15.10"
