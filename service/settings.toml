@@ -28,7 +28,7 @@ load_ssm_secrets = false
 [dev]
 env_verbose_name = "Dev"
 django_debug = true
-solvers_backend_url = "https://solvers.dev.the-spymaster.xyz"
+solvers_backend_url = "https://solvers.dev.303707.xyz"
 
 [stage]
 env_verbose_name = "Staging"
@@ -36,7 +36,7 @@ django_debug = true
 
 [prod]
 env_verbose_name = "Production"
-solvers_backend_url = "https://solvers.the-spymaster.xyz"
+solvers_backend_url = "https://solvers.303707.xyz"
 
 [rsbpi]
 env_verbose_name = "Raspberry Pi"

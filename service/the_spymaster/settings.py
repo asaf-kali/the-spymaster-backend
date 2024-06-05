@@ -24,7 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config.django_debug
 SECRET_KEY = config.django_secret_key
 SITE_ID = 1
-ALLOWED_HOSTS = ["backend.the-spymaster.xyz", "backend.dev.the-spymaster.xyz", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "backend.303707.xyz",
+    "backend.dev.303707.xyz",
+    "backend.the-spymaster.xyz",
+    "backend.dev.the-spymaster.xyz",
+    "localhost",
+    "127.0.0.1",
+]
 
 if config.sentry_setup:
     sentry_sdk.init(  # type: ignore  # pylint: disable=abstract-class-instantiated
