@@ -13,7 +13,7 @@ python = "^3.9"
 codenames = "^4.1.6"
 the-spymaster-api = { path = "./api", develop = true }
 the-spymaster-util = { version = "^3.2", extras = ["all"] }
-the-spymaster-solvers-api = "^2.0.2"
+the-spymaster-solvers-api = "^2.0.3"
 # Server
 Django = "^4.2"
 django-allauth = "^0.50.0"

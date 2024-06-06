@@ -1930,13 +1930,13 @@ url = "api"
 
 [[package]]
 name = "the-spymaster-solvers-api"
-version = "2.0.2"
+version = "2.0.3"
 description = "Python client implementation for The Spymaster Solvers HTTP backend."
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "the_spymaster_solvers_api-2.0.2-py3-none-any.whl", hash = "sha256:322beb440640e2bb5ba9f0a5d2ad631f4fe62c5aacb098e74f83033e290b7cdd"},
-    {file = "the_spymaster_solvers_api-2.0.2.tar.gz", hash = "sha256:782b487506d33d68ce59362a95b35d9778890e20ca0389a4256517e84197c435"},
+    {file = "the_spymaster_solvers_api-2.0.3-py3-none-any.whl", hash = "sha256:b4e9363b2f730e343a0f65ce36f7eb1369ab046266a68b78bd7d40d2e63b9522"},
+    {file = "the_spymaster_solvers_api-2.0.3.tar.gz", hash = "sha256:418f0c830f255dcde7acd7899d4ee287d09d2fa963ae5665317ddf69533d377f"},
 ]
 
 [package.dependencies]
@@ -2242,4 +2242,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "349ec0f9841a0c34526a94a7f3bf6b3952f7413cd00809cbf285587199fd21a2"
+content-hash = "a8227332bc2e7e3641692623c01e01c1a1ad5de4ee9ee40584a8fdb337f7390e"
