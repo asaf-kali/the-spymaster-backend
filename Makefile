@@ -1,5 +1,6 @@
 # Commands
 PYTHON_TEST_COMMAND=pytest -s
+PACKAGE_TYPE=*.whl
 ifeq ($(OS),Windows_NT)
 	OPEN_FILE_COMMAND=start
 	DEL_COMMAND=del
@@ -49,7 +50,15 @@ lock-check:
 lock-export: lock-check
 	poetry export -f requirements.txt --output requirements.lock --only main --without-hashes
 	sed -i '/the-spymaster-backend\/api/d' requirements.lock
-	echo "api/" >> requirements.lock
+	# echo "api/" >> requirements.lock
+
+wheels-export:
+	$(DEL_COMMAND) -f wheels
+	mkdir -p wheels
+	cd api; make build
+	cp api/dist/$(PACKAGE_TYPE) wheels/
+
+artifacts: lock-export wheels-export
 
 # Test
 
@@ -105,9 +114,6 @@ lint: format
 	@make check-pylint --no-print-directory
 
 # Terraform deployment
-
-build-layer:
-	./scripts/build_layer.sh
 
 update:
 	cd tf; make update;
