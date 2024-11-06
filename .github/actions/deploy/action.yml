@@ -38,11 +38,6 @@ runs:
       shell: bash
       run: |
         echo "sentry_dsn = \"${{ inputs.sentry_dsn }}\"" > ${TF_VAR_FILE}
-    - name: Download deploy artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: deployment-${{ inputs.sha }}
-        path: ./.deployment
     - name: Install CI dependencies
       shell: bash
       run: make install-ci

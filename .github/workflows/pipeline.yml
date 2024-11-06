@@ -107,26 +107,6 @@ jobs:
 
   # Deploy
 
-  build-deployment:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Set up python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - name: Install dependencies
-        run: |
-          make install-ci
-      - name: Build Lambda Layer
-        run: make build-layer
-      - name: Upload deployment folder artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-${{ github.sha }}
-          path: ./.deployment
-
   deploy-dev:
     runs-on: ubuntu-latest
     needs:
@@ -137,7 +117,6 @@ jobs:
       - check-pylint
       - check-poetry-lock
       - unit-tests
-      - build-deployment
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
