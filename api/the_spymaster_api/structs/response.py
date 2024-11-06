@@ -48,6 +48,6 @@ class GuessResponse(BaseModel):
 class NextMoveResponse(BaseModel):
     game_state: GameState
     used_solver: Solver
-    given_hint: Optional[GivenHint]
-    given_guess: Optional[GivenGuess]
+    given_hint: Optional[GivenHint] = None
+    given_guess: Optional[GivenGuess] = None
     used_model_identifier: Optional[ModelIdentifier]

@@ -90,12 +90,12 @@ save:
 # Lint
 
 format:
-	ruff . --fix
 	black .
 	isort .
+	ruff check --fix
 
 check-ruff:
-	ruff .
+	ruff check
 
 check-black:
 	black --check .

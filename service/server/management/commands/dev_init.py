@@ -28,7 +28,7 @@ class EnvironmentSafetyError(BadRequestError):
         )
 
 
-def _create_user(  # pylint: disable=too-many-arguments
+def _create_user(  # pylint: disable=R0913, R0917
     username: str,
     email: str,
     first_name: str,
