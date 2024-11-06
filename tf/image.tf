@@ -1,7 +1,7 @@
 # Vars and data
 
 locals {
-  lock_file      = "${local.project_root}/poetry.lock"
+  lock_file  = "${local.project_root}/poetry.lock"
   lock_file_sha = filebase64sha256(local.lock_file)
   dockerfile = "${local.project_root}/Dockerfile"
 }
@@ -19,7 +19,7 @@ resource "aws_ecr_lifecycle_policy" "ecr_lifecycle_policy" {
   "rules": [
     {
       "rulePriority": 1,
-      "description": "Keep last 3 images",
+      "description": "Limit number of untagged images",
       "selection": {
         "tagStatus": "untagged",
         "countType": "imageCountMoreThan",
@@ -35,6 +35,12 @@ EOF
 }
 
 # Prepare
+
+module "wheels_archive" {
+  source     = "github.com/asaf-kali/resources//tf/filtered_archive"
+  name       = "wheels"
+  source_dir = "${local.project_root}/wheels"
+}
 
 module "app_archive" {
   source     = "github.com/asaf-kali/resources//tf/filtered_archive"
@@ -64,5 +70,6 @@ module "app_image" {
     docker_file = filebase64sha256(local.dockerfile)
     lock_file  = local.lock_file_sha
     source_dir = module.app_archive.output_sha
+    wheels_dir = module.wheels_archive.output_sha
   }
 }
