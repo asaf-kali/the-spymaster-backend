@@ -21,7 +21,7 @@ resource "aws_ecr_lifecycle_policy" "ecr_lifecycle_policy" {
       "rulePriority": 1,
       "description": "Keep last 3 images",
       "selection": {
-        "tagStatus": "any",
+        "tagStatus": "untagged",
         "countType": "imageCountMoreThan",
         "countNumber": 3
       },
