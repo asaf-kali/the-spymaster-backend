@@ -1,11 +1,12 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from .views import IndexView, auth, game
+from .views import IndexView, auth
+from .views.game.classic import ClassicGameView
 
 router_v1 = routers.SimpleRouter()
 router_v1.register(r"users", viewset=auth.UserDetailsView, basename="users")
-router_v1.register(r"game", viewset=game.GameManagerView, basename="game")
+router_v1.register(r"game/classic", viewset=ClassicGameView, basename="game")
 
 urlpatterns = [
     path("", view=IndexView.as_view(), name="index"),

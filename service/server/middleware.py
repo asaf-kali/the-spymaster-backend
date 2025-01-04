@@ -3,7 +3,7 @@ import traceback
 from typing import Any, Mapping, Optional
 
 import sentry_sdk
-from codenames.game.exceptions import GameRuleError
+from codenames.generic.exceptions import GameRuleError
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.handlers.wsgi import WSGIRequest
@@ -61,10 +61,10 @@ class SpymasterExceptionHandlerMiddleware(MiddlewareMixin):
         sentry_sdk.flush(timeout=5)
         if settings.DEBUG:
             data = {"exception_type": exception.__class__.__name__, "details": traceback.format_exc()}
-            api_error = InternalServerError(message=str(exception), data=data)
+            internal_error = InternalServerError(message=str(exception), data=data)
         else:
-            api_error = InternalServerError()
-        return response_from_api_error(e=api_error)
+            internal_error = InternalServerError()
+        return response_from_api_error(e=internal_error)
 
 
 class ContextLoggingMiddleware(MiddlewareMixin):

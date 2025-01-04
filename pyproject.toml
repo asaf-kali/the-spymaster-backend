@@ -10,7 +10,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 # Codenames
-codenames = "^5.2"
+codenames = "^5.3"
 the-spymaster-api = { path = "./api", develop = true }
 the-spymaster-util = { version = "^3.2", extras = ["all"] }
 the-spymaster-solvers-api = "^3.0"

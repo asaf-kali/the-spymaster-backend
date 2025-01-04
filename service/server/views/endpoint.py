@@ -122,7 +122,7 @@ def _parse_request(request_model: Type[BaseModel], drf_request: Request) -> Base
     try:
         parsed_request = request_model(drf_request=drf_request, **data)
     except Exception as e:  # pylint: disable=invalid-name
-        details = e.errors() if isinstance(e, ValidationError) else str(e)
+        details = e.errors() if isinstance(e, ValidationError) else str(e)  # pylint: disable=no-member
         raise BadRequestError(message="Request parsing failed.", data={"details": details}) from e
     return parsed_request
 
@@ -140,7 +140,7 @@ def _get_json_response(response: ResponseType) -> JsonResponse:
         if response.headers:
             headers.update(response.headers)
     elif isinstance(response, BaseModel):
-        data = response.dict()
+        data = response.model_dump()
     elif isinstance(response, DjangoHttpResponse):
         status_code = response.status_code
         response_body = response.content.decode("utf-8")

@@ -70,7 +70,7 @@ cover:
 	export ENV_FOR_DYNACONF="test"; \
 	coverage run --rcfile=pyproject.toml -m $(PYTHON_TEST_COMMAND)
 	coverage html --rcfile=pyproject.toml
-	xdg-open htmlcov/index.html &
+	xdg-open htmlcov/index.html > /dev/null 2>&1 &
 	$(DEL_COMMAND) .coverage*
 
 # Proxy

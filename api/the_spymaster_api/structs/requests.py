@@ -1,13 +1,12 @@
 from typing import List, Optional
 
-from codenames.game.color import TeamColor
-from pydantic import BaseModel, Extra
-from the_spymaster_solvers_api.structs.base import ModelIdentifier, Solver
+from pydantic import BaseModel
+from the_spymaster_solvers_api.structs.base import APIModelIdentifier, Solver
 
 
 class BaseRequest(BaseModel):
     class Config:
-        extra = Extra.allow
+        extra = "allow"
         fields = {"drf_request": {"exclude": True}}
         arbitrary_types_allowed = True
 
@@ -17,12 +16,7 @@ class BaseRequest(BaseModel):
         return drf_request.user if drf_request else None
 
 
-class StartGameRequest(BaseRequest):
-    language: str = "english"
-    first_team: Optional[TeamColor] = None
-
-
-class HintRequest(BaseRequest):
+class ClueRequest(BaseRequest):
     game_id: str
     word: str
     card_amount: int
@@ -41,4 +35,4 @@ class GetGameStateRequest(BaseRequest):
 class NextMoveRequest(BaseRequest):
     game_id: str
     solver: Solver = Solver.NAIVE
-    model_identifier: Optional[ModelIdentifier] = None
+    model_identifier: Optional[APIModelIdentifier] = None

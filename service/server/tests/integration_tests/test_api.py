@@ -2,13 +2,13 @@ import json
 from unittest.mock import ANY
 
 from rest_framework.test import APIClient
-from the_spymaster_api.structs import StartGameResponse
+from the_spymaster_api.structs.classic.responses import StartGameResponse
 
 from server.tests.spymaster_test import SpymasterTest
 from server.tests.util.deep_diff import deep_diff
 
-START_GAME_PATH = "game/start/"
-HINT_PATH = "game/hint/"
+START_GAME_PATH = "game/classic/start/"
+CLUE_PATH = "game/classic/clue/"
 
 
 class TestApi(SpymasterTest):
@@ -28,12 +28,12 @@ class TestApi(SpymasterTest):
                     "blue": {"total": lambda x: x >= 8, "revealed": 0},
                     "red": {"total": lambda x: x >= 8, "revealed": 0},
                 },
-                "current_team_color": lambda x: x in {"BLUE", "RED"},
-                "current_player_role": "HINTER",
+                "current_team": lambda x: x in {"BLUE", "RED"},
+                "current_player_role": "SPYMASTER",
                 "left_guesses": 0,
                 "winner": None,
-                "raw_hints": [],
-                "given_hints": [],
+                "given_clues": [],
+                "clues": [],
                 "given_guesses": [],
             },
         }
@@ -41,7 +41,7 @@ class TestApi(SpymasterTest):
         diff = deep_diff(expected_data, actual_data)
         assert diff is None
 
-    def test_hint(self):
+    def test_clue(self):
         start_game_response = self._start_game()
         data = {
             "game_id": start_game_response.game_id,
@@ -49,20 +49,20 @@ class TestApi(SpymasterTest):
             "card_amount": 2,
             "for_words": ["word1", "word2"],
         }
-        response = self._post(path=HINT_PATH, data=data)
+        response = self._post(path=CLUE_PATH, data=data)
         assert response.status_code == 200
         expected_data = {
-            "given_hint": {"word": "test", "card_amount": 2, "team_color": "BLUE"},
+            "given_clue": {"word": "test", "card_amount": 2, "team": "BLUE"},
             "game_state": {
                 "board": ANY,
                 "score": {"blue": {"total": 9, "revealed": 0}, "red": {"total": 8, "revealed": 0}},
-                "current_team_color": "BLUE",
-                "current_player_role": "GUESSER",
-                "given_hints": [{"word": "test", "card_amount": 2, "team_color": "BLUE"}],
+                "current_team": "BLUE",
+                "current_player_role": "OPERATIVE",
+                "given_clues": [{"word": "test", "card_amount": 2, "team": "BLUE"}],
                 "given_guesses": [],
                 "left_guesses": 3,
                 "winner": None,
-                "raw_hints": [{"word": "test", "card_amount": 2, "for_words": ["word1", "word2"]}],
+                "clues": [{"word": "test", "card_amount": 2, "for_words": ["word1", "word2"]}],
             },
         }
         actual_data = response.json()
@@ -79,7 +79,7 @@ class TestApi(SpymasterTest):
 
     def _start_game(self) -> StartGameResponse:
         response = self._post(path=START_GAME_PATH, data={"first_team": "BLUE"})
-        return StartGameResponse.parse_obj(response.json())
+        return StartGameResponse.model_validate(response.json())
 
     # def test_guess(self):
     #     request_data = {"game_id": 1, "card_index": 0}

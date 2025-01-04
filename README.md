@@ -15,7 +15,7 @@ Provides game state and opponent solvers for the [the-spymaster-bot](https://git
 
 ### Environment Setup
 
-1. Install `Python 3.11`.
+1. Install `Python 3.12`.
 2. Create a virtual environment and set source.
 3. Run `make setup-local-env`.
 

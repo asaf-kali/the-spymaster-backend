@@ -1,14 +1,15 @@
 import logging
 from typing import Optional
 
-from codenames.game.player import PlayerRole
-from codenames.game.state import GameState
-from the_spymaster_api.structs import NextMoveResponse, Solver
+from codenames.classic.state import ClassicGameState
+from codenames.generic.player import PlayerRole
+from the_spymaster_api.structs import Solver
+from the_spymaster_api.structs.classic.responses import NextMoveResponse
 from the_spymaster_solvers_api.client import TheSpymasterSolversClient
-from the_spymaster_solvers_api.structs.base import ModelIdentifier
+from the_spymaster_solvers_api.structs.base import APIModelIdentifier
 from the_spymaster_solvers_api.structs.requests import (
+    GenerateClueRequest,
     GenerateGuessRequest,
-    GenerateHintRequest,
 )
 from the_spymaster_util.http.errors import BadRequestError
 
@@ -19,7 +20,9 @@ config = get_config()
 
 
 class NextMoveHandler:
-    def __init__(self, game_state: GameState, solver: Solver, model_identifier: Optional[ModelIdentifier] = None):
+    def __init__(
+        self, game_state: ClassicGameState, solver: Solver, model_identifier: Optional[APIModelIdentifier] = None
+    ):
         self.game_state = game_state
         self.solver = solver
         self.model_identifier = model_identifier
@@ -29,30 +32,30 @@ class NextMoveHandler:
     def handle(self) -> NextMoveResponse:
         if self.game_state.is_game_over:
             raise BadRequestError(message="Game is over")
-        if self.game_state.current_player_role == PlayerRole.HINTER:
-            return self._make_hinter_move()
-        if self.game_state.current_player_role == PlayerRole.GUESSER:
-            return self._make_guesser_move()
+        if self.game_state.current_player_role == PlayerRole.SPYMASTER:
+            return self._make_spymaster_move()
+        if self.game_state.current_player_role == PlayerRole.OPERATIVE:
+            return self._make_operative_move()
         raise ValueError(f"Unknown player role: {self.game_state.current_player_role}")
 
-    def _make_hinter_move(self) -> NextMoveResponse:
-        generate_hint_request = GenerateHintRequest(
-            game_state=self.game_state,
+    def _make_spymaster_move(self) -> NextMoveResponse:
+        generate_clue_request = GenerateClueRequest(
+            spymaster_state=self.game_state,
             model_identifier=self.model_identifier,
             solver=self.solver,
         )
-        generate_hint_response = self.solvers_client.generate_hint(request=generate_hint_request)
-        given_hint = self.game_state.process_hint(hint=generate_hint_response.suggested_hint)
+        generate_clue_response = self.solvers_client.generate_clue(request=generate_clue_request)
+        given_clue = self.game_state.process_clue(clue=generate_clue_response.suggested_clue)
         return NextMoveResponse(
             game_state=self.game_state,
-            used_solver=generate_hint_response.used_solver,
-            used_model_identifier=generate_hint_response.used_model_identifier,
-            given_hint=given_hint,
+            used_solver=generate_clue_response.used_solver,
+            used_model_identifier=generate_clue_response.used_model_identifier,
+            given_clue=given_clue,
         )
 
-    def _make_guesser_move(self) -> NextMoveResponse:
+    def _make_operative_move(self) -> NextMoveResponse:
         generate_guess_request = GenerateGuessRequest(
-            game_state=self.game_state,
+            operative_state=self.game_state.operative_state,
             model_identifier=self.model_identifier,
             solver=self.solver,
         )

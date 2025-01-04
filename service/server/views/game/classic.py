@@ -1,21 +1,24 @@
 import requests
 import ulid
-from codenames.boards.builder import generate_board
-from codenames.game.move import Guess, Hint
-from codenames.game.state import build_game_state
+from codenames.classic.board import ClassicBoard
+from codenames.classic.state import ClassicGameState
+from codenames.generic.move import Clue, Guess
+from codenames.utils.vocabulary.languages import get_vocabulary
 from rest_framework.viewsets import GenericViewSet
 from the_spymaster_api.structs import (
     BaseRequest,
+    ClueRequest,
     GetGameStateRequest,
-    GetGameStateResponse,
     GuessRequest,
-    GuessResponse,
-    HintRequest,
-    HintResponse,
     HttpResponse,
     NextMoveRequest,
+)
+from the_spymaster_api.structs.classic.requests import StartGameRequest
+from the_spymaster_api.structs.classic.responses import (
+    ClueResponse,
+    GetGameStateResponse,
+    GuessResponse,
     NextMoveResponse,
-    StartGameRequest,
     StartGameResponse,
 )
 from the_spymaster_solvers_api.structs.requests import LoadModelsRequest
@@ -26,7 +29,7 @@ from the_spymaster_util.logger import get_logger
 from server.logic.db import load_game, save_game
 from server.logic.next_move import NextMoveHandler
 from server.logic.solvers import get_solvers_client
-from server.models.game import Game
+from server.models.game import ClassicGame
 from server.views.endpoint import HttpMethod, endpoint
 
 log = get_logger(__name__)
@@ -36,29 +39,31 @@ def ulid_lower():
     return ulid.new().str.lower()
 
 
-class GameManagerView(GenericViewSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class ClassicGameView(GenericViewSet):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.solvers_client = get_solvers_client()
 
     @endpoint
     def start(self, request: StartGameRequest) -> StartGameResponse:
-        board = generate_board(language=request.language, first_team=request.first_team)
-        game_state = build_game_state(board=board)
-        game = Game(id=ulid_lower(), state_data=game_state.dict())
+        vocabulary = get_vocabulary(language=request.language)
+        board = ClassicBoard.from_vocabulary(vocabulary=vocabulary, first_team=request.first_team)
+        game_state = ClassicGameState.from_board(board=board)
+        game = ClassicGame(id=ulid_lower(), state_data=game_state.model_dump())
         save_game(game)
         log.info(f"Starting game: {game.id}")
         return StartGameResponse(game_id=game.id, game_state=game_state)
 
     @endpoint
-    def hint(self, request: HintRequest) -> HintResponse:
+    def clue(self, request: ClueRequest) -> ClueResponse:
         game = load_game(request.game_id)
         game_state = game.state
-        hint = Hint(word=request.word, card_amount=request.card_amount, for_words=request.for_words)
-        given_hint = game_state.process_hint(hint)
-        game.state_data = game_state.dict()
+        for_words = tuple(request.for_words) if request.for_words else None
+        clue = Clue(word=request.word, card_amount=request.card_amount, for_words=for_words)
+        given_clue = game_state.process_clue(clue)
+        game.state_data = game_state.model_dump()
         save_game(game)
-        return HintResponse(given_hint=given_hint, game_state=game_state)
+        return ClueResponse(given_clue=given_clue, game_state=game_state)
 
     @endpoint
     def guess(self, request: GuessRequest) -> GuessResponse:
@@ -66,7 +71,7 @@ class GameManagerView(GenericViewSet):
         game_state = game.state
         guess = Guess(card_index=request.card_index)
         given_guess = game_state.process_guess(guess)
-        game.state_data = game_state.dict()
+        game.state_data = game_state.model_dump()
         save_game(game)
         return GuessResponse(given_guess=given_guess, game_state=game_state)
 
@@ -83,7 +88,7 @@ class GameManagerView(GenericViewSet):
             game_state=game_state, solver=request.solver, model_identifier=request.model_identifier
         )
         response = handler.handle()
-        game.state_data = handler.game_state.dict()
+        game.state_data = handler.game_state.model_dump()
         save_game(game)
         return response
 

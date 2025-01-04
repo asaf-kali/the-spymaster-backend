@@ -5,13 +5,13 @@ import logging
 
 from django.core.management import BaseCommand
 
-from server.models.game import Game
+from server.models.game import ClassicGame
 
 log = logging.getLogger(__name__)
 
 
 def _fix_game_state_json():
-    for game in Game.objects.all():
+    for game in ClassicGame.objects.all():
         state = game.state_data
         if not isinstance(state, str):
             continue

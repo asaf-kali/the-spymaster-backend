@@ -1,3 +1,3 @@
 from .errors import *  # noqa
-from .request import *  # noqa
-from .response import *  # noqa
+from .requests import *  # noqa
+from .responses import *  # noqa

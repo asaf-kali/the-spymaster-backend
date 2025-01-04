@@ -8,15 +8,17 @@ from urllib3 import Retry
 
 from .structs import (
     SERVICE_ERRORS,
+    ClueRequest,
     GetGameStateRequest,
-    GetGameStateResponse,
     GuessRequest,
-    GuessResponse,
-    HintRequest,
-    HintResponse,
     NextMoveRequest,
+)
+from .structs.classic.requests import StartGameRequest
+from .structs.classic.responses import (
+    ClueResponse,
+    GetGameStateResponse,
+    GuessResponse,
     NextMoveResponse,
-    StartGameRequest,
     StartGameResponse,
 )
 
@@ -33,27 +35,27 @@ class TheSpymasterClient(BaseHttpClient):
         )
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
-        data = self.post(endpoint="start/", data=request.dict(), error_types={})
+        data: dict = self.post(endpoint="start/", data=request.model_dump(), error_types={})  # type: ignore
         return StartGameResponse(**data)
 
-    def hint(self, request: HintRequest) -> HintResponse:
-        data = self.post(endpoint="hint/", data=request.dict())
-        return HintResponse(**data)
+    def clue(self, request: ClueRequest) -> ClueResponse:
+        data: dict = self.post(endpoint="clue/", data=request.model_dump())  # type: ignore
+        return ClueResponse(**data)
 
     def guess(self, request: GuessRequest) -> GuessResponse:
-        data = self.post(endpoint="guess/", data=request.dict())
+        data: dict = self.post(endpoint="guess/", data=request.model_dump())  # type: ignore
         return GuessResponse(**data)
 
     def next_move(self, request: NextMoveRequest) -> NextMoveResponse:
-        data = self.post(endpoint="next-move/", data=request.dict())
+        data: dict = self.post(endpoint="next-move/", data=request.model_dump())  # type: ignore
         return NextMoveResponse(**data)
 
     def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
-        data = self.get(endpoint="state/", data=request.dict())
+        data: dict = self.get(endpoint="state/", data=request.model_dump())  # type: ignore
         return GetGameStateResponse(**data)
 
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        data = self.post(endpoint="load-models/", data=request.dict())
+        data: dict = self.post(endpoint="load-models/", data=request.model_dump())  # type: ignore
         return LoadModelsResponse(**data)
 
     def raise_error(self, request: dict):
