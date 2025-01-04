@@ -35,28 +35,28 @@ class TheSpymasterClient(BaseHttpClient):
         )
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
-        data: dict = self.post(endpoint="start/", data=request.model_dump(), error_types={})  # type: ignore
+        data: dict = self.post(endpoint="classic/start/", data=request.model_dump(), error_types={})  # type: ignore
         return StartGameResponse(**data)
 
     def clue(self, request: ClueRequest) -> ClueResponse:
-        data: dict = self.post(endpoint="clue/", data=request.model_dump())  # type: ignore
+        data: dict = self.post(endpoint="classic/clue/", data=request.model_dump())  # type: ignore
         return ClueResponse(**data)
 
     def guess(self, request: GuessRequest) -> GuessResponse:
-        data: dict = self.post(endpoint="guess/", data=request.model_dump())  # type: ignore
+        data: dict = self.post(endpoint="classic/guess/", data=request.model_dump())  # type: ignore
         return GuessResponse(**data)
 
     def next_move(self, request: NextMoveRequest) -> NextMoveResponse:
-        data: dict = self.post(endpoint="next-move/", data=request.model_dump())  # type: ignore
+        data: dict = self.post(endpoint="classic/next-move/", data=request.model_dump())  # type: ignore
         return NextMoveResponse(**data)
 
     def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
-        data: dict = self.get(endpoint="state/", data=request.model_dump())  # type: ignore
+        data: dict = self.get(endpoint="classic/state/", data=request.model_dump())  # type: ignore
         return GetGameStateResponse(**data)
 
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        data: dict = self.post(endpoint="load-models/", data=request.model_dump())  # type: ignore
+        data: dict = self.post(endpoint="classic/load-models/", data=request.model_dump())  # type: ignore
         return LoadModelsResponse(**data)
 
     def raise_error(self, request: dict):
-        return self.get(endpoint="raise-error/", data=request)
+        return self.get(endpoint="classic/raise-error/", data=request)
