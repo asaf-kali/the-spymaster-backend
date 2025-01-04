@@ -104,10 +104,10 @@ check-isort:
 	isort --check .
 
 check-mypy:
-	mypy .
+	mypy service/ api/
 
 check-pylint:
-	pylint service/ --fail-under=10
+	pylint service/ api/ --fail-under=10
 
 lint: format
 	pre-commit run --all-files
