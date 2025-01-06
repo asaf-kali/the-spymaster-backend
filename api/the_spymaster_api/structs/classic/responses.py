@@ -1,6 +1,8 @@
 from typing import Optional
 
 from codenames.classic.state import ClassicGameState
+from codenames.classic.team import ClassicTeam
+from codenames.classic.types import ClassicGivenClue, ClassicGivenGuess
 from codenames.generic.move import GivenClue, GivenGuess
 from pydantic import BaseModel
 from the_spymaster_solvers_api.structs import APIModelIdentifier, Solver
@@ -16,7 +18,7 @@ class GetGameStateResponse(BaseModel):
 
 
 class ClueResponse(BaseModel):
-    given_clue: GivenClue | None
+    given_clue: GivenClue[ClassicTeam] | None
     game_state: ClassicGameState
 
 
@@ -28,6 +30,6 @@ class GuessResponse(BaseModel):
 class NextMoveResponse(BaseModel):
     game_state: ClassicGameState
     used_solver: Solver
-    given_clue: Optional[GivenClue] = None
-    given_guess: Optional[GivenGuess] = None
+    given_clue: Optional[ClassicGivenClue] = None
+    given_guess: Optional[ClassicGivenGuess] = None
     used_model_identifier: Optional[APIModelIdentifier]

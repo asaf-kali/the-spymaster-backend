@@ -1,6 +1,6 @@
 from typing import Optional
 
-from codenames.classic.color import ClassicTeam
+from codenames.classic.team import ClassicTeam
 from codenames.utils.vocabulary.languages import SupportedLanguage
 from the_spymaster_api.structs import BaseRequest
 
