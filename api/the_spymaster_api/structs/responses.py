@@ -1,11 +1,11 @@
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from pydantic import BaseModel, ConfigDict
 
 
 class HttpResponse(BaseModel):
     status_code: int = 200
-    headers: Optional[dict] = None
+    headers: dict | None = None
     body: Union[dict, BaseModel]
 
     @property
@@ -16,6 +16,6 @@ class HttpResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    message: Optional[str]
+    message: str | None
     details: Any
     model_config = ConfigDict(extra="allow")

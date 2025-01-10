@@ -1,5 +1,5 @@
 import json
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 
 def deep_diff(left: Any, right: Any) -> Any:
@@ -16,7 +16,7 @@ def deep_diff(left: Any, right: Any) -> Any:
     return None
 
 
-def dict_diff(left: dict, right: dict) -> Optional[dict]:
+def dict_diff(left: dict, right: dict) -> dict | None:
     diff = {}
     all_keys = set(left.keys()) | set(right.keys())
     for key in all_keys:
@@ -31,7 +31,7 @@ def dict_diff(left: dict, right: dict) -> Optional[dict]:
     return diff or None
 
 
-def list_diff(left: list, right: list) -> Optional[dict]:
+def list_diff(left: list, right: list) -> dict | None:
     diff = {}
     len1, len2 = len(left), len(right)
     for i in range(max(len1, len2)):
@@ -46,7 +46,7 @@ def list_diff(left: list, right: list) -> Optional[dict]:
     return diff or None
 
 
-def pretty_diff(left: Any, right: Any) -> Optional[str]:
+def pretty_diff(left: Any, right: Any) -> str | None:
     diff = deep_diff(left, right)
     if not diff:
         return None

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from codenames.duet.state import DuetGameState
 from codenames.duet.types import DuetGivenClue, DuetGivenGuess
 from pydantic import BaseModel
@@ -21,7 +19,7 @@ class ClueResponse(BaseModel):
 
 
 class GuessResponse(BaseModel):
-    given_guess: Optional[DuetGivenGuess]
+    given_guess: DuetGivenGuess | None
     game_state: DuetGameState
 
 

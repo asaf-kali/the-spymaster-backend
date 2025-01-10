@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from codenames.classic.state import ClassicGameState
 from codenames.generic.player import PlayerRole
@@ -21,7 +20,7 @@ config = get_config()
 
 class NextMoveHandler:
     def __init__(
-        self, game_state: ClassicGameState, solver: Solver, model_identifier: Optional[APIModelIdentifier] = None
+        self, game_state: ClassicGameState, solver: Solver, model_identifier: APIModelIdentifier | None = None
     ):
         self.game_state = game_state
         self.solver = solver
