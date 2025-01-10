@@ -2,12 +2,14 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .views import IndexView, auth
+from .views.game.base import GameView
 from .views.game.classic import ClassicGameView
 from .views.game.duet import DuetGameView
 
 router_v1 = routers.SimpleRouter()
 router_v1.register(r"users", viewset=auth.UserDetailsView, basename="users")
-router_v1.register(r"game/classic", viewset=ClassicGameView, basename="game")
+router_v1.register(r"game", viewset=GameView, basename="game")
+router_v1.register(r"game/classic", viewset=ClassicGameView, basename="classic")
 router_v1.register(r"game/duet", viewset=DuetGameView, basename="duet")
 
 urlpatterns = [
