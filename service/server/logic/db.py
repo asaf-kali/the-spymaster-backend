@@ -6,7 +6,7 @@ from pynamodb.exceptions import DoesNotExist as PynamoDoesNotExist
 from pynamodb.models import Model
 from the_spymaster_api.structs import GameDoesNotExistError
 
-from server.models.game import ClassicGame
+from server.models.game import Game
 from the_spymaster.config import get_config
 
 config = get_config()
@@ -35,15 +35,15 @@ class GameItem(Model):
         return super().get(*args, hash_key=hash_key, **kwargs)  # type: ignore
 
 
-def load_game(game_id: str) -> ClassicGame:
+def get_or_create[T: Game](game_id: str, game_type: type[T]) -> T:
     try:
         game_item = GameItem.load(game_id=game_id)
     except PynamoDoesNotExist as e:  # pylint: disable=invalid-name
         raise GameDoesNotExistError.create(game_id=game_id) from e
-    return ClassicGame(id=game_id, state_data=game_item.state_data)
+    return game_type(id=game_id, state_data=game_item.state_data)
 
 
-def save_game(game: ClassicGame) -> None:
+def save_game(game: Game) -> None:
     item_id = get_game_item_id(game_id=game.id)
     game_item = GameItem(item_id=item_id, state_data=game.state_data)
     game_item.save()
