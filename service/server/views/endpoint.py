@@ -55,8 +55,8 @@ def endpoint(
     *,
     detail: bool = False,
     methods: Optional[List[HttpMethod]] = None,
-    url_path: Optional[str] = None,
-    url_name: Optional[str] = None,
+    url_path: str | None = None,
+    url_name: str | None = None,
 ):
     methods = methods or [HttpMethod.POST]
     str_methods = [m.value for m in methods]

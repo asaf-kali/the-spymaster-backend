@@ -1,5 +1,3 @@
-from typing import Optional
-
 from codenames.classic.state import ClassicGameState
 from codenames.classic.types import ClassicGivenClue, ClassicGivenGuess
 from pydantic import BaseModel
@@ -21,13 +19,13 @@ class ClueResponse(BaseModel):
 
 
 class GuessResponse(BaseModel):
-    given_guess: Optional[ClassicGivenGuess]
+    given_guess: ClassicGivenGuess | None
     game_state: ClassicGameState
 
 
 class NextMoveResponse(BaseModel):
     game_state: ClassicGameState
     used_solver: Solver
-    given_clue: Optional[ClassicGivenClue] = None
-    given_guess: Optional[ClassicGivenGuess] = None
-    used_model_identifier: Optional[APIModelIdentifier]
+    given_clue: ClassicGivenClue | None = None
+    given_guess: ClassicGivenGuess | None = None
+    used_model_identifier: APIModelIdentifier | None = None

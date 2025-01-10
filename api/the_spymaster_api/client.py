@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from the_spymaster_solvers_api.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_api.structs.responses import LoadModelsResponse
@@ -27,7 +26,7 @@ DEFAULT_BASE_URL = "http://localhost:8000"
 
 
 class TheSpymasterClient(BaseHttpClient):
-    def __init__(self, base_url: Optional[str] = None, retry_strategy: Optional[Retry] = DEFAULT_RETRY_STRATEGY):
+    def __init__(self, base_url: str | None = None, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
         if not base_url:
             base_url = DEFAULT_BASE_URL
         super().__init__(

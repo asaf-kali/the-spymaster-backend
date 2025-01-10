@@ -1,6 +1,6 @@
 import json
 import traceback
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 
 import sentry_sdk
 from codenames.generic.exceptions import GameRuleError
@@ -26,7 +26,7 @@ log = get_logger(__name__)
 
 
 def response_from_api_error(
-    e: APIError, override_error_code: Optional[str] = None  # pylint: disable=invalid-name
+    e: APIError, override_error_code: str | None = None  # pylint: disable=invalid-name
 ) -> HttpResponseBase:
     data = e.response_payload
     if override_error_code:

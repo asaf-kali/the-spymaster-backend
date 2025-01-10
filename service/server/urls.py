@@ -3,10 +3,12 @@ from rest_framework import routers
 
 from .views import IndexView, auth
 from .views.game.classic import ClassicGameView
+from .views.game.duet import DuetGameView
 
 router_v1 = routers.SimpleRouter()
 router_v1.register(r"users", viewset=auth.UserDetailsView, basename="users")
 router_v1.register(r"game/classic", viewset=ClassicGameView, basename="game")
+router_v1.register(r"game/duet", viewset=DuetGameView, basename="duet")
 
 urlpatterns = [
     path("", view=IndexView.as_view(), name="index"),

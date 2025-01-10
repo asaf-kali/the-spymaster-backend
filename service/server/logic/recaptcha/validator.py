@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import requests
 from django.conf import settings
@@ -10,10 +9,10 @@ log = logging.getLogger(__name__)
 
 
 class RecaptchaVerification(BaseModel):
-    success: Optional[bool] = False
-    challenge_ts: Optional[str] = None
-    hostname: Optional[str] = None
-    error_codes: Optional[list] = None
+    success: bool | None = False
+    challenge_ts: str | None = None
+    hostname: str | None = None
+    error_codes: list | None = None
 
 
 RECAPTCHA_FAILED_ERROR = ForbiddenError(message="reCAPTCHA Validation failed")

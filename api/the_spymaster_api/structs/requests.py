@@ -35,4 +35,4 @@ class GetGameStateRequest(BaseRequest):
 class NextMoveRequest(BaseRequest):
     game_id: str
     solver: Solver = Solver.NAIVE
-    model_identifier: Optional[APIModelIdentifier] = None
+    model_identifier: APIModelIdentifier | None = None
