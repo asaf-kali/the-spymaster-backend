@@ -22,15 +22,14 @@ from .structs.classic.responses import (
 )
 
 log = logging.getLogger(__name__)
-DEFAULT_BASE_URL = "http://localhost:8000"
 
 
 class TheSpymasterClient(BaseHttpClient):
-    def __init__(self, base_url: str | None = None, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
-        if not base_url:
-            base_url = DEFAULT_BASE_URL
+    def __init__(self, base_url: str, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
         super().__init__(
-            base_url=f"{base_url}/api/v1/game", retry_strategy=retry_strategy, common_errors=SERVICE_ERRORS
+            base_url=f"{base_url}/api/v1/game",
+            retry_strategy=retry_strategy,
+            common_errors=SERVICE_ERRORS,
         )
 
     def start_game(self, request: StartGameRequest) -> StartGameResponse:
@@ -54,8 +53,8 @@ class TheSpymasterClient(BaseHttpClient):
         return GetGameStateResponse(**data)
 
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        data: dict = self.post(endpoint="classic/load-models/", data=request.model_dump())  # type: ignore
+        data: dict = self.post(endpoint="load-models/", data=request.model_dump())  # type: ignore
         return LoadModelsResponse(**data)
 
     def raise_error(self, request: dict):
-        return self.get(endpoint="classic/raise-error/", data=request)
+        return self.get(endpoint="raise-error/", data=request)

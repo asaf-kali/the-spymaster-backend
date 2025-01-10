@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "the-spymaster-api"
-version = "3.0.4"
+version = "3.0.5"
 description = "Python client implementation for The Spymaster HTTP backend."
 authors = ["Asaf Kali <asaf.kali@mail.huji.ac.il>"]
 
