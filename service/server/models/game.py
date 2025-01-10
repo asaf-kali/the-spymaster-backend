@@ -11,8 +11,7 @@ class Game[T: BaseModel](BaseModel, abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def get_state_class(cls) -> type[T]:
-        raise NotImplementedError
+    def get_state_class(cls) -> type[T]: ...
 
     @property
     def state(self) -> T:

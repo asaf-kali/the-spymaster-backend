@@ -28,6 +28,6 @@ class GuessResponse(BaseModel):
 class NextMoveResponse(BaseModel):
     game_state: DuetGameState
     used_solver: Solver
-    given_clue: Optional[DuetGivenClue] = None
-    given_guess: Optional[DuetGivenGuess] = None
-    used_model_identifier: Optional[APIModelIdentifier]
+    given_clue: DuetGivenClue | None = None
+    given_guess: DuetGivenGuess | None = None
+    used_model_identifier: APIModelIdentifier | None = None

@@ -43,7 +43,7 @@ def get_or_create[T: Game](game_id: str, game_type: type[T]) -> T:
     return game_type(id=game_id, state_data=game_item.state_data)
 
 
-def save_game(game: Game) -> None:
+def save_game(game: Game[Any]) -> None:
     item_id = get_game_item_id(game_id=game.id)
     game_item = GameItem(item_id=item_id, state_data=game.state_data)
     game_item.save()
