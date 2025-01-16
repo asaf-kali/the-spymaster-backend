@@ -40,10 +40,29 @@ class GameView(GenericViewSet):
 
     @endpoint(methods=[HttpMethod.GET], url_path="ping-google")
     def ping_google(self, request: BaseRequest) -> HttpResponse:  # pylint: disable=unused-argument
+        """
+        Ping Google's website and return the HTTP response status and request duration.
+        
+        Performs a GET request to "https://www.google.com" with a 10-second timeout.
+        
+        Parameters:
+            request (BaseRequest): Incoming HTTP request (unused)
+        
+        Returns:
+            HttpResponse: Response containing:
+                - status_code (int): HTTP status code from the Google request
+                - duration (float): Total request duration in seconds
+        """
         response = requests.get("https://www.google.com", timeout=10)
         body = {"status_code": response.status_code, "duration": response.elapsed.total_seconds()}
         return HttpResponse(body=body)
 
 
 def ulid_lower():
+    """
+    Generate a new ULID (Universally Unique Lexicographically Sortable Identifier) and return its lowercase string representation.
+    
+    Returns:
+        str: A lowercase ULID string
+    """
     return ulid.new().str.lower()

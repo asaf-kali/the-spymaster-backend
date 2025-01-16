@@ -73,11 +73,40 @@ class TestApi(SpymasterTest):
         return f"/api/v1/{path}"
 
     def _post(self, path: str, data: dict):
+        """
+        Send a POST request to the specified API endpoint with JSON-encoded data.
+        
+        Parameters:
+            path (str): The relative path of the API endpoint to send the request to.
+            data (dict): A dictionary containing the payload to be sent with the request.
+        
+        Returns:
+            Response: The HTTP response from the API client after sending the POST request.
+        
+        Notes:
+            - Converts the input data dictionary to a JSON-encoded string
+            - Sets the content type to "application/json"
+            - Uses the internal `_url` method to construct the full URL
+        """
         url = self._url(path)
         _data = json.dumps(data)
         return self.api_client.post(path=url, data=_data, content_type="application/json")
 
     def _start_game(self) -> ClassicStartGameResponse:
+        """
+        Start a new game with the first team set to "BLUE".
+        
+        Sends a POST request to the game start endpoint and validates the response.
+        
+        Parameters:
+            None
+        
+        Returns:
+            ClassicStartGameResponse: A validated response containing game initialization details.
+        
+        Raises:
+            ValidationError: If the response cannot be validated against the ClassicStartGameResponse model.
+        """
         response = self._post(path=START_GAME_PATH, data={"first_team": "BLUE"})
         return ClassicStartGameResponse.model_validate(response.json())
 
