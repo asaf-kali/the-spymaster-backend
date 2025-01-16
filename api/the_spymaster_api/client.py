@@ -12,13 +12,13 @@ from .structs import (
     GuessRequest,
     NextMoveRequest,
 )
-from .structs.classic.requests import StartGameRequest
+from .structs.classic.requests import StartClassicGameRequest
 from .structs.classic.responses import (
-    ClueResponse,
-    GetGameStateResponse,
-    GuessResponse,
-    NextMoveResponse,
-    StartGameResponse,
+    ClassicClueResponse,
+    ClassicGetGameStateResponse,
+    ClassicGuessResponse,
+    ClassicNextMoveResponse,
+    ClassicStartGameResponse,
 )
 
 log = logging.getLogger(__name__)
@@ -32,25 +32,25 @@ class TheSpymasterClient(BaseHttpClient):
             common_errors=SERVICE_ERRORS,
         )
 
-    def start_game(self, request: StartGameRequest) -> StartGameResponse:
+    def start_classic_game(self, request: StartClassicGameRequest) -> ClassicStartGameResponse:
         data: dict = self.post(endpoint="classic/start/", data=request.model_dump(), error_types={})  # type: ignore
-        return StartGameResponse(**data)
+        return ClassicStartGameResponse(**data)
 
-    def clue(self, request: ClueRequest) -> ClueResponse:
+    def clue(self, request: ClueRequest) -> ClassicClueResponse:
         data: dict = self.post(endpoint="classic/clue/", data=request.model_dump())  # type: ignore
-        return ClueResponse(**data)
+        return ClassicClueResponse(**data)
 
-    def guess(self, request: GuessRequest) -> GuessResponse:
+    def guess(self, request: GuessRequest) -> ClassicGuessResponse:
         data: dict = self.post(endpoint="classic/guess/", data=request.model_dump())  # type: ignore
-        return GuessResponse(**data)
+        return ClassicGuessResponse(**data)
 
-    def next_move(self, request: NextMoveRequest) -> NextMoveResponse:
+    def next_move(self, request: NextMoveRequest) -> ClassicNextMoveResponse:
         data: dict = self.post(endpoint="classic/next-move/", data=request.model_dump())  # type: ignore
-        return NextMoveResponse(**data)
+        return ClassicNextMoveResponse(**data)
 
-    def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
+    def get_game_state(self, request: GetGameStateRequest) -> ClassicGetGameStateResponse:
         data: dict = self.get(endpoint="classic/state/", data=request.model_dump())  # type: ignore
-        return GetGameStateResponse(**data)
+        return ClassicGetGameStateResponse(**data)
 
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
         data: dict = self.post(endpoint="load-models/", data=request.model_dump())  # type: ignore

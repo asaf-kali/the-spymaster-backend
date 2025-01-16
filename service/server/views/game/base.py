@@ -1,6 +1,7 @@
 # pylint: disable=R0801
 
 import requests
+import ulid
 from rest_framework.viewsets import GenericViewSet
 from the_spymaster_api.structs import BaseRequest, HttpResponse
 from the_spymaster_solvers_api.structs.requests import LoadModelsRequest
@@ -42,3 +43,7 @@ class GameView(GenericViewSet):
         response = requests.get("https://www.google.com", timeout=10)
         body = {"status_code": response.status_code, "duration": response.elapsed.total_seconds()}
         return HttpResponse(body=body)
+
+
+def ulid_lower():
+    return ulid.new().str.lower()
