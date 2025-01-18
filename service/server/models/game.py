@@ -2,6 +2,7 @@ import abc
 
 from codenames.classic.state import ClassicGameState
 from codenames.duet.state import DuetGameState
+from codenames.mini.state import MiniGameState
 from pydantic import BaseModel
 
 
@@ -28,3 +29,9 @@ class DuetGame(Game[DuetGameState]):
     @classmethod
     def get_state_class(cls) -> type[DuetGameState]:
         return DuetGameState
+
+
+class MiniGame(Game[MiniGameState]):
+    @classmethod
+    def get_state_class(cls) -> type[MiniGameState]:
+        return MiniGameState
