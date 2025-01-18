@@ -19,7 +19,7 @@ from the_spymaster_api.structs.classic.responses import (
 )
 from the_spymaster_util.logger import get_logger
 
-from server.logic.db import get_or_create, save_game
+from server.logic.db import load_game, save_game
 from server.logic.next_move import NextMoveHandler
 from server.models.game import ClassicGame
 from server.views.endpoint import HttpMethod, endpoint
@@ -37,12 +37,12 @@ class ClassicGameView(GenericViewSet):
         game_state = ClassicGameState.from_board(board=board)
         game = ClassicGame(id=ulid_lower(), state_data=game_state.model_dump())
         save_game(game)
-        log.info(f"Starting game: {game.id}")
+        log.info(f"Starting classic game: {game.id}")
         return ClassicStartGameResponse(game_id=game.id, game_state=game_state)
 
     @endpoint
     def clue(self, request: ClueRequest) -> ClassicClueResponse:
-        game = get_or_create(request.game_id, game_type=ClassicGame)
+        game = load_game(request.game_id, game_type=ClassicGame)
         game_state = game.state
         log.debug(f"Processing clue for game [{game.id}]: [{request.word}]")
         for_words = tuple(request.for_words) if request.for_words else None
@@ -54,7 +54,7 @@ class ClassicGameView(GenericViewSet):
 
     @endpoint
     def guess(self, request: GuessRequest) -> ClassicGuessResponse:
-        game = get_or_create(request.game_id, game_type=ClassicGame)
+        game = load_game(request.game_id, game_type=ClassicGame)
         game_state = game.state
         log.debug(f"Processing guess for game [{game.id}]: [{request.card_index}]")
         guess = Guess(card_index=request.card_index)
@@ -65,12 +65,12 @@ class ClassicGameView(GenericViewSet):
 
     @endpoint(methods=[HttpMethod.GET], url_path="state")
     def get_game_state(self, request: GetGameStateRequest) -> ClassicGetGameStateResponse:
-        game = get_or_create(request.game_id, game_type=ClassicGame)
+        game = load_game(request.game_id, game_type=ClassicGame)
         return ClassicGetGameStateResponse(game_state=game.state)
 
     @endpoint(url_path="next-move")
     def next_move(self, request: NextMoveRequest) -> ClassicNextMoveResponse:
-        game = get_or_create(request.game_id, game_type=ClassicGame)
+        game = load_game(request.game_id, game_type=ClassicGame)
         game_state = game.state
         handler = NextMoveHandler(
             game_id=game.id, game_state=game_state, solver=request.solver, model_identifier=request.model_identifier

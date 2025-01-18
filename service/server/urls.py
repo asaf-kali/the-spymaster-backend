@@ -5,12 +5,14 @@ from .views import IndexView, auth
 from .views.game.base import GameView
 from .views.game.classic import ClassicGameView
 from .views.game.duet import DuetGameView
+from .views.game.mini import MiniGameView
 
 router_v1 = routers.SimpleRouter()
 router_v1.register(r"users", viewset=auth.UserDetailsView, basename="users")
 router_v1.register(r"game", viewset=GameView, basename="game")
 router_v1.register(r"game/classic", viewset=ClassicGameView, basename="classic")
 router_v1.register(r"game/duet", viewset=DuetGameView, basename="duet")
+router_v1.register(r"game/mini", viewset=MiniGameView, basename="mini")
 
 urlpatterns = [
     path("", view=IndexView.as_view(), name="index"),
