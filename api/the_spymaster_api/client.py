@@ -41,7 +41,7 @@ class ClassicClient(HTTPClient):
         )
 
     def start_game(self, request: ClassicStartGameRequest) -> ClassicStartGameResponse:
-        data = self.post(endpoint="start/", data=request.model_dump(), error_types={})
+        data = self.post(endpoint="start/", data=request.model_dump())
         return ClassicStartGameResponse(**data)
 
     def clue(self, request: ClueRequest) -> ClassicClueResponse:
@@ -70,7 +70,7 @@ class DuetClient(HTTPClient):
         )
 
     def start_game(self, request: DuetStartGameRequest) -> DuetStartGameResponse:
-        data = self.post(endpoint="start/", data=request.model_dump(), error_types={})
+        data = self.post(endpoint="start/", data=request.model_dump())
         return DuetStartGameResponse(**data)
 
     def clue(self, request: ClueRequest) -> DuetClueResponse:

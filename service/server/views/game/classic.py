@@ -44,6 +44,7 @@ class ClassicGameView(GenericViewSet):
     def clue(self, request: ClueRequest) -> ClassicClueResponse:
         game = get_or_create(request.game_id, game_type=ClassicGame)
         game_state = game.state
+        log.debug(f"Processing clue for game [{game.id}]: [{request.word}]")
         for_words = tuple(request.for_words) if request.for_words else None
         clue = Clue(word=request.word, card_amount=request.card_amount, for_words=for_words)
         given_clue = game_state.process_clue(clue)
@@ -55,6 +56,7 @@ class ClassicGameView(GenericViewSet):
     def guess(self, request: GuessRequest) -> ClassicGuessResponse:
         game = get_or_create(request.game_id, game_type=ClassicGame)
         game_state = game.state
+        log.debug(f"Processing guess for game [{game.id}]: [{request.card_index}]")
         guess = Guess(card_index=request.card_index)
         given_guess = game_state.process_guess(guess)
         game.state_data = game_state.model_dump()
