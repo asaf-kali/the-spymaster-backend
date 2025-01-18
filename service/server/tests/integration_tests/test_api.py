@@ -2,7 +2,7 @@ import json
 from unittest.mock import ANY
 
 from rest_framework.test import APIClient
-from the_spymaster_api.structs.classic.responses import StartGameResponse
+from the_spymaster_api.structs.classic.responses import ClassicStartGameResponse
 
 from server.tests.spymaster_test import SpymasterTest
 from server.tests.util.deep_diff import deep_diff
@@ -77,9 +77,9 @@ class TestApi(SpymasterTest):
         _data = json.dumps(data)
         return self.api_client.post(path=url, data=_data, content_type="application/json")
 
-    def _start_game(self) -> StartGameResponse:
+    def _start_game(self) -> ClassicStartGameResponse:
         response = self._post(path=START_GAME_PATH, data={"first_team": "BLUE"})
-        return StartGameResponse.model_validate(response.json())
+        return ClassicStartGameResponse.model_validate(response.json())
 
     # def test_guess(self):
     #     request_data = {"game_id": 1, "card_index": 0}

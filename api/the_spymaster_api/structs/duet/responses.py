@@ -4,26 +4,26 @@ from pydantic import BaseModel
 from the_spymaster_solvers_api.structs import APIModelIdentifier, Solver
 
 
-class StartGameResponse(BaseModel):
+class DuetStartGameResponse(BaseModel):
     game_id: str
     game_state: DuetGameState
 
 
-class GetGameStateResponse(BaseModel):
+class DuetGetGameStateResponse(BaseModel):
     game_state: DuetGameState
 
 
-class ClueResponse(BaseModel):
+class DuetClueResponse(BaseModel):
     given_clue: DuetGivenClue | None
     game_state: DuetGameState
 
 
-class GuessResponse(BaseModel):
+class DuetGuessResponse(BaseModel):
     given_guess: DuetGivenGuess | None
     game_state: DuetGameState
 
 
-class NextMoveResponse(BaseModel):
+class DuetNextMoveResponse(BaseModel):
     game_state: DuetGameState
     used_solver: Solver
     given_clue: DuetGivenClue | None = None

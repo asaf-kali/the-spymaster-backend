@@ -354,13 +354,13 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "codenames"
-version = "5.4.2"
+version = "5.5.2"
 description = "Codenames board game logic implementation in python."
 optional = false
 python-versions = "<4.0,>=3.12"
 files = [
-    {file = "codenames-5.4.2-py3-none-any.whl", hash = "sha256:3ce42cb7e09b9bdae9d466fdc1b3698938d36c4255b5c442464a6caf8eb66b2e"},
-    {file = "codenames-5.4.2.tar.gz", hash = "sha256:404053948d01e88eb8e587882bcc7841f2237158354f96f3992ec53607911eb0"},
+    {file = "codenames-5.5.2-py3-none-any.whl", hash = "sha256:d9e76091eb45e3f97ec27580b27b17488d84f8aa7d16e5d3c2bdec6f72486959"},
+    {file = "codenames-5.5.2.tar.gz", hash = "sha256:8132f977343ff2c6753a3872a9277a1dd3da9946ef114c407183e1d5e3b59a52"},
 ]
 
 [package.dependencies]
@@ -548,13 +548,13 @@ with-social = ["django-allauth (>=0.40.0,<0.53.0)"]
 
 [[package]]
 name = "django"
-version = "4.2.17"
+version = "4.2.18"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Django-4.2.17-py3-none-any.whl", hash = "sha256:3a93350214ba25f178d4045c0786c61573e7dbfa3c509b3551374f1e11ba8de0"},
-    {file = "Django-4.2.17.tar.gz", hash = "sha256:6b56d834cc94c8b21a8f4e775064896be3b4a4ca387f2612d4406a5927cd2fdc"},
+    {file = "Django-4.2.18-py3-none-any.whl", hash = "sha256:ba52eff7e228f1c775d5b0db2ba53d8c49d2f8bfe6ca0234df6b7dd12fb25b19"},
+    {file = "Django-4.2.18.tar.gz", hash = "sha256:52ae8eacf635617c0f13b44f749e5ea13dc34262819b2cc8c8636abb08d82c4b"},
 ]
 
 [package.dependencies]
@@ -1045,13 +1045,13 @@ files = [
 
 [[package]]
 name = "more-itertools"
-version = "10.5.0"
+version = "10.6.0"
 description = "More routines for operating on iterables, beyond itertools"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "more-itertools-10.5.0.tar.gz", hash = "sha256:5482bfef7849c25dc3c6dd53a6173ae4795da2a41a80faea6700d9f5846c5da6"},
-    {file = "more_itertools-10.5.0-py3-none-any.whl", hash = "sha256:037b0d3203ce90cca8ab1defbbdac29d5f993fc20131f3664dc8d6acfa872aef"},
+    {file = "more-itertools-10.6.0.tar.gz", hash = "sha256:2cd7fad1009c31cc9fb6a035108509e6547547a7a738374f10bd49a09eb3ee3b"},
+    {file = "more_itertools-10.6.0-py3-none-any.whl", hash = "sha256:6eb054cb4b6db1473f6e15fcc676a08e4732548acd47c708f0e179c2c7c01e89"},
 ]
 
 [[package]]
@@ -1339,13 +1339,13 @@ files = [
 
 [[package]]
 name = "pydantic"
-version = "2.10.4"
+version = "2.10.5"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pydantic-2.10.4-py3-none-any.whl", hash = "sha256:597e135ea68be3a37552fb524bc7d0d66dcf93d395acd93a00682f1efcb8ee3d"},
-    {file = "pydantic-2.10.4.tar.gz", hash = "sha256:82f12e9723da6de4fe2ba888b5971157b3be7ad914267dea8f05f82b28254f06"},
+    {file = "pydantic-2.10.5-py3-none-any.whl", hash = "sha256:4dd4e322dbe55472cb7ca7e73f4b63574eecccf2835ffa2af9021ce113c83c53"},
+    {file = "pydantic-2.10.5.tar.gz", hash = "sha256:278b38dbbaec562011d659ee05f63346951b3a248a6f3642e1bc68894ea2b4ff"},
 ]
 
 [package.dependencies]
@@ -1471,13 +1471,13 @@ typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
 name = "pygments"
-version = "2.19.0"
+version = "2.19.1"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pygments-2.19.0-py3-none-any.whl", hash = "sha256:4755e6e64d22161d5b61432c0600c923c5927214e7c956e31c23923c89251a9b"},
-    {file = "pygments-2.19.0.tar.gz", hash = "sha256:afc4146269910d4bdfabcd27c24923137a74d562a23a320a41a55ad303e19783"},
+    {file = "pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c"},
+    {file = "pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f"},
 ]
 
 [package.extras]
@@ -1761,13 +1761,13 @@ requests = ">=2.0.1,<3.0.0"
 
 [[package]]
 name = "responses"
-version = "0.25.3"
+version = "0.25.6"
 description = "A utility library for mocking out the `requests` Python library."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "responses-0.25.3-py3-none-any.whl", hash = "sha256:521efcbc82081ab8daa588e08f7e8a64ce79b91c39f6e62199b19159bea7dbcb"},
-    {file = "responses-0.25.3.tar.gz", hash = "sha256:617b9247abd9ae28313d57a75880422d55ec63c29d33d629697590a034358dba"},
+    {file = "responses-0.25.6-py3-none-any.whl", hash = "sha256:9cac8f21e1193bb150ec557875377e41ed56248aed94e4567ed644db564bacf1"},
+    {file = "responses-0.25.6.tar.gz", hash = "sha256:eae7ce61a9603004e76c05691e7c389e59652d91e94b419623c12bbfb8e331d8"},
 ]
 
 [package.dependencies]
@@ -1871,13 +1871,13 @@ jeepney = ">=0.6"
 
 [[package]]
 name = "sentry-sdk"
-version = "2.19.2"
+version = "2.20.0"
 description = "Python client for Sentry (https://sentry.io)"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sentry_sdk-2.19.2-py2.py3-none-any.whl", hash = "sha256:ebdc08228b4d131128e568d696c210d846e5b9d70aa0327dec6b1272d9d40b84"},
-    {file = "sentry_sdk-2.19.2.tar.gz", hash = "sha256:467df6e126ba242d39952375dd816fbee0f217d119bf454a8ce74cf1e7909e8d"},
+    {file = "sentry_sdk-2.20.0-py2.py3-none-any.whl", hash = "sha256:c359a1edf950eb5e80cffd7d9111f3dbeef57994cb4415df37d39fda2cf22364"},
+    {file = "sentry_sdk-2.20.0.tar.gz", hash = "sha256:afa82713a92facf847df3c6f63cec71eb488d826a50965def3d7722aa6f0fdab"},
 ]
 
 [package.dependencies]
@@ -1922,6 +1922,7 @@ sqlalchemy = ["sqlalchemy (>=1.2)"]
 starlette = ["starlette (>=0.19.1)"]
 starlite = ["starlite (>=1.48)"]
 tornado = ["tornado (>=6)"]
+unleash = ["UnleashClient (>=6.0.1)"]
 
 [[package]]
 name = "six"
@@ -1951,7 +1952,7 @@ doc = ["sphinx"]
 
 [[package]]
 name = "the-spymaster-api"
-version = "3.0.4"
+version = "3.1.0"
 description = "Python client implementation for The Spymaster HTTP backend."
 optional = false
 python-versions = "^3.9"
@@ -1963,7 +1964,7 @@ codenames = "^5.4"
 pydantic = "^2.0"
 requests = "^2.28"
 the-spymaster-solvers-api = "^3.0"
-the-spymaster-util = {version = "^3.2", extras = ["clients"]}
+the-spymaster-util = {version = "^4.0", extras = ["clients"]}
 
 [package.source]
 type = "directory"
@@ -1971,42 +1972,42 @@ url = "api"
 
 [[package]]
 name = "the-spymaster-solvers-api"
-version = "3.0.2"
+version = "3.1.0"
 description = "Python client implementation for The Spymaster Solvers HTTP backend."
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "the_spymaster_solvers_api-3.0.2-py3-none-any.whl", hash = "sha256:f620d1365dc23c13828b8aae50642d2d044eb9034724a7b9fed340b21e54f6b0"},
-    {file = "the_spymaster_solvers_api-3.0.2.tar.gz", hash = "sha256:2c4ee2578958822ed36e0649249082309926f564a5930f84b100480ddf0793a8"},
+    {file = "the_spymaster_solvers_api-3.1.0-py3-none-any.whl", hash = "sha256:91fb3425c278e8c019f8d05ad781c6f335406e83c93bd3d331324cc1387a5608"},
+    {file = "the_spymaster_solvers_api-3.1.0.tar.gz", hash = "sha256:8513eec95489cf39999895d64a83ddbfa229d9f192e41305efd1784a03d82c2d"},
 ]
 
 [package.dependencies]
-codenames = ">=5.2,<6.0"
+codenames = ">=5.4,<6.0"
 pydantic = ">=2.8,<3.0"
 requests = ">=2.28,<3.0"
-the-spymaster-util = {version = ">=3.2,<4.0", extras = ["clients"]}
+the-spymaster-util = {version = ">=4.0,<5.0", extras = ["clients"]}
 
 [[package]]
 name = "the-spymaster-util"
-version = "3.2.4"
+version = "4.0.0"
 description = "Common utilities and infra for The Spymaster game."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "the_spymaster_util-3.2.4-py3-none-any.whl", hash = "sha256:d5b65c998113a48a2670b185efa58d53e0f39718ed52935cb79f1d78db721506"},
-    {file = "the_spymaster_util-3.2.4.tar.gz", hash = "sha256:1c6576ac296ba09d0a5aca4e7b83cde8dea9bcdbb30dd5542570012f440dd99b"},
+    {file = "the_spymaster_util-4.0.0-py3-none-any.whl", hash = "sha256:87c8bec578cc1482815f3b329a94eb17ffe3175d5325e52a5584c4b30921a429"},
+    {file = "the_spymaster_util-4.0.0.tar.gz", hash = "sha256:e2dd3ca83bc838c896ad702fea4adc2fb47c6fe00549dcc8c4782ceaa1910e1e"},
 ]
 
 [package.dependencies]
-boto3 = {version = ">=1.24.6,<2.0.0", optional = true, markers = "extra == \"config\" or extra == \"all\""}
+boto3 = {version = ">=1.24,<2.0", optional = true, markers = "extra == \"config\" or extra == \"all\""}
 dynaconf = {version = ">=3.1,<4.0", optional = true, markers = "extra == \"config\" or extra == \"all\""}
-requests = {version = ">=2.28,<3.0", optional = true, markers = "extra == \"clients\" or extra == \"all\""}
+requests = {version = ">=2.32,<3.0", optional = true, markers = "extra == \"clients\" or extra == \"all\""}
 ulid-py = {version = ">=1.1,<2.0", optional = true, markers = "extra == \"logging\" or extra == \"all\""}
 
 [package.extras]
-all = ["boto3 (>=1.24.6,<2.0.0)", "dynaconf (>=3.1,<4.0)", "requests (>=2.28,<3.0)", "ulid-py (>=1.1,<2.0)"]
-clients = ["requests (>=2.28,<3.0)"]
-config = ["boto3 (>=1.24.6,<2.0.0)", "dynaconf (>=3.1,<4.0)"]
+all = ["boto3 (>=1.24,<2.0)", "dynaconf (>=3.1,<4.0)", "requests (>=2.32,<3.0)", "ulid-py (>=1.1,<2.0)"]
+clients = ["requests (>=2.32,<3.0)"]
+config = ["boto3 (>=1.24,<2.0)", "dynaconf (>=3.1,<4.0)"]
 logging = ["ulid-py (>=1.1,<2.0)"]
 
 [[package]]
@@ -2118,13 +2119,13 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "virtualenv"
-version = "20.28.1"
+version = "20.29.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "virtualenv-20.28.1-py3-none-any.whl", hash = "sha256:412773c85d4dab0409b83ec36f7a6499e72eaf08c80e81e9576bca61831c71cb"},
-    {file = "virtualenv-20.28.1.tar.gz", hash = "sha256:5d34ab240fdb5d21549b76f9e8ff3af28252f5499fb6d6f031adac4e5a8c5329"},
+    {file = "virtualenv-20.29.1-py3-none-any.whl", hash = "sha256:4e4cb403c0b0da39e13b46b1b2476e505cb0046b25f242bee80f62bf990b2779"},
+    {file = "virtualenv-20.29.1.tar.gz", hash = "sha256:b8b8970138d32fb606192cb97f6cd4bb644fa486be9308fb9b63f81091b5dc35"},
 ]
 
 [package.dependencies]
@@ -2197,4 +2198,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "e133ae521b376b7e08fe32bb9983a924e008d09fd5346caf8e71d868d3f919e3"
+content-hash = "416f028a2cba87af9720bdf53cdbab4b3c1c7433f3a9af144d447de74193179d"

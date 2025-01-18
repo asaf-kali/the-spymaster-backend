@@ -1,6 +1,5 @@
 # pylint: disable=R0801
 
-import ulid
 from codenames.duet.board import DuetBoard
 from codenames.duet.state import DuetGameState
 from codenames.generic.move import Clue, Guess
@@ -12,13 +11,13 @@ from the_spymaster_api.structs import (
     GuessRequest,
     NextMoveRequest,
 )
-from the_spymaster_api.structs.duet.requests import StartGameRequest
+from the_spymaster_api.structs.duet.requests import DuetStartGameRequest
 from the_spymaster_api.structs.duet.responses import (
-    ClueResponse,
-    GetGameStateResponse,
-    GuessResponse,
-    NextMoveResponse,
-    StartGameResponse,
+    DuetClueResponse,
+    DuetGetGameStateResponse,
+    DuetGuessResponse,
+    DuetNextMoveResponse,
+    DuetStartGameResponse,
 )
 from the_spymaster_util.http.errors import BadRequestError
 from the_spymaster_util.logger import get_logger
@@ -26,18 +25,15 @@ from the_spymaster_util.logger import get_logger
 from server.logic.db import get_or_create, save_game
 from server.models.game import DuetGame
 from server.views.endpoint import HttpMethod, endpoint
+from server.views.game.base import ulid_lower
 
 log = get_logger(__name__)
-
-
-def ulid_lower():
-    return ulid.new().str.lower()
 
 
 class DuetGameView(GenericViewSet):
 
     @endpoint
-    def start(self, request: StartGameRequest) -> StartGameResponse:
+    def start(self, request: DuetStartGameRequest) -> DuetStartGameResponse:
         vocabulary = get_vocabulary(language=request.language)
         board = DuetBoard.from_vocabulary(vocabulary=vocabulary)
         game_state = DuetGameState.from_board(board=board)
@@ -46,36 +42,38 @@ class DuetGameView(GenericViewSet):
         game = DuetGame(id=ulid_lower(), state_data=game_state.model_dump())
         save_game(game)
         log.info(f"Starting game: {game.id}")
-        return StartGameResponse(game_id=game.id, game_state=game_state)
+        return DuetStartGameResponse(game_id=game.id, game_state=game_state)
 
     @endpoint
-    def clue(self, request: ClueRequest) -> ClueResponse:
+    def clue(self, request: ClueRequest) -> DuetClueResponse:
         game = get_or_create(request.game_id, game_type=DuetGame)
         game_state = game.state
+        log.debug(f"Processing clue for game [{game.id}]: [{request.word}]")
         for_words = tuple(request.for_words) if request.for_words else None
         clue = Clue(word=request.word, card_amount=request.card_amount, for_words=for_words)
         given_clue = game_state.process_clue(clue)
         game.state_data = game_state.model_dump()
         save_game(game)
-        return ClueResponse(given_clue=given_clue, game_state=game_state)
+        return DuetClueResponse(given_clue=given_clue, game_state=game_state)
 
     @endpoint
-    def guess(self, request: GuessRequest) -> GuessResponse:
+    def guess(self, request: GuessRequest) -> DuetGuessResponse:
         game = get_or_create(request.game_id, game_type=DuetGame)
         game_state = game.state
+        log.debug(f"Processing guess for game [{game.id}]: [{request.card_index}]")
         guess = Guess(card_index=request.card_index)
         given_guess = game_state.process_guess(guess)
         game.state_data = game_state.model_dump()
         save_game(game)
-        return GuessResponse(given_guess=given_guess, game_state=game_state)
+        return DuetGuessResponse(given_guess=given_guess, game_state=game_state)
 
     @endpoint(methods=[HttpMethod.GET], url_path="state")
-    def get_game_state(self, request: GetGameStateRequest) -> GetGameStateResponse:
+    def get_game_state(self, request: GetGameStateRequest) -> DuetGetGameStateResponse:
         game = get_or_create(request.game_id, game_type=DuetGame)
-        return GetGameStateResponse(game_state=game.state)
+        return DuetGetGameStateResponse(game_state=game.state)
 
     @endpoint(url_path="next-move")
-    def next_move(self, request: NextMoveRequest) -> NextMoveResponse:
+    def next_move(self, request: NextMoveRequest) -> DuetNextMoveResponse:
         raise BadRequestError(message="Not implemented")
         # game = get_or_create(request.game_id, game_type=DuetGame)
         # game_state = game.state

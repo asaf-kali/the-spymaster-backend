@@ -7,6 +7,7 @@
 [![Imports: isort](https://img.shields.io/badge/imports-isort-%231674b1)](https://pycqa.github.io/isort/)
 [![Type checked: mypy](https://img.shields.io/badge/type%20check-mypy-22aa11)](http://mypy-lang.org/)
 [![Linting: pylint](https://img.shields.io/badge/linting-pylint-22aa11)](https://github.com/pylint-dev/pylint)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/asaf-kali/the-spymaster-backend)
 
 A generic backend service for Codenames board game. \
 Provides game state and opponent solvers for the [the-spymaster-bot](https://github.com/asaf-kali/the-spymaster-bot).
