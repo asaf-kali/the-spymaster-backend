@@ -73,7 +73,7 @@ class ClassicGameView(GenericViewSet):
         game = get_or_create(request.game_id, game_type=ClassicGame)
         game_state = game.state
         handler = NextMoveHandler(
-            game_state=game_state, solver=request.solver, model_identifier=request.model_identifier
+            game_id=game.id, game_state=game_state, solver=request.solver, model_identifier=request.model_identifier
         )
         response = handler.handle()
         game.state_data = handler.game_state.model_dump()

@@ -20,8 +20,13 @@ config = get_config()
 
 class NextMoveHandler:
     def __init__(
-        self, game_state: ClassicGameState, solver: Solver, model_identifier: APIModelIdentifier | None = None
+        self,
+        game_id: str,
+        game_state: ClassicGameState,
+        solver: Solver,
+        model_identifier: APIModelIdentifier | None = None,
     ):
+        self.game_id = game_id
         self.game_state = game_state
         self.solver = solver
         self.model_identifier = model_identifier
@@ -30,12 +35,14 @@ class NextMoveHandler:
 
     def handle(self) -> ClassicNextMoveResponse:
         if self.game_state.is_game_over:
-            raise BadRequestError(message="Game is over")
+            raise BadRequestError(message=f"Cannot make move: Game [{self.game_id}] is already over")
         if self.game_state.current_player_role == PlayerRole.SPYMASTER:
             return self._make_spymaster_move()
         if self.game_state.current_player_role == PlayerRole.OPERATIVE:
             return self._make_operative_move()
-        raise ValueError(f"Unknown player role: {self.game_state.current_player_role}")
+        raise ValueError(
+            f"Cannot make move: Unknown player role [{self.game_state.current_player_role}] in game [{self.game_id}]"
+        )
 
     def _make_spymaster_move(self) -> ClassicNextMoveResponse:
         generate_clue_request = GenerateClueRequest(
