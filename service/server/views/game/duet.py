@@ -11,7 +11,7 @@ from the_spymaster_api.structs import (
     GuessRequest,
     NextMoveRequest,
 )
-from the_spymaster_api.structs.duet.requests import StartDuetGameRequest
+from the_spymaster_api.structs.duet.requests import DuetStartGameRequest
 from the_spymaster_api.structs.duet.responses import (
     DuetClueResponse,
     DuetGetGameStateResponse,
@@ -33,7 +33,7 @@ log = get_logger(__name__)
 class DuetGameView(GenericViewSet):
 
     @endpoint
-    def start(self, request: StartDuetGameRequest) -> DuetStartGameResponse:
+    def start(self, request: DuetStartGameRequest) -> DuetStartGameResponse:
         vocabulary = get_vocabulary(language=request.language)
         board = DuetBoard.from_vocabulary(vocabulary=vocabulary)
         game_state = DuetGameState.from_board(board=board)

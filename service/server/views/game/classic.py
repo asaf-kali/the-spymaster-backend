@@ -9,7 +9,7 @@ from the_spymaster_api.structs import (
     GuessRequest,
     NextMoveRequest,
 )
-from the_spymaster_api.structs.classic.requests import StartClassicGameRequest
+from the_spymaster_api.structs.classic.requests import ClassicStartGameRequest
 from the_spymaster_api.structs.classic.responses import (
     ClassicClueResponse,
     ClassicGetGameStateResponse,
@@ -31,7 +31,7 @@ log = get_logger(__name__)
 class ClassicGameView(GenericViewSet):
 
     @endpoint
-    def start(self, request: StartClassicGameRequest) -> ClassicStartGameResponse:
+    def start(self, request: ClassicStartGameRequest) -> ClassicStartGameResponse:
         vocabulary = get_vocabulary(language=request.language)
         board = ClassicBoard.from_vocabulary(vocabulary=vocabulary, first_team=request.first_team)
         game_state = ClassicGameState.from_board(board=board)

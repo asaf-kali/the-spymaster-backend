@@ -11,7 +11,7 @@ from django.http import JsonResponse
 from django.http.response import HttpResponseBase
 from django.utils.deprecation import MiddlewareMixin
 from the_spymaster_api.structs import APIGameRuleError
-from the_spymaster_util.http.base_client import extract_context
+from the_spymaster_util.http.client import extract_context
 from the_spymaster_util.http.defs import CONTEXT_ID_HEADER_KEY
 from the_spymaster_util.http.errors import (
     APIError,

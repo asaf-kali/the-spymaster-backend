@@ -2,7 +2,7 @@ import logging
 
 from the_spymaster_solvers_api.structs.requests import LoadModelsRequest
 from the_spymaster_solvers_api.structs.responses import LoadModelsResponse
-from the_spymaster_util.http.base_client import DEFAULT_RETRY_STRATEGY, BaseHttpClient
+from the_spymaster_util.http.client import DEFAULT_RETRY_STRATEGY, HTTPClient
 from urllib3 import Retry
 
 from .structs import (
@@ -12,7 +12,7 @@ from .structs import (
     GuessRequest,
     NextMoveRequest,
 )
-from .structs.classic.requests import StartClassicGameRequest
+from .structs.classic.requests import ClassicStartGameRequest
 from .structs.classic.responses import (
     ClassicClueResponse,
     ClassicGetGameStateResponse,
@@ -20,40 +20,89 @@ from .structs.classic.responses import (
     ClassicNextMoveResponse,
     ClassicStartGameResponse,
 )
+from .structs.duet.requests import DuetStartGameRequest
+from .structs.duet.responses import (
+    DuetClueResponse,
+    DuetGetGameStateResponse,
+    DuetGuessResponse,
+    DuetNextMoveResponse,
+    DuetStartGameResponse,
+)
 
 log = logging.getLogger(__name__)
 
 
-class TheSpymasterClient(BaseHttpClient):
-    def __init__(self, base_url: str, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
+class ClassicClient(HTTPClient):
+    def __init__(self, game_api_url: str, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
         super().__init__(
-            base_url=f"{base_url}/api/v1/game",
+            base_url=f"{game_api_url}/classic",
             retry_strategy=retry_strategy,
             common_errors=SERVICE_ERRORS,
         )
 
-    def start_classic_game(self, request: StartClassicGameRequest) -> ClassicStartGameResponse:
-        data: dict = self.post(endpoint="classic/start/", data=request.model_dump(), error_types={})  # type: ignore
+    def start_game(self, request: ClassicStartGameRequest) -> ClassicStartGameResponse:
+        data = self.post(endpoint="start/", data=request.model_dump(), error_types={})
         return ClassicStartGameResponse(**data)
 
     def clue(self, request: ClueRequest) -> ClassicClueResponse:
-        data: dict = self.post(endpoint="classic/clue/", data=request.model_dump())  # type: ignore
+        data = self.post(endpoint="clue/", data=request.model_dump())
         return ClassicClueResponse(**data)
 
     def guess(self, request: GuessRequest) -> ClassicGuessResponse:
-        data: dict = self.post(endpoint="classic/guess/", data=request.model_dump())  # type: ignore
+        data = self.post(endpoint="guess/", data=request.model_dump())
         return ClassicGuessResponse(**data)
 
     def next_move(self, request: NextMoveRequest) -> ClassicNextMoveResponse:
-        data: dict = self.post(endpoint="classic/next-move/", data=request.model_dump())  # type: ignore
+        data = self.post(endpoint="next-move/", data=request.model_dump())
         return ClassicNextMoveResponse(**data)
 
     def get_game_state(self, request: GetGameStateRequest) -> ClassicGetGameStateResponse:
-        data: dict = self.get(endpoint="classic/state/", data=request.model_dump())  # type: ignore
+        data = self.get(endpoint="state/", data=request.model_dump())
         return ClassicGetGameStateResponse(**data)
 
+
+class DuetClient(HTTPClient):
+    def __init__(self, game_api_url: str, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
+        super().__init__(
+            base_url=f"{game_api_url}/duet",
+            retry_strategy=retry_strategy,
+            common_errors=SERVICE_ERRORS,
+        )
+
+    def start_game(self, request: DuetStartGameRequest) -> DuetStartGameResponse:
+        data = self.post(endpoint="start/", data=request.model_dump(), error_types={})
+        return DuetStartGameResponse(**data)
+
+    def clue(self, request: ClueRequest) -> DuetClueResponse:
+        data = self.post(endpoint="clue/", data=request.model_dump())
+        return DuetClueResponse(**data)
+
+    def guess(self, request: GuessRequest) -> DuetGuessResponse:
+        data = self.post(endpoint="guess/", data=request.model_dump())
+        return DuetGuessResponse(**data)
+
+    def next_move(self, request: NextMoveRequest) -> DuetNextMoveResponse:
+        data = self.post(endpoint="next-move/", data=request.model_dump())
+        return DuetNextMoveResponse(**data)
+
+    def get_game_state(self, request: GetGameStateRequest) -> DuetGetGameStateResponse:
+        data = self.get(endpoint="state/", data=request.model_dump())
+        return DuetGetGameStateResponse(**data)
+
+
+class TheSpymasterClient(HTTPClient):
+    def __init__(self, server_host: str, retry_strategy: Retry | None = DEFAULT_RETRY_STRATEGY):
+        game_api_url = f"{server_host}/api/v1/game"
+        super().__init__(
+            base_url=game_api_url,
+            retry_strategy=retry_strategy,
+            common_errors=SERVICE_ERRORS,
+        )
+        self.classic = ClassicClient(game_api_url=game_api_url, retry_strategy=retry_strategy)
+        self.duet = DuetClient(game_api_url=game_api_url, retry_strategy=retry_strategy)
+
     def load_models(self, request: LoadModelsRequest) -> LoadModelsResponse:
-        data: dict = self.post(endpoint="load-models/", data=request.model_dump())  # type: ignore
+        data = self.post(endpoint="load-models/", data=request.model_dump())
         return LoadModelsResponse(**data)
 
     def raise_error(self, request: dict):
