@@ -62,9 +62,9 @@ def endpoint(
     str_methods = [m.value for m in methods]
 
     def decorator(f):  # pylint: disable=invalid-name
-        endpoint_name = f.__name__
+        endpoint_name = f.__qualname__
         request_model, response_model = _get_request_response_models(f)  # pylint: disable=unused-variable
-        log.debug(f"Registering endpoint {endpoint_name}")
+        log.debug(f"Registering endpoint [{endpoint_name}]")
 
         @functools.wraps(f)
         def wrapper(view, request: Request, *args, **kwargs):  # pylint: disable=unused-argument
