@@ -5,5 +5,5 @@ from the_spymaster_api.structs import BaseRequest
 class MiniStartGameRequest(BaseRequest):
     language: SupportedLanguage = SupportedLanguage.ENGLISH
     total_points: int = 8
-    timer_tokens: int = 5
+    timer_tokens: int = 6
     allowed_mistakes: int = 4
