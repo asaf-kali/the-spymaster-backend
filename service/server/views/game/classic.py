@@ -20,7 +20,7 @@ from the_spymaster_api.structs.classic.responses import (
 from the_spymaster_util.logger import get_logger
 
 from server.logic.db import load_game, save_game
-from server.logic.next_move import NextMoveHandler
+from server.logic.next_move_classic import ClassicNextMoveHandler
 from server.models.game import ClassicGame
 from server.views.endpoint import HttpMethod, endpoint
 from server.views.game.base import ulid_lower
@@ -72,8 +72,11 @@ class ClassicGameView(GenericViewSet):
     def next_move(self, request: NextMoveRequest) -> ClassicNextMoveResponse:
         game = load_game(request.game_id, game_type=ClassicGame)
         game_state = game.state
-        handler = NextMoveHandler(
-            game_id=game.id, game_state=game_state, solver=request.solver, model_identifier=request.model_identifier
+        handler = ClassicNextMoveHandler(
+            game_id=game.id,
+            game_state=game_state,
+            solver=request.solver,
+            model_identifier=request.model_identifier,
         )
         response = handler.handle()
         game.state_data = handler.game_state.model_dump()

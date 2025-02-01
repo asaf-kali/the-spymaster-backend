@@ -1,31 +1,29 @@
 from codenames.classic.state import ClassicGameState
 from codenames.classic.types import ClassicGivenClue, ClassicGivenGuess
-from pydantic import BaseModel
-from the_spymaster_solvers_api.structs import APIModelIdentifier, Solver
+from the_spymaster_api.structs.abstract.responses import (
+    ClueResponse,
+    GetGameStateResponse,
+    GuessResponse,
+    NextMoveResponse,
+    StartGameResponse,
+)
 
 
-class ClassicStartGameResponse(BaseModel):
-    game_id: str
-    game_state: ClassicGameState
+class ClassicStartGameResponse(StartGameResponse[ClassicGameState]):
+    pass
 
 
-class ClassicGetGameStateResponse(BaseModel):
-    game_state: ClassicGameState
+class ClassicGetGameStateResponse(GetGameStateResponse[ClassicGameState]):
+    pass
 
 
-class ClassicClueResponse(BaseModel):
-    given_clue: ClassicGivenClue | None
-    game_state: ClassicGameState
+class ClassicClueResponse(ClueResponse[ClassicGameState, ClassicGivenClue]):
+    pass
 
 
-class ClassicGuessResponse(BaseModel):
-    given_guess: ClassicGivenGuess | None
-    game_state: ClassicGameState
+class ClassicGuessResponse(GuessResponse[ClassicGameState, ClassicGivenGuess]):
+    pass
 
 
-class ClassicNextMoveResponse(BaseModel):
-    game_state: ClassicGameState
-    used_solver: Solver
-    given_clue: ClassicGivenClue | None = None
-    given_guess: ClassicGivenGuess | None = None
-    used_model_identifier: APIModelIdentifier | None = None
+class ClassicNextMoveResponse(NextMoveResponse[ClassicGameState, ClassicGivenClue, ClassicGivenGuess]):
+    pass
