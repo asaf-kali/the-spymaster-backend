@@ -1,31 +1,29 @@
 from codenames.duet.state import DuetGameState
 from codenames.duet.types import DuetGivenClue, DuetGivenGuess
-from pydantic import BaseModel
-from the_spymaster_solvers_api.structs import APIModelIdentifier, Solver
+from the_spymaster_api.structs.abstract.responses import (
+    ClueResponse,
+    GetGameStateResponse,
+    GuessResponse,
+    NextMoveResponse,
+    StartGameResponse,
+)
 
 
-class DuetStartGameResponse(BaseModel):
-    game_id: str
-    game_state: DuetGameState
+class DuetStartGameResponse(StartGameResponse[DuetGameState]):
+    pass
 
 
-class DuetGetGameStateResponse(BaseModel):
-    game_state: DuetGameState
+class DuetGetGameStateResponse(GetGameStateResponse[DuetGameState]):
+    pass
 
 
-class DuetClueResponse(BaseModel):
-    given_clue: DuetGivenClue | None
-    game_state: DuetGameState
+class DuetClueResponse(ClueResponse[DuetGameState, DuetGivenClue]):
+    pass
 
 
-class DuetGuessResponse(BaseModel):
-    given_guess: DuetGivenGuess | None
-    game_state: DuetGameState
+class DuetGuessResponse(GuessResponse[DuetGameState, DuetGivenGuess]):
+    pass
 
 
-class DuetNextMoveResponse(BaseModel):
-    game_state: DuetGameState
-    used_solver: Solver
-    given_clue: DuetGivenClue | None = None
-    given_guess: DuetGivenGuess | None = None
-    used_model_identifier: APIModelIdentifier | None = None
+class DuetNextMoveResponse(NextMoveResponse[DuetGameState, DuetGivenClue, DuetGivenGuess]):
+    pass

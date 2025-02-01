@@ -35,7 +35,7 @@ class GameItem(Model):
         return super().get(*args, hash_key=hash_key, **kwargs)  # type: ignore
 
 
-def get_or_create[T: Game](game_id: str, game_type: type[T]) -> T:
+def load_game[T: Game](game_id: str, game_type: type[T]) -> T:
     try:
         game_item = GameItem.load(game_id=game_id)
     except PynamoDoesNotExist as e:  # pylint: disable=invalid-name

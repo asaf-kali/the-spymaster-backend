@@ -50,6 +50,7 @@ module "app_archive" {
     ".coverage",
     "**/__pycache__/**",
     "**/.pytest_cache/**",
+    "**/*.sqlite3",
   ]
 }
 

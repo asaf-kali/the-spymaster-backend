@@ -22,7 +22,7 @@ from the_spymaster_api.structs.duet.responses import (
 from the_spymaster_util.http.errors import BadRequestError
 from the_spymaster_util.logger import get_logger
 
-from server.logic.db import get_or_create, save_game
+from server.logic.db import load_game, save_game
 from server.models.game import DuetGame
 from server.views.endpoint import HttpMethod, endpoint
 from server.views.game.base import ulid_lower
@@ -41,12 +41,12 @@ class DuetGameView(GenericViewSet):
         game_state.allowed_mistakes = request.allowed_mistakes
         game = DuetGame(id=ulid_lower(), state_data=game_state.model_dump())
         save_game(game)
-        log.info(f"Starting game: {game.id}")
+        log.info(f"Starting duet game: {game.id}")
         return DuetStartGameResponse(game_id=game.id, game_state=game_state)
 
     @endpoint
     def clue(self, request: ClueRequest) -> DuetClueResponse:
-        game = get_or_create(request.game_id, game_type=DuetGame)
+        game = load_game(request.game_id, game_type=DuetGame)
         game_state = game.state
         log.debug(f"Processing clue for game [{game.id}]: [{request.word}]")
         for_words = tuple(request.for_words) if request.for_words else None
@@ -58,7 +58,7 @@ class DuetGameView(GenericViewSet):
 
     @endpoint
     def guess(self, request: GuessRequest) -> DuetGuessResponse:
-        game = get_or_create(request.game_id, game_type=DuetGame)
+        game = load_game(request.game_id, game_type=DuetGame)
         game_state = game.state
         log.debug(f"Processing guess for game [{game.id}]: [{request.card_index}]")
         guess = Guess(card_index=request.card_index)
@@ -69,7 +69,7 @@ class DuetGameView(GenericViewSet):
 
     @endpoint(methods=[HttpMethod.GET], url_path="state")
     def get_game_state(self, request: GetGameStateRequest) -> DuetGetGameStateResponse:
-        game = get_or_create(request.game_id, game_type=DuetGame)
+        game = load_game(request.game_id, game_type=DuetGame)
         return DuetGetGameStateResponse(game_state=game.state)
 
     @endpoint(url_path="next-move")
