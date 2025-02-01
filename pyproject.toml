@@ -44,16 +44,16 @@ freezegun = "^1.2"
 moto = "^4.0"
 
 [tool.poetry.group.lint.dependencies]
-ruff = "^0.7"
-black = "^24.3"
-isort = "^5.11"
-mypy = "^1.13"
-pylint = "^3.3"
-types-requests = "^2.28.11.8"
+ruff = ">=0.7"
+black = ">=24.3"
+isort = ">=5.11"
+mypy = ">=1.13"
+pylint = ">=3.3"
+types-requests = ">=2.28.11.8"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^2.17"
-twine = "^5.0"
+pre-commit = ">=2.17"
+twine = ">=5.0"
 
 [build-system]
 requires = ["poetry-core"]
